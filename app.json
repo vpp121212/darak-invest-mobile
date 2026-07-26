@@ -15,21 +15,10 @@
       "bundleIdentifier": "com.darak.wahayk"
     },
     "android": {
-      "package": "com.darak.wahayk",
-      "adaptiveIcon": {
-        "backgroundColor": "#020617"
-      }
+      "package": "com.darak.wahayk"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      [
-        "expo-web-browser",
-        {
-          "showsGoBackButton": true
-        }
-      ]
-    ]
+    }
   }
 }
