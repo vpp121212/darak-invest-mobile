@@ -1,24 +1,35 @@
 {
   "expo": {
-    "name": "darak-app",
-    "slug": "darak-app",
+    "name": "دارك وحيك",
+    "slug": "darak-wa-hayk",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#020617",
+      "resizeMode": "contain"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.darak.wahayk"
     },
     "android": {
+      "package": "com.darak.wahayk",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#020617"
       }
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-web-browser",
+        {
+          "showsGoBackButton": true
+        }
+      ]
+    ]
   }
 }
