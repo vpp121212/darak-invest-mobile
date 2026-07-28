@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: darak-invest-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node scripts/seed.js && node src/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "5000"
+      - key: MAPBOX_TOKEN
+        value: pk.eyJ1IjoidnBwLTY2IiwiYSI6ImNtcndoZW5hdzA2MGYzM3IzbTA4cW1yNnAifQ.bP-Z7H9Wn6WkgF2fXYITQw
+      - key: JWT_SECRET
+        generateValue: true
