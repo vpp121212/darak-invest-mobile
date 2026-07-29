@@ -160,7 +160,7 @@ await sql.unsafe(`SET client_min_messages = WARNING;
   CREATE TABLE IF NOT EXISTS neighbourhood_pulse (
     id SERIAL PRIMARY KEY,
     city TEXT NOT NULL,
-    district TEXT NOT NULL UNIQUE,
+    district TEXT NOT NULL,
     avg_rent REAL,
     avg_sale REAL,
     roi REAL,
@@ -173,6 +173,8 @@ await sql.unsafe(`SET client_min_messages = WARNING;
     data_source TEXT,
     "updatedAt" TEXT DEFAULT (NOW())
   );
+  ALTER TABLE neighbourhood_pulse DROP CONSTRAINT IF EXISTS neighbourhood_pulse_district_key;
+  ALTER TABLE neighbourhood_pulse ADD UNIQUE (city, district);
 
   DELETE FROM neighbourhood_pulse WHERE city = 'الرياض';
   INSERT INTO neighbourhood_pulse (city, district, avg_rent, avg_sale, roi, metro_stations, nearby_projects, sports_boulevard, walk_score, green_spaces, future_value_growth, data_source) VALUES
@@ -302,7 +304,7 @@ await sql.unsafe(`SET client_min_messages = WARNING;
     ('الباحة', 'بني كبير', 12000, 800000, 3.5, '[]', '[]', false, 20, '[{"name":"الغابات","distance":"20 دقيقة"}]', 3, 'تحليل السوق 2024-2026'),
     ('الباحة', 'جرب', 15000, 650000, 4.8, '[]', '[]', false, 30, '[]', 4, 'تحليل السوق 2024-2026'),
     ('الباحة', 'قرن ظبي', 12000, 500000, 5.0, '[]', '[]', false, 25, '[]', 3, 'تحليل السوق 2024-2026')
-  ON CONFLICT (district) DO NOTHING;
+  ON CONFLICT (city, district) DO NOTHING;
 `);
 
 export default sql;
