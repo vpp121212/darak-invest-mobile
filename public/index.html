@@ -564,7 +564,7 @@
   <div class="logino" id="login"><div class="login-box" style="position:relative"><div class="login-close" onclick="closeLogin()">✕</div><div class="login-logo">د</div><div class="login-title">دارك وحيك</div><div class="login-sub">سجّل دخولك للوصول إلى عقاراتك وإعداداتك</div>
     <div class="login-tabs"><button class="login-tab on" onclick="switchLoginTab(this,'login-form')">تسجيل الدخول</button><button class="login-tab" onclick="switchLoginTab(this,'register-form')">حساب جديد</button></div>
     <div class="login-form" id="login-form"><div class="login-field"><input type="email" id="login-email" placeholder="البريد الإلكتروني"></div><div class="login-field"><input type="password" id="login-pass" placeholder="كلمة المرور"></div><button class="login-btn" onclick="doLogin()">تسجيل الدخول</button></div>
-    <div class="login-form" id="register-form" style="display:none"><div class="login-field"><input type="text" id="reg-name" placeholder="الاسم الكامل"></div><div class="login-field"><input type="email" id="reg-email" placeholder="البريد الإلكتروني"></div><div class="login-field"><input type="tel" id="reg-phone" placeholder="رقم الجوال"></div><div class="login-field"><input type="password" id="reg-pass" placeholder="كلمة المرور"></div><button class="login-btn" onclick="doRegister()">إنشاء حساب</button></div>
+    <div class="login-form" id="register-form" style="display:none"><div class="login-field"><input type="text" id="reg-name" placeholder="الاسم الكامل"></div><div class="login-field"><input type="email" id="reg-email" placeholder="البريد الإلكتروني"></div><div class="login-field"><input type="tel" id="reg-phone" placeholder="رقم الجوال"></div><div class="login-field"><input type="password" id="reg-pass" placeholder="كلمة المرور"></div><label class="agree" style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--m);text-align:right;cursor:pointer;margin-top:4px"><input type="checkbox" id="reg-agree" style="width:16px;height:16px;accent-color:var(--g);flex-shrink:0">أوافق على <a href="#" onclick="nav('legal');closeLogin();return false" style="color:var(--g);text-decoration:underline">الصفحة القانونية</a> وشروط الخدمة</label><button class="login-btn" onclick="doRegister()">إنشاء حساب</button></div>
   </div></div>
 
   <!-- AI PRICE OVERLAY -->
@@ -1293,6 +1293,7 @@ async function doRegister(){
   var ph=document.getElementById('reg-phone')?document.getElementById('reg-phone').value:'';
   var pw=document.getElementById('reg-pass')?document.getElementById('reg-pass').value:'';
   if(!nm||!em||!ph||!pw){toast('أكمل جميع الحقول');return}
+  if(!document.getElementById('reg-agree').checked){toast('يجب الموافقة على الشروط القانونية');return}
   var d=await api('/auth/register',{method:'POST',body:JSON.stringify({name:nm,email:em,phone:ph,password:pw})});
   if(d&&d.success){
     authToken=d.accessToken;localStorage.setItem('darak_token',d.accessToken);
