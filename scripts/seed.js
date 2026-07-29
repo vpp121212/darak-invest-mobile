@@ -1,3 +1,5 @@
+import '../src/config/database.js';
+
 import Database from 'better-sqlite3';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
