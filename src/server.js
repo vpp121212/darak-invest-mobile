@@ -17,6 +17,7 @@ import { securityMiddleware } from './middleware/security.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import propertyRoutes from './routes/properties.js';
 import authRoutes from './routes/auth.js';
+import signupRoute from './routes/signup.js';
 import userRoutes from './routes/users.js';
 import agentRoutes from './routes/agents.js';
 import searchRoutes from './routes/search.js';
@@ -77,6 +78,7 @@ app.use(express.static(join(__dirname, '..', 'public')));
 
 app.set('io', io);
 
+app.use('/api/auth', signupRoute);
 app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/users', userRoutes);
