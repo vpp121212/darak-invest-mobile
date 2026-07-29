@@ -80,7 +80,7 @@
 .bn{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;justify-content:space-around;align-items:center;padding:10px 16px 20px;background:rgba(8,9,14,.98);border-top:1px solid var(--b);z-index:100;backdrop-filter:blur(20px)}.bi{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--m);cursor:pointer;padding:4px 8px;border-radius:var(--r);position:relative}.bi.on{color:var(--g)}.bii{width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--g)}.bi.on .bii{border-color:rgba(212,175,55,.65);box-shadow:0 0 14px rgba(212,175,55,.45)}
 
 /* Pages */
-.pg{display:none;padding-bottom:80px}.pg.on{display:block}
+.pg{display:none;padding-bottom:80px}.pg.on{display:block}#pg-map.pg{padding-bottom:0}#pg-map.pg.on{display:block}#mapSidebar::-webkit-scrollbar{width:4px}#mapSidebar::-webkit-scrollbar-track{background:transparent}#mapSidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}#mapSidebar .biz-item{cursor:pointer}#mapSidebar .biz-item:active{opacity:.8}
 
 /* Filter chips */
 .fb{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px}.fb::-webkit-scrollbar{display:none}.fch{padding:6px 14px;border-radius:999px;background:rgba(18,20,30,.7);border:1px solid rgba(255,255,255,.08);font-size:12px;color:var(--m);cursor:pointer;white-space:nowrap;font-family:inherit}.fch.on{background:rgba(212,175,55,.15);border-color:rgba(212,175,55,.5);color:var(--g)}
@@ -405,15 +405,60 @@
     </div>
   </div>
 
-  <!-- MAP PAGE -->
-  <div class="pg" id="pg-map">
-    <div style="position:relative;height:calc(100vh - 140px)">
+  <!-- MAP PAGE 3D -->
+  <div class="pg" id="pg-map" style="padding:0">
+    <div id="map3dContainer" style="position:relative;width:100%;height:100vh">
+      <div id="map3dView" style="width:100%;height:100%"></div>
+
+      <!-- Search -->
       <div style="position:absolute;top:100px;left:12px;right:12px;z-index:10;display:flex;gap:8px">
         <input id="mapSearchInput" type="text" placeholder="🔍 ابحث عن منطقة، حي، أو شارع..." style="flex:1;padding:12px 16px;border-radius:14px;background:rgba(14,16,24,.95);border:1px solid rgba(212,175,55,.3);color:var(--t);font-size:13px;font-family:'Cairo',sans-serif;outline:none;direction:rtl;backdrop-filter:blur(12px)" oninput="mapSearchDebounced()" onkeydown="if(event.key==='Enter')mapSearchNow()">
         <div id="mapSearchResults" style="position:absolute;top:48px;left:0;right:0;background:rgba(14,16,24,.98);border:1px solid rgba(212,175,55,.2);border-radius:12px;display:none;max-height:200px;overflow-y:auto;z-index:20;backdrop-filter:blur(12px)"></div>
         <button onclick="mapLocateMe()" style="width:46px;height:46px;border-radius:14px;background:rgba(14,16,24,.95);border:1px solid rgba(212,175,55,.3);color:var(--g);font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)" title="موقعك الحالي">📍</button>
       </div>
-      <div id="mapView" style="width:100%;height:100%"></div>
+
+      <!-- Filters -->
+      <div id="mapFilters" style="position:absolute;top:170px;left:12px;z-index:10;display:flex;gap:6px;flex-wrap:wrap">
+        <select id="mapTypeFilter" onchange="mapFilterChanged()" style="padding:8px 12px;border-radius:10px;background:rgba(14,16,24,.95);border:1px solid rgba(212,175,55,.3);color:var(--t);font-size:11px;font-family:'Cairo',sans-serif;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer">
+          <option value="">الكل</option>
+          <option value="شقة">شقة</option>
+          <option value="فيلا">فيلا</option>
+          <option value="أرض">أرض</option>
+          <option value="بنتهاوس">بنتهاوس</option>
+          <option value="قصر">قصر</option>
+          <option value="مكتب">مكتب</option>
+        </select>
+        <select id="mapPurposeFilter" onchange="mapFilterChanged()" style="padding:8px 12px;border-radius:10px;background:rgba(14,16,24,.95);border:1px solid rgba(212,175,55,.3);color:var(--t);font-size:11px;font-family:'Cairo',sans-serif;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer">
+          <option value="">بيع/إيجار</option>
+          <option value="بيع">بيع</option>
+          <option value="إيجار">إيجار</option>
+        </select>
+        <select id="mapPriceFilter" onchange="mapFilterChanged()" style="padding:8px 12px;border-radius:10px;background:rgba(14,16,24,.95);border:1px solid rgba(212,175,55,.3);color:var(--t);font-size:11px;font-family:'Cairo',sans-serif;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer">
+          <option value="">أي سعر</option>
+          <option value="0-500000">أقل من 500 ألف</option>
+          <option value="500000-1500000">500 ألف - 1.5 مليون</option>
+          <option value="1500000-3000000">1.5 - 3 مليون</option>
+          <option value="3000000-99999999">أكثر من 3 مليون</option>
+        </select>
+      </div>
+
+      <!-- Selected area badge -->
+      <div id="mapSelectedArea" style="position:absolute;top:235px;left:12px;z-index:10;display:none;padding:6px 14px;border-radius:999px;background:rgba(212,175,55,.2);border:1px solid rgba(212,175,55,.5);color:var(--g);font-size:12px;font-weight:600;font-family:'Cairo',sans-serif;backdrop-filter:blur(10px)">
+        📍 <span id="mapSelectedAreaName"></span>
+        <span onclick="clearSelectedArea()" style="margin-right:8px;cursor:pointer;opacity:.6">✕</span>
+      </div>
+
+      <!-- Sidebar -->
+      <div id="mapSidebar" style="position:absolute;left:0;top:0;width:300px;height:100vh;overflow-y:auto;background:rgba(14,16,24,.97);border-left:1px solid rgba(255,255,255,.06);z-index:10;padding:10px;backdrop-filter:blur(16px);display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-size:14px;font-weight:700;color:var(--g)" id="mapSidebarTitle">🏠 العقارات</div>
+          <button onclick="toggleSidebar()" style="background:none;border:none;color:var(--m);font-size:18px;cursor:pointer">✕</button>
+        </div>
+        <div id="mapSidebarList"></div>
+      </div>
+
+      <!-- Toggle sidebar button -->
+      <button id="mapSidebarToggle" onclick="toggleSidebar()" style="position:absolute;bottom:120px;right:12px;z-index:10;width:42px;height:42px;border-radius:50%;background:rgba(14,16,24,.95);border:1px solid rgba(212,175,55,.3);color:var(--g);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px)" title="القائمة الجانبية">📋</button>
     </div>
   </div>
 
@@ -1171,7 +1216,7 @@ function nav(page){
   document.getElementById('pg-'+page).classList.add('on');
   var nb=document.getElementById('nav-'+page);
   if(nb)nb.classList.add('on');
-  if(page==='map')initMapPage();
+  if(page==='map'){initMapPage();setTimeout(initMap3d,300)}
   if(page==='add')setTimeout(fetchDistricts,100);
   if(page==='pulse')loadPulseData();
 }
@@ -1607,7 +1652,7 @@ function initMapPage(){
   if(mapInstance)return;
   ensureToken().then(function(ok){
     if(!ok)return;
-    mapInstance=createMap({container:'mapView'});
+    if(document.getElementById('mapView'))mapInstance=createMap({container:'mapView'});
   });
 }
 function openMap(){
@@ -1780,6 +1825,215 @@ function mapFullLocateMe(){
   },function(){toast('تعذر تحديد الموقع — تأكد من الأذن')},{enableHighAccuracy:true,timeout:8000});
 }
 
+/* 3D MAP + NEIGHBORHOODS + FILTERS + SIDEBAR */
+var map3dInstance2=null,map3dMarkers2=[],map3dSelectedArea='',map3dSidebarOpen=false,map3dNeighborhoodSource='riyadh-neighborhoods';
+
+function clearSelectedArea(){map3dSelectedArea='';document.getElementById('mapSelectedArea').style.display='none';loadMapAds()}
+function toggleSidebar(){map3dSidebarOpen=!map3dSidebarOpen;document.getElementById('mapSidebar').style.display=map3dSidebarOpen?'block':'none'}
+function mapFilterChanged(){loadMapAds()}
+
+var map3dNeighborhoods={
+  type:'FeatureCollection',
+  features:[
+    /* NORTH */
+    {type:'Feature',properties:{name:'النرجس',dir:'شمال',color:'#4ade80'},geometry:{type:'Polygon',coordinates:[[[46.700,24.900],[46.720,24.905],[46.725,24.890],[46.705,24.885],[46.700,24.900]]]}},
+    {type:'Feature',properties:{name:'الفلاح',dir:'شمال',color:'#4ade80'},geometry:{type:'Polygon',coordinates:[[[46.680,24.895],[46.700,24.900],[46.705,24.885],[46.685,24.880],[46.680,24.895]]]}},
+    {type:'Feature',properties:{name:'الربيع',dir:'شمال',color:'#4ade80'},geometry:{type:'Polygon',coordinates:[[[46.660,24.890],[46.680,24.895],[46.685,24.880],[46.665,24.875],[46.660,24.890]]]}},
+    {type:'Feature',properties:{name:'الياسمين',dir:'شمال',color:'#4ade80'},geometry:{type:'Polygon',coordinates:[[[46.720,24.880],[46.735,24.885],[46.740,24.870],[46.725,24.865],[46.720,24.880]]]}},
+    {type:'Feature',properties:{name:'الوادي',dir:'شمال',color:'#4ade80'},geometry:{type:'Polygon',coordinates:[[[46.740,24.895],[46.755,24.900],[46.760,24.885],[46.745,24.880],[46.740,24.895]]]}},
+    {type:'Feature',properties:{name:'الغدير',dir:'شمال',color:'#4ade80'},geometry:{type:'Polygon',coordinates:[[[46.755,24.880],[46.770,24.885],[46.775,24.870],[46.760,24.865],[46.755,24.880]]]}},
+    {type:'Feature',properties:{name:'حطين',dir:'شمال',color:'#4ade80'},geometry:{type:'Polygon',coordinates:[[[46.680,24.870],[46.695,24.875],[46.700,24.860],[46.685,24.855],[46.680,24.870]]]}},
+    {type:'Feature',properties:{name:'النفل',dir:'شمال',color:'#4ade80'},geometry:{type:'Polygon',coordinates:[[[46.695,24.875],[46.710,24.880],[46.715,24.865],[46.700,24.860],[46.695,24.875]]]}},
+    {type:'Feature',properties:{name:'الملقا',dir:'شمال',color:'#4ade80'},geometry:{type:'Polygon',coordinates:[[[46.650,24.875],[46.665,24.880],[46.670,24.865],[46.655,24.860],[46.650,24.875]]]}},
+    {type:'Feature',properties:{name:'العارض',dir:'شمال',color:'#4ade80'},geometry:{type:'Polygon',coordinates:[[[46.665,24.860],[46.680,24.865],[46.685,24.850],[46.670,24.845],[46.665,24.860]]]}},
+    {type:'Feature',properties:{name:'الصحافة',dir:'شمال',color:'#4ade80'},geometry:{type:'Polygon',coordinates:[[[46.640,24.860],[46.655,24.865],[46.660,24.850],[46.645,24.845],[46.640,24.860]]]}},
+    {type:'Feature',properties:{name:'القيروان',dir:'شمال',color:'#4ade80'},geometry:{type:'Polygon',coordinates:[[[46.710,24.865],[46.725,24.870],[46.730,24.855],[46.715,24.850],[46.710,24.865]]]}},
+    {type:'Feature',properties:{name:'الندى',dir:'شمال',color:'#4ade80'},geometry:{type:'Polygon',coordinates:[[[46.725,24.870],[46.740,24.875],[46.745,24.860],[46.730,24.855],[46.725,24.870]]]}},
+    {type:'Feature',properties:{name:'العقيق',dir:'شمال',color:'#4ade80'},geometry:{type:'Polygon',coordinates:[[[46.745,24.865],[46.760,24.870],[46.765,24.855],[46.750,24.850],[46.745,24.865]]]}},
+    {type:'Feature',properties:{name:'الخير',dir:'شمال',color:'#4ade80'},geometry:{type:'Polygon',coordinates:[[[46.620,24.870],[46.635,24.875],[46.640,24.860],[46.625,24.855],[46.620,24.870]]]}},
+    {type:'Feature',properties:{name:'جامعة الامام',dir:'شمال',color:'#4ade80'},geometry:{type:'Polygon',coordinates:[[[46.690,24.840],[46.710,24.845],[46.715,24.830],[46.695,24.825],[46.690,24.840]]]}},
+    {type:'Feature',properties:{name:'بنيان',dir:'شمال',color:'#4ade80'},geometry:{type:'Polygon',coordinates:[[[46.635,24.845],[46.650,24.850],[46.655,24.835],[46.640,24.830],[46.635,24.845]]]}},
+    /* SOUTH */
+    {type:'Feature',properties:{name:'الشفاء',dir:'جنوب',color:'#60a5fa'},geometry:{type:'Polygon',coordinates:[[[46.710,24.600],[46.730,24.605],[46.735,24.585],[46.715,24.580],[46.710,24.600]]]}},
+    {type:'Feature',properties:{name:'بدر',dir:'جنوب',color:'#60a5fa'},geometry:{type:'Polygon',coordinates:[[[46.690,24.600],[46.710,24.605],[46.715,24.585],[46.695,24.580],[46.690,24.600]]]}},
+    {type:'Feature',properties:{name:'العزيزية',dir:'جنوب',color:'#60a5fa'},geometry:{type:'Polygon',coordinates:[[[46.730,24.585],[46.750,24.590],[46.755,24.570],[46.735,24.565],[46.730,24.585]]]}},
+    {type:'Feature',properties:{name:'الدار البيضاء',dir:'جنوب',color:'#60a5fa'},geometry:{type:'Polygon',coordinates:[[[46.710,24.575],[46.730,24.580],[46.735,24.560],[46.715,24.555],[46.710,24.575]]]}},
+    {type:'Feature',properties:{name:'المنصورة',dir:'جنوب',color:'#60a5fa'},geometry:{type:'Polygon',coordinates:[[[46.690,24.575],[46.710,24.580],[46.715,24.560],[46.695,24.555],[46.690,24.575]]]}},
+    {type:'Feature',properties:{name:'نمار',dir:'جنوب',color:'#60a5fa'},geometry:{type:'Polygon',coordinates:[[[46.670,24.575],[46.690,24.580],[46.695,24.560],[46.675,24.555],[46.670,24.575]]]}},
+    {type:'Feature',properties:{name:'شبرا',dir:'جنوب',color:'#60a5fa'},geometry:{type:'Polygon',coordinates:[[[46.710,24.555],[46.725,24.560],[46.730,24.545],[46.715,24.540],[46.710,24.555]]]}},
+    {type:'Feature',properties:{name:'اليمامة',dir:'جنوب',color:'#60a5fa'},geometry:{type:'Polygon',coordinates:[[[46.690,24.555],[46.710,24.560],[46.715,24.545],[46.695,24.540],[46.690,24.555]]]}},
+    {type:'Feature',properties:{name:'الحاير',dir:'جنوب',color:'#60a5fa'},geometry:{type:'Polygon',coordinates:[[[46.650,24.545],[46.670,24.550],[46.675,24.530],[46.655,24.525],[46.650,24.545]]]}},
+    {type:'Feature',properties:{name:'الشعلان',dir:'جنوب',color:'#60a5fa'},geometry:{type:'Polygon',coordinates:[[[46.730,24.545],[46.745,24.550],[46.750,24.535],[46.735,24.530],[46.730,24.545]]]}},
+    {type:'Feature',properties:{name:'الدريهمية',dir:'جنوب',color:'#60a5fa'},geometry:{type:'Polygon',coordinates:[[[46.670,24.555],[46.690,24.560],[46.695,24.545],[46.675,24.540],[46.670,24.555]]]}},
+    {type:'Feature',properties:{name:'المروة',dir:'جنوب',color:'#60a5fa'},geometry:{type:'Polygon',coordinates:[[[46.670,24.595],[46.690,24.600],[46.695,24.585],[46.675,24.580],[46.670,24.595]]]}},
+    {type:'Feature',properties:{name:'الفواز',dir:'جنوب',color:'#60a5fa'},geometry:{type:'Polygon',coordinates:[[[46.650,24.590],[46.670,24.595],[46.675,24.580],[46.655,24.575],[46.650,24.590]]]}},
+    {type:'Feature',properties:{name:'الحزم',dir:'جنوب',color:'#60a5fa'},geometry:{type:'Polygon',coordinates:[[[46.650,24.575],[46.670,24.580],[46.675,24.565],[46.655,24.560],[46.650,24.575]]]}},
+    {type:'Feature',properties:{name:'المصانع',dir:'جنوب',color:'#60a5fa'},geometry:{type:'Polygon',coordinates:[[[46.730,24.565],[46.750,24.570],[46.755,24.555],[46.735,24.550],[46.730,24.565]]]}},
+    {type:'Feature',properties:{name:'بن تركي',dir:'جنوب',color:'#60a5fa'},geometry:{type:'Polygon',coordinates:[[[46.710,24.540],[46.725,24.545],[46.730,24.530],[46.715,24.525],[46.710,24.540]]]}},
+    {type:'Feature',properties:{name:'الشميسي',dir:'جنوب',color:'#60a5fa'},geometry:{type:'Polygon',coordinates:[[[46.690,24.540],[46.710,24.545],[46.715,24.530],[46.695,24.525],[46.690,24.540]]]}},
+    /* EAST */
+    {type:'Feature',properties:{name:'اليرموك',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.740,24.710],[46.755,24.715],[46.760,24.700],[46.745,24.695],[46.740,24.710]]]}},
+    {type:'Feature',properties:{name:'النسيم الشرقي',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.770,24.700],[46.790,24.705],[46.795,24.685],[46.775,24.680],[46.770,24.700]]]}},
+    {type:'Feature',properties:{name:'النسيم الغربي',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.750,24.700],[46.770,24.705],[46.775,24.685],[46.755,24.680],[46.750,24.700]]]}},
+    {type:'Feature',properties:{name:'النهضة',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.790,24.705],[46.810,24.710],[46.815,24.690],[46.795,24.685],[46.790,24.705]]]}},
+    {type:'Feature',properties:{name:'غرناطة',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.735,24.695],[46.750,24.700],[46.755,24.685],[46.740,24.680],[46.735,24.695]]]}},
+    {type:'Feature',properties:{name:'السلي',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.755,24.685],[46.770,24.690],[46.775,24.675],[46.760,24.670],[46.755,24.685]]]}},
+    {type:'Feature',properties:{name:'اشبيليا',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.770,24.675],[46.785,24.680],[46.790,24.665],[46.775,24.660],[46.770,24.675]]]}},
+    {type:'Feature',properties:{name:'الروضة',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.750,24.670],[46.765,24.675],[46.770,24.660],[46.755,24.655],[46.750,24.670]]]}},
+    {type:'Feature',properties:{name:'الريان',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.765,24.660],[46.780,24.665],[46.785,24.650],[46.770,24.645],[46.765,24.660]]]}},
+    {type:'Feature',properties:{name:'قرطبة',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.735,24.680],[46.750,24.685],[46.755,24.670],[46.740,24.665],[46.735,24.680]]]}},
+    {type:'Feature',properties:{name:'السلام',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.790,24.680],[46.805,24.685],[46.810,24.670],[46.795,24.665],[46.790,24.680]]]}},
+    {type:'Feature',properties:{name:'المونسية',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.785,24.690],[46.800,24.695],[46.805,24.680],[46.790,24.675],[46.785,24.690]]]}},
+    {type:'Feature',properties:{name:'الرمال',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.805,24.690],[46.820,24.695],[46.825,24.680],[46.810,24.675],[46.805,24.690]]]}},
+    {type:'Feature',properties:{name:'الفيحاء',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.770,24.690],[46.785,24.695],[46.790,24.680],[46.775,24.675],[46.770,24.690]]]}},
+    {type:'Feature',properties:{name:'الخليج',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.755,24.695],[46.770,24.700],[46.775,24.685],[46.760,24.680],[46.755,24.695]]]}},
+    {type:'Feature',properties:{name:'النظيم',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.790,24.710],[46.805,24.715],[46.810,24.700],[46.795,24.695],[46.790,24.710]]]}},
+    {type:'Feature',properties:{name:'الروابي',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.785,24.665],[46.800,24.670],[46.805,24.655],[46.790,24.650],[46.785,24.665]]]}},
+    {type:'Feature',properties:{name:'الشهداء',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.750,24.710],[46.765,24.715],[46.770,24.700],[46.755,24.695],[46.750,24.710]]]}},
+    {type:'Feature',properties:{name:'الرواد',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.770,24.710],[46.785,24.715],[46.790,24.700],[46.775,24.695],[46.770,24.710]]]}},
+    {type:'Feature',properties:{name:'المغرزات',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.735,24.710],[46.750,24.715],[46.755,24.700],[46.740,24.695],[46.735,24.710]]]}},
+    {type:'Feature',properties:{name:'السعادة',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.755,24.675],[46.770,24.680],[46.775,24.665],[46.760,24.660],[46.755,24.675]]]}},
+    {type:'Feature',properties:{name:'الحمراء',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.740,24.700],[46.755,24.705],[46.760,24.690],[46.745,24.685],[46.740,24.700]]]}},
+    {type:'Feature',properties:{name:'الجزيرة',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.770,24.685],[46.785,24.690],[46.790,24.675],[46.775,24.670],[46.770,24.685]]]}},
+    {type:'Feature',properties:{name:'الشعلة',dir:'شرق',color:'#fbbf24'},geometry:{type:'Polygon',coordinates:[[[46.750,24.660],[46.765,24.665],[46.770,24.650],[46.755,24.645],[46.750,24.660]]]}},
+    /* WEST */
+    {type:'Feature',properties:{name:'السويدي',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.650,24.650],[46.670,24.655],[46.675,24.635],[46.655,24.630],[46.650,24.650]]]}},
+    {type:'Feature',properties:{name:'العارض',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.630,24.650],[46.650,24.655],[46.655,24.635],[46.635,24.630],[46.630,24.650]]]}},
+    {type:'Feature',properties:{name:'لبن',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.590,24.650],[46.610,24.655],[46.615,24.635],[46.595,24.630],[46.590,24.650]]]}},
+    {type:'Feature',properties:{name:'وادي لبن',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.570,24.640],[46.590,24.645],[46.595,24.625],[46.575,24.620],[46.570,24.640]]]}},
+    {type:'Feature',properties:{name:'البديعة',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.610,24.655],[46.630,24.660],[46.635,24.640],[46.615,24.635],[46.610,24.655]]]}},
+    {type:'Feature',properties:{name:'العريجاء',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.590,24.665],[46.610,24.670],[46.615,24.650],[46.595,24.645],[46.590,24.665]]]}},
+    {type:'Feature',properties:{name:'العريجاء الغربي',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.570,24.660],[46.590,24.665],[46.595,24.645],[46.575,24.640],[46.570,24.660]]]}},
+    {type:'Feature',properties:{name:'العوالي',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.630,24.670],[46.650,24.675],[46.655,24.660],[46.635,24.655],[46.630,24.670]]]}},
+    {type:'Feature',properties:{name:'طويق',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.610,24.670],[46.630,24.675],[46.635,24.660],[46.615,24.655],[46.610,24.670]]]}},
+    {type:'Feature',properties:{name:'ظهيرة لبن',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.560,24.655],[46.580,24.660],[46.585,24.640],[46.565,24.635],[46.560,24.655]]]}},
+    {type:'Feature',properties:{name:'الناصرية',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.650,24.670],[46.665,24.675],[46.670,24.660],[46.655,24.655],[46.650,24.670]]]}},
+    {type:'Feature',properties:{name:'عليشة',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.665,24.675],[46.680,24.680],[46.685,24.665],[46.670,24.660],[46.665,24.675]]]}},
+    {type:'Feature',properties:{name:'الخزامى',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.640,24.665],[46.655,24.670],[46.660,24.655],[46.645,24.650],[46.640,24.665]]]}},
+    {type:'Feature',properties:{name:'السفارات',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.655,24.690],[46.670,24.695],[46.675,24.680],[46.660,24.675],[46.655,24.690]]]}},
+    {type:'Feature',properties:{name:'المعذر',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.655,24.675],[46.670,24.680],[46.675,24.665],[46.660,24.660],[46.655,24.675]]]}},
+    {type:'Feature',properties:{name:'الشرفية',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.650,24.680],[46.665,24.685],[46.670,24.670],[46.655,24.665],[46.650,24.680]]]}},
+    {type:'Feature',properties:{name:'الهدا',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.630,24.680],[46.645,24.685],[46.650,24.670],[46.635,24.665],[46.630,24.680]]]}},
+    {type:'Feature',properties:{name:'سلطانة',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.590,24.675],[46.610,24.680],[46.615,24.665],[46.595,24.660],[46.590,24.675]]]}},
+    {type:'Feature',properties:{name:'ظهيرة البديعة',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.610,24.680],[46.630,24.685],[46.635,24.670],[46.615,24.665],[46.610,24.680]]]}},
+    /* CENTER */
+    {type:'Feature',properties:{name:'العليا',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.685,24.730],[46.700,24.735],[46.705,24.720],[46.690,24.715],[46.685,24.730]]]}},
+    {type:'Feature',properties:{name:'المربع',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.670,24.725],[46.685,24.730],[46.690,24.715],[46.675,24.710],[46.670,24.725]]]}},
+    {type:'Feature',properties:{name:'الملز',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.700,24.720],[46.715,24.725],[46.720,24.710],[46.705,24.705],[46.700,24.720]]]}},
+    {type:'Feature',properties:{name:'البطحاء',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.710,24.710],[46.725,24.715],[46.730,24.700],[46.715,24.695],[46.710,24.710]]]}},
+    {type:'Feature',properties:{name:'الديرة',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.720,24.715],[46.735,24.720],[46.740,24.705],[46.725,24.700],[46.720,24.715]]]}},
+    {type:'Feature',properties:{name:'الورود',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.685,24.745],[46.700,24.750],[46.705,24.735],[46.690,24.730],[46.685,24.745]]]}},
+    {type:'Feature',properties:{name:'المحمدية',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.700,24.745],[46.715,24.750],[46.720,24.735],[46.705,24.730],[46.700,24.745]]]}},
+    {type:'Feature',properties:{name:'النزهة',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.715,24.730],[46.730,24.735],[46.735,24.720],[46.720,24.715],[46.715,24.730]]]}},
+    {type:'Feature',properties:{name:'أم الحمام',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.675,24.710],[46.690,24.715],[46.695,24.700],[46.680,24.695],[46.675,24.710]]]}},
+    {type:'Feature',properties:{name:'المنفوحة',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.695,24.700],[46.710,24.705],[46.715,24.690],[46.700,24.685],[46.695,24.700]]]}},
+    {type:'Feature',properties:{name:'الصالحية',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.700,24.695],[46.715,24.700],[46.720,24.685],[46.705,24.680],[46.700,24.695]]]}},
+    {type:'Feature',properties:{name:'المزبلية',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.715,24.700],[46.730,24.705],[46.735,24.690],[46.720,24.685],[46.715,24.700]]]}},
+    {type:'Feature',properties:{name:'المرقب',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.685,24.715],[46.700,24.720],[46.705,24.705],[46.690,24.700],[46.685,24.715]]]}},
+    {type:'Feature',properties:{name:'الزهرة',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.665,24.705],[46.680,24.710],[46.685,24.695],[46.670,24.690],[46.665,24.705]]]}},
+    {type:'Feature',properties:{name:'أم سليم',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.675,24.695],[46.690,24.700],[46.695,24.685],[46.680,24.680],[46.675,24.695]]]}},
+    {type:'Feature',properties:{name:'الفاخرية',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.665,24.690],[46.680,24.695],[46.685,24.680],[46.670,24.675],[46.665,24.690]]]}},
+    {type:'Feature',properties:{name:'الجرادية',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.680,24.700],[46.695,24.705],[46.700,24.690],[46.685,24.685],[46.680,24.700]]]}},
+    {type:'Feature',properties:{name:'سكيرينة',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.690,24.685],[46.705,24.690],[46.710,24.675],[46.695,24.670],[46.690,24.685]]]}},
+    {type:'Feature',properties:{name:'العود',dir:'وسط',color:'#f87171'},geometry:{type:'Polygon',coordinates:[[[46.705,24.685],[46.720,24.690],[46.725,24.675],[46.710,24.670],[46.705,24.685]]]}},
+    {type:'Feature',properties:{name:'ديراب',dir:'غرب',color:'#a78bfa'},geometry:{type:'Polygon',coordinates:[[[46.550,24.630],[46.570,24.635],[46.575,24.615],[46.555,24.610],[46.550,24.630]]]}}
+  ]
+};
+
+function initMap3d(){
+  if(map3dInstance2)return;
+  ensureToken().then(function(ok){
+    if(!ok)return;
+    map3dInstance2=new mapboxgl.Map({
+      container:'map3dView',
+      style:'mapbox://styles/mapbox/streets-v12',
+      center:[46.738586,24.774265],
+      zoom:11,
+      pitch:60,
+      bearing:-17.6
+    });
+    map3dInstance2.addControl(new mapboxgl.NavigationControl(),'top-left');
+    map3dInstance2.on('load',function(){
+      try{map3dInstance2.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512});map3dInstance2.setTerrain({source:'mapbox-dem',exaggeration:1})}catch(e){}
+      try{map3dInstance2.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',type:'fill-extrusion',minzoom:15,paint:{'fill-extrusion-color':isNight()?'#2a2d35':'#c8ccd4','fill-extrusion-height':['get','height'],'fill-extrusion-base':['get','min_height'],'fill-extrusion-opacity':isNight()?0.6:0.4}})}catch(e){}
+      addNeighborhoodsLayer();
+    });
+    map3dInstance2.on('moveend',loadMapAdsByBounds);
+    map3dInstance2.on('zoom',function(){var z=map3dInstance2.getZoom();map3dInstance2.setLayoutProperty('neighborhoods-fill','visibility',z>=11?'visible':'none');map3dInstance2.setLayoutProperty('neighborhoods-outline','visibility',z>=11?'visible':'none');map3dInstance2.setLayoutProperty('neighborhoods-labels','visibility',z>=11?'visible':'none')});
+    setTimeout(loadMapAdsByBounds,1000)
+  })
+}
+function addNeighborhoodsLayer(){
+  if(map3dInstance2.getSource(map3dNeighborhoodSource))return;
+  map3dInstance2.addSource(map3dNeighborhoodSource,{type:'geojson',data:map3dNeighborhoods});
+  map3dInstance2.addLayer({id:'neighborhoods-fill',type:'fill',source:map3dNeighborhoodSource,paint:{'fill-color':['get','color'],'fill-opacity':0.2}});
+  map3dInstance2.addLayer({id:'neighborhoods-outline',type:'line',source:map3dNeighborhoodSource,paint:{'line-color':['get','color'],'line-width':1.5,'line-opacity':0.6}});
+  map3dInstance2.addLayer({id:'neighborhoods-labels',type:'symbol',source:map3dNeighborhoodSource,layout:{'text-field':['get','name'],'text-font':['Cairo Regular'],'text-size':10,'text-offset':[0,-0.5]},paint:{'text-color':'#fff','text-halo-color':'rgba(0,0,0,.8)','text-halo-width':1}});
+  map3dInstance2.on('click','neighborhoods-fill',function(e){var f=e.features[0];if(f){selectMapArea(f.properties.name)}});
+  map3dInstance2.on('mouseenter','neighborhoods-fill',function(){map3dInstance2.getCanvas().style.cursor='pointer'});
+  map3dInstance2.on('mouseleave','neighborhoods-fill',function(){map3dInstance2.getCanvas().style.cursor=''});
+}
+function selectMapArea(name){
+  map3dSelectedArea=name;
+  document.getElementById('mapSelectedArea').style.display='block';
+  document.getElementById('mapSelectedAreaName').textContent=name;
+  loadMapAds();
+  if(!map3dSidebarOpen)toggleSidebar();
+}
+async function loadMapAds(){
+  var type=document.getElementById('mapTypeFilter').value;
+  var purpose=document.getElementById('mapPurposeFilter').value;
+  var price=document.getElementById('mapPriceFilter').value;
+  var url='/api/ads/search?area='+encodeURIComponent(map3dSelectedArea)+'&type='+encodeURIComponent(type)+'&purpose='+encodeURIComponent(purpose)+'&price='+encodeURIComponent(price);
+  var res=await api(url);
+  if(res&&res.success){renderMapMarkers(res.ads);renderMapSidebar(res.ads)}
+}
+async function loadMapAdsByBounds(){
+  if(!map3dInstance2||map3dSelectedArea)return;
+  var b=map3dInstance2.getBounds();
+  if(!b)return;
+  var ne=b.getNorthEast(),sw=b.getSouthWest();
+  var res=await api('/api/ads/in-bounds?ne='+ne.lat+','+ne.lng+'&sw='+sw.lat+','+sw.lng);
+  if(res&&res.success){renderMapMarkers(res.ads);renderMapSidebar(res.ads)}
+}
+function renderMapMarkers(ads){
+  map3dMarkers2.forEach(function(m){m.remove()});map3dMarkers2=[];
+  ads.forEach(function(p){
+    if(!p.lat||!p.lng)return;
+    var isSale=p.purpose==='بيع';var color=isSale?'#d4af37':'#60a5fa';var letter=isSale?'ب':'إ';
+    var el=document.createElement('div');
+    el.style.cssText='position:relative;cursor:pointer';
+    el.innerHTML='<div style="width:36px;height:36px;border-radius:50% 50% 50% 0;background:'+color+';transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 3px 10px '+color+';display:flex;align-items:center;justify-content:center"><span style="transform:rotate(45deg);font-size:13px;color:#05060a;font-weight:800;font-family:Cairo">'+letter+'</span></div>';
+    var popup=new mapboxgl.Popup({offset:25,direction:'rtl'}).setHTML(
+      '<div style="direction:rtl;font-family:Cairo,sans-serif;min-width:200px;padding:14px;line-height:1.6">'+
+      '<div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:2px">'+p.title+'</div>'+
+      '<div style="font-size:10px;color:#999;margin-bottom:4px">📍 '+(p.district||'')+'، '+(p.city||'')+'</div>'+
+      '<div style="font-size:18px;font-weight:800;color:#d4af37;margin-bottom:4px">'+fmt(p.price)+' ر.س</div>'+
+      '<div style="display:flex;gap:8px;font-size:10px;color:#aaa;margin-bottom:6px">'+(p.rooms?'<span>🛏 '+p.rooms+'</span>':'')+(p.area?'<span>📐 '+fmt(p.area)+' م²</span>':'')+(p.baths?'<span>🚿 '+p.baths+'</span>':'')+'</div>'+
+      '<button onclick="closeMap3d();showDetail('+p.id+')" style="width:100%;padding:8px;border-radius:8px;background:linear-gradient(135deg,#d4af37,#b8941f);color:#05060a;border:none;font-weight:700;font-size:12px;cursor:pointer;font-family:Cairo">عرض التفاصيل</button></div>'
+    );
+    var marker=new mapboxgl.Marker({element:el,anchor:'bottom'}).setLngLat([p.lng,p.lat]).setPopup(popup).addTo(map3dInstance2);
+    map3dMarkers2.push(marker);
+  })
+}
+function renderMapSidebar(ads){
+  var html='';
+  if(!ads.length){html='<div style="color:var(--m);text-align:center;padding:30px;font-size:12px">لا توجد عقارات في هذا النطاق</div>'}
+  ads.forEach(function(p){
+    var bg=p.purpose==='بيع'?'rgba(212,175,55,.12)':'rgba(96,165,250,.12)';var cl=p.purpose==='بيع'?'var(--g)':'#60a5fa';
+    html+='<div onclick="showDetail('+p.id+')" style="padding:10px;border-radius:10px;background:rgba(18,20,30,.6);border:1px solid rgba(255,255,255,.04);margin-bottom:6px;cursor:pointer">'+
+      '<div style="font-size:12px;font-weight:600;color:var(--t);margin-bottom:2px">'+(p.images&&p.images[0]?'<span style="font-size:10px">🏠</span> ':'')+p.title+'</div>'+
+      '<div style="font-size:10px;color:var(--m);margin-bottom:2px">'+(p.district||'')+'، '+(p.city||'')+'</div>'+
+      '<div style="display:flex;gap:6px;align-items:center"><span style="font-size:12px;font-weight:700;color:var(--g)">'+fmt(p.price)+' ر.س</span>'+
+      '<span style="padding:2px 8px;border-radius:999px;font-size:9px;font-weight:600;background:'+bg+';color:'+cl+'">'+p.purpose+'</span>'+
+      (p.rooms?'<span style="font-size:9px;color:var(--m)">🛏 '+p.rooms+'</span>':'')+
+      (p.area?'<span style="font-size:9px;color:var(--m)">📐 '+fmt(p.area)+' م²</span>':'')+
+      '</div></div>'
+  });
+  document.getElementById('mapSidebarList').innerHTML=html;
+  document.getElementById('mapSidebarTitle').innerHTML='🏠 '+ads.length+' عقار'+(map3dSelectedArea?' في '+map3dSelectedArea:'');
+}
+function closeMap3d(){}
 /* LOGIN */
 function openLogin(){document.getElementById('login').classList.add('on')}
 function closeLogin(){document.getElementById('login').classList.remove('on')}
