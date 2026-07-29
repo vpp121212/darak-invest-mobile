@@ -174,6 +174,7 @@ await sql.unsafe(`SET client_min_messages = WARNING;
     "updatedAt" TEXT DEFAULT (NOW())
   );
 
+  DELETE FROM neighbourhood_pulse WHERE city = 'الرياض';
   INSERT INTO neighbourhood_pulse (city, district, avg_rent, avg_sale, roi, metro_stations, nearby_projects, sports_boulevard, walk_score, green_spaces, future_value_growth, data_source) VALUES
     ('الرياض', 'الصحافة', 50000, 1700000, 6.8, '[{"name": "طريق خالد بن الوليد", "line": "الأحمر", "year": 2024, "distance": "8 دقائق"}, {"name": "النزهة", "line": "الأحمر", "year": 2024, "distance": "12 دقيقة"}]', '[{"name": "المربع الجديد", "type": "مشروع ترفيهي", "year": 2030, "distance": "12 دقيقة"}]', false, 58, '[{"name": "حديقة الصحافة", "distance": "5 دقائق"}]', 12, 'تحليل السوق 2024-2026'),
     ('الرياض', 'الربيع', 65000, 2800000, 6.0, '[{"name": "الربيع", "line": "الأصفر", "year": 2024, "distance": "5 دقائق"}, {"name": "طريق عثمان بن عفان", "line": "الأصفر", "year": 2024, "distance": "8 دقائق"}]', '[{"name": "المسار الرياضي", "type": "مشروع رياضي", "year": 2026, "distance": "5 دقائق"}]', true, 72, '[{"name": "حديقة الربيع", "distance": "5 دقائق"}]', 15, 'تحليل السوق 2024-2026'),
