@@ -9,10 +9,11 @@ export const protect = async (req, res, next) => {
   if (!token) return res.status(401).json({ error: 'غير مصرح' });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-jwt-secret-darak-2026');
     const [user] = await sql`SELECT id, name, email, phone, role FROM users WHERE id = ${decoded.id}`;
     if (!user) return res.status(401).json({ error: 'المستخدم غير موجود' });
     req.user = user;
+    req.userId = user.id;
     next();
   } catch (err) {
     return res.status(401).json({ error: 'رمز غير صالح' });
