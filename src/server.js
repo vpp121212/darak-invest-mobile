@@ -43,12 +43,12 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: { origin: '*' } });
 
-  // Apply security middleware (includes helmet)
-  securityMiddleware(app);
-  
-  // Body parser
+  // Body parser (must be before security middleware)
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  
+  // Apply security middleware (includes helmet)
+  securityMiddleware(app);
   
   // JWT authentication middleware
   app.use((req, res, next) => {

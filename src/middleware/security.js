@@ -5,12 +5,12 @@ import crypto from 'crypto';
 
 export const createRateLimiter = (type = 'basic') => {
   const configs = {
-    basic: { windowMs: 15 * 60 * 1000, max: 100 },
-    strict: { windowMs: 15 * 60 * 1000, max: 20 },
-    auth: { windowMs: 15 * 60 * 1000, max: 10 }
+    basic: { windowMs: 15 * 60 * 1000, limit: 100 },
+    strict: { windowMs: 15 * 60 * 1000, limit: 20 },
+    auth: { windowMs: 15 * 60 * 1000, limit: 10 }
   };
   const cfg = configs[type] || configs.basic;
-  return rateLimit({ windowMs: cfg.windowMs, max: cfg.max, standardHeaders: true, legacyHeaders: false });
+  return rateLimit({ windowMs: cfg.windowMs, limit: cfg.limit, standardHeaders: true, legacyHeaders: false });
 };
 
 export const securityMiddleware = (app) => {

@@ -9,8 +9,9 @@ const router = Router();
 const authLimiter = createRateLimiter('basic');
 
 // Register
-router.post('/register', authLimiter, async (req, res) => {
+router.post('/register', async (req, res) => {
   try {
+    console.log('REGISTER BODY:', JSON.stringify(req.body));
     const { name, email, phone, password } = req.body;
     if (!name || !email || !phone || !password) {
       return res.status(400).json({ error: 'أكمل جميع الحقول' });
@@ -35,7 +36,7 @@ router.post('/register', authLimiter, async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'خطأ داخلي' });
+    res.status(500).json({ error: 'خطأ داخلي', detail: err.message, stack: err.stack?.split('\n')[0] });
   }
 });
 
