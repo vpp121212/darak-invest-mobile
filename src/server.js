@@ -42,6 +42,7 @@ import realestateRoutes from './routes/realestate.js';
 import paymentRoutes from './routes/payments.js';
 import dashboardRoutes from './routes/dashboard.js';
 import reportRoutes from './routes/reports.js';
+import ratingRoutes from './routes/ratings.js';
 
 dotenv.config();
 
@@ -111,6 +112,7 @@ app.use('/api/realestate', realestateRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/ratings', ratingRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '1.0.0' });

@@ -1533,12 +1533,58 @@ function showDetail(id){
   if(p.desc){html+='<div class="desc"><h3>الوصف</h3><p>'+p.desc+'</p></div>'}
   html+='<div id="pulse-card-'+p.id+'"><div class="load" style="padding:16px">جاري تحميل مؤشر نبض الحي...</div></div>'
   var ph=(p.agent&&p.agent.phone)?p.agent.phone.replace(/[^0-9]/g,''):'';
-  html+='<div class="ag"><div class="ag-n">'+(p.agent&&p.agent.name||'دارك وحيك')+'</div><div class="ag-r">'+(p.agent&&p.agent.role||'بائع مباشر')+'</div><div class="ag-b">'+(ph?'<a class="ag-btn ag-w" href="https://wa.me/'+ph+'" target="_blank">💬 واتساب</a><a class="ag-btn ag-c" href="tel:+('+ph+')">📞 اتصال</a>':'')+'</div></div>';
+  html+='<div class="ag"><div class="ag-n">'+(p.agent&&p.agent.name||'دارك وحيك')+'</div><div class="ag-r">'+(p.agent&&p.agent.role||'بائع مباشر')+'</div><div id="ag-rating-'+p.id+'"></div><div class="ag-b">'+(ph?'<a class="ag-btn ag-w" href="https://wa.me/'+ph+'" target="_blank">💬 واتساب</a><a class="ag-btn ag-c" href="tel:+('+ph+')">📞 اتصال</a>':'')+'</div></div>';
   html+='<div class="dacts"><button class="dbt p" onclick="openAIP(currentDetail)">🤖 تحليل السعر</button>'+(p.lat&&p.lng?'<button class="dbt s" onclick="open3D(currentDetail)">🏗️ عرض 3D</button>':'')+'<button class="dbt s" onclick="shareProp('+p.id+')">📤 مشاركة</button><button class="dbt d" onclick="reportAd('+p.id+')">🚩 بلاغ</button></div>';
   document.getElementById('ovp').innerHTML=html;
   document.getElementById('ov').classList.add('open');
   document.body.style.overflow='hidden';
   fetchPulse(p);
+  var advId=p.agentUserId||(p.agent&&p.agent.id);
+  if(advId)fetchAdvertiserRating(advId,p.id);
+}
+function fetchAdvertiserRating(advId,propId){
+  api('/ratings/advertiser/'+advId).then(function(d){
+    if(!d)return;
+    var el=document.getElementById('ag-rating-'+propId);if(!el)return;
+    var avg=d.average||0,count=d.count||0;
+    var stars='';for(var i=1;i<=5;i++){stars+=i<=Math.round(avg)?'★':'☆'}
+    el.innerHTML='<div style="display:flex;align-items:center;gap:6px;margin:6px 0;font-size:14px;color:var(--g);cursor:pointer" onclick="openRatingOv('+advId+','+propId+')">'+
+      '<span style="color:'+(avg>=4.5?'#4ade80':avg>=3?'var(--g)':'#f87171')+'">'+stars+'</span>'+
+      '<span style="font-size:11px;color:var(--m)">('+avg+')</span>'+
+      '<span style="font-size:10px;color:var(--m)">— '+count+' تقييم</span>'+
+      (count>=5&&avg>=4?'<span style="font-size:10px;padding:2px 6px;border-radius:999px;background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3)">✓ موثوق</span>':'')+
+    '</div>'
+  }).catch(function(){})
+}
+function openRatingOv(advId,propId){
+  if(!authToken){toast('يرجى تسجيل الدخول أولاً');openLogin();return}
+  var p=A.find(function(x){return x.id===propId});if(!p)return;
+  var name=p.agent&&p.agent.name||'المعلن';
+  var html='<button class="cls" onclick="closeOv()">×</button><div style="padding-top:44px;text-align:center">';
+  html+='<div style="font-size:28px;margin-bottom:6px">⭐</div>';
+  html+='<div style="font-size:15px;font-weight:700;color:var(--t);margin-bottom:4px">تقييم '+name+'</div>';
+  html+='<div style="font-size:11px;color:var(--m);margin-bottom:16px">اختر تقييمك من 1 إلى 5 نجوم</div>';
+  html+='<div style="display:flex;justify-content:center;gap:6px;margin-bottom:16px">';
+  for(var i=1;i<=5;i++){html+='<span id="rs-'+i+'" onclick="selectRating('+i+')" style="font-size:32px;cursor:pointer;color:var(--m);transition:color .15s">☆</span>'}
+  html+='</div>';
+  html+='<div style="margin-bottom:12px"><input id="rating-comment" type="text" placeholder="تعليق (اختياري)" maxlength="200" style="width:100%;padding:10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--b);color:var(--t);font-size:13px;font-family:inherit;outline:none;text-align:right"></div>';
+  html+='<button id="rating-submit-btn" onclick="submitRating('+advId+','+propId+')" style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--g),#c9a430);color:#05060a;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer">إرسال التقييم</button>';
+  html+='</div>';
+  document.getElementById('ovp').innerHTML=html;
+  document.getElementById('ov').classList.add('open');
+  document.body.style.overflow='hidden';
+  window._ratingScore=0;
+}
+function selectRating(s){window._ratingScore=s;for(var i=1;i<=5;i++){document.getElementById('rs-'+i).style.color=i<=s?'var(--g)':'var(--m)';document.getElementById('rs-'+i).textContent=i<=s?'★':'☆'}}
+async function submitRating(advId,propId){
+  var score=window._ratingScore||0;if(!score){toast('اختر تقييمًا من 1 إلى 5');return}
+  var comment=document.getElementById('rating-comment')?document.getElementById('rating-comment').value:'';
+  var btn=document.getElementById('rating-submit-btn');btn.disabled=true;btn.textContent='جاري الإرسال...';
+  try{
+    var r=await api('/ratings',{method:'POST',body:JSON.stringify({advertiserId:advId,score:score,comment:comment})});
+    if(r&&r.message){toast(r.message);closeOv();fetchAdvertiserRating(advId,propId)}
+    else{toast('فشل إرسال التقييم');btn.disabled=false;btn.textContent='إرسال التقييم'}
+  }catch(e){toast('فشل إرسال التقييم');btn.disabled=false;btn.textContent='إرسال التقييم'}
 }
 function fetchPulse(p){
   var district=encodeURIComponent(p.district);
@@ -1706,7 +1752,9 @@ function open3D(p){
   ensureToken().then(function(ok){
     if(!ok)return;
     if(map3dInstance){map3dInstance.remove();map3dInstance=null}
-    var s=0.0008;
+    var area=p.area||300;
+    var side=(Math.sqrt(area)/111000)*(Math.cos(p.lat*Math.PI/180)||1);
+    var s=side/2;
     var plotGeoJSON={type:'Feature',properties:{title:p.title,type:p.type,area:p.area},geometry:{type:'Polygon',coordinates:[[[p.lng-s,p.lat-s],[p.lng+s,p.lat-s],[p.lng+s,p.lat+s],[p.lng-s,p.lat+s],[p.lng-s,p.lat-s]]]}};
     map3dInstance=createMap({container:'map3d',center:[p.lng,p.lat],zoom:17,pitch:60,bearing:-20,_addMarkers:false,_onLoad:function(m){
       m.addSource('plot',{type:'geojson',data:plotGeoJSON});

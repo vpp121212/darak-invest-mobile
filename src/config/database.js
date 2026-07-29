@@ -431,6 +431,16 @@ await sql.unsafe(`SET client_min_messages = WARNING;
     "createdAt" TEXT DEFAULT (NOW())
   );
 
+  CREATE TABLE IF NOT EXISTS ratings (
+    id SERIAL PRIMARY KEY,
+    "advertiserId" INTEGER REFERENCES users(id) NOT NULL,
+    "userId" INTEGER REFERENCES users(id) NOT NULL,
+    score INTEGER NOT NULL CHECK(score >= 1 AND score <= 5),
+    comment TEXT DEFAULT '',
+    "createdAt" TEXT DEFAULT (NOW()),
+    UNIQUE("advertiserId", "userId")
+  );
+
   CREATE TABLE IF NOT EXISTS realestate_deeds (
     id SERIAL PRIMARY KEY,
     "userId" INTEGER REFERENCES users(id),
