@@ -1046,6 +1046,12 @@
   <div class="ov" id="payOv"><div class="ov-p"><button class="cls" onclick="closePayOv()">✕</button><div class="pay" style="padding-top:44px">
     <div class="pay-hdr">💳 إتمام الدفع</div>
     <div class="pay-sub" id="paySummary">باقة الاحترافي · 99 ر.س/شهرياً</div>
+    <div id="payTestNotice" style="display:none;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);border-radius:12px;padding:12px;margin-bottom:14px;font-size:11px;color:#fbbf24;text-align:center">
+      <div style="font-weight:700;margin-bottom:4px">🧪 نسخة تجريبية</div>
+      استخدم: <b dir="ltr" style="font-family:monospace;background:rgba(0,0,0,.3);padding:2px 6px;border-radius:4px">4111 1111 1111 1111</b> فيزا &nbsp;·&nbsp; <b dir="ltr" style="font-family:monospace;background:rgba(0,0,0,.3);padding:2px 6px;border-radius:4px">5123 4567 8901 2346</b> مدى<br>
+      أي تاريخ مستقبلي · أي CVV (مثلاً <b dir="ltr" style="font-family:monospace;background:rgba(0,0,0,.3);padding:2px 6px;border-radius:4px">123</b>)<br>
+      <span style="font-size:10px;color:var(--m)">تنبيه: هذه بطاقات اختبار وهمية، لا تُستخدم للدفع الحقيقي</span>
+    </div>
     <div class="pay-card" id="payCardForm">
       <div class="pay-logos"><span>💳 مدى</span><span>💳 فيزا</span><span>💳 ماستركارد</span></div>
       <div class="pay-field"><label>اسم حامل البطاقة</label><input id="pay-name" placeholder="الاسم على البطاقة" autocomplete="cc-name"></div>
@@ -1053,6 +1059,10 @@
       <div class="pay-row">
         <div class="pay-field"><label>شهر/سنة</label><input id="pay-exp" placeholder="MM/YY" maxlength="5" inputmode="numeric"></div>
         <div class="pay-field"><label>رمز CVV</label><input id="pay-cvc" placeholder="123" maxlength="4" inputmode="numeric"></div>
+      </div>
+      <div id="payQuickFill" style="display:none;margin-top:10px;gap:6px;flex-wrap:wrap;justify-content:center" class="pay-logos">
+        <span onclick="fillTestCard('4111111111111111','12/28','123')" style="cursor:pointer;border-color:rgba(212,175,55,.3);color:var(--g);font-weight:600;font-size:11px">🔹 فيزا تجريبية</span>
+        <span onclick="fillTestCard('5123456789012346','12/28','123')" style="cursor:pointer;border-color:rgba(212,175,55,.3);color:var(--g);font-weight:600;font-size:11px">🔸 مدى تجريبية</span>
       </div>
     </div>
     <div id="payMoyasarForm" style="display:none"></div>
@@ -1994,7 +2004,7 @@ async function subscribePkg(id){
 function closePkg(){document.getElementById('pkg').classList.remove('open')}
 var selectedPkgId=null;
 var pkgsData={basic:{name:'الأساسي',price:0},pro:{name:'الاحترافي',price:99},enterprise:{name:'المؤسسات',price:299}};
-function openPaymentOv(id){
+async function openPaymentOv(id){
   selectedPkgId=id;
   var p=pkgsData[id]||{name:'',price:0};
   document.getElementById('paySummary').innerText='باقة '+p.name+' · '+p.price+' ر.س/شهرياً';
@@ -2004,8 +2014,21 @@ function openPaymentOv(id){
   document.getElementById('payMoyasarForm').style.display='none';
   document.getElementById('payBtn').style.display='block';
   document.getElementById('paySpinner').style.display='none';
+  document.getElementById('payQuickFill').style.display='none';
+  document.getElementById('payTestNotice').style.display='none';
   ['pay-name','pay-number','pay-exp','pay-cvc'].forEach(function(x){document.getElementById(x).value=''});
+  var cfg=await api('/payments/config');
+  if(cfg&&cfg.testMode){
+    document.getElementById('payTestNotice').style.display='block';
+    document.getElementById('payQuickFill').style.display='flex'
+  }
   document.getElementById('payOv').classList.add('open')
+}
+function fillTestCard(number,exp,cvc){
+  document.getElementById('pay-number').value=number.replace(/(.{4})/g,'$1 ').trim();
+  document.getElementById('pay-exp').value=exp;
+  document.getElementById('pay-cvc').value=cvc;
+  document.getElementById('pay-name').focus()
 }
 document.getElementById('pay-number').addEventListener('input',function(e){var v=e.target.value.replace(/\D/g,'');e.target.value=v.replace(/(.{4})/g,'$1 ').trim()});
 document.getElementById('pay-exp').addEventListener('input',function(e){var v=e.target.value.replace(/\D/g,'');if(v.length>2){e.target.value=v.slice(0,2)+'/'+v.slice(2,4)}else{e.target.value=v}});
