@@ -100,7 +100,7 @@ router.put('/:id', protect, validate.body(updatePropertySchema), async (req, res
   try {
     const [existing] = await sql`SELECT * FROM properties WHERE id = ${req.params.id}`;
     if (!existing) return res.status(404).json(Errors.notFound('العقار').toJSON());
-    if (existing.agentUserId !== req.user.id && req.user.role !== 'admin') {
+    if (existing.agentUserId !== req.user.id && req.user.role !== 'admin' && req.user.role !== 'owner') {
       return res.status(403).json(Errors.forbidden('غير مصرح بالتعديل').toJSON());
     }
     const p = req.body;
@@ -110,7 +110,7 @@ router.put('/:id', protect, validate.body(updatePropertySchema), async (req, res
         "updatedAt"=NOW()
       WHERE id=$22
     `, [
-      p.title || existing.title, p.type || existing.type, p.purpose || existing.purpose, p.price || existing.price,
+      p.title || existing.title, p.type || existing.purpose, p.purpose || existing.purpose, p.price || existing.price,
       p.area || existing.area, p.rooms ?? existing.rooms, p.baths ?? existing.baths, p.cars ?? existing.cars,
       p.facing || existing.facing, p.year || existing.year, p.age ?? existing.age, p.description || existing.description,
       p.city || existing.city, p.district || existing.district, p.area_name || existing.area_name,
@@ -126,7 +126,7 @@ router.delete('/:id', protect, async (req, res) => {
   try {
     const [existing] = await sql`SELECT * FROM properties WHERE id = ${req.params.id}`;
     if (!existing) return res.status(404).json(Errors.notFound('العقار').toJSON());
-    if (existing.agentUserId !== req.user.id && req.user.role !== 'admin') {
+    if (existing.agentUserId !== req.user.id && req.user.role !== 'admin' && req.user.role !== 'owner') {
       return res.status(403).json(Errors.forbidden('غير مصرح بالحذف').toJSON());
     }
     await sql`DELETE FROM properties WHERE id = ${req.params.id}`;

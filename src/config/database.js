@@ -15,7 +15,7 @@ await sql.unsafe(`SET client_min_messages = WARNING;
     email TEXT UNIQUE NOT NULL,
     phone TEXT NOT NULL,
     password TEXT NOT NULL,
-    role TEXT DEFAULT 'user' CHECK(role IN ('user','agent','admin')),
+    role TEXT DEFAULT 'user' CHECK(role IN ('user','agent','admin','owner')),
     avatar TEXT DEFAULT '',
     favorites TEXT DEFAULT '[]',
     "refreshToken" TEXT,

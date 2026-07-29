@@ -65,6 +65,7 @@
 /* Packages */
 .pkg{padding:16px}.pkg-card{padding:14px;border-radius:var(--r);background:linear-gradient(135deg,rgba(18,20,30,.85),rgba(8,9,14,.9));border:1px solid var(--b);margin-bottom:10px}.pkg-card.featured{border-color:rgba(212,175,55,.4)}.pkg-name{font-size:15px;font-weight:700;color:var(--t);margin-bottom:2px}.pkg-price{font-size:20px;font-weight:800;color:var(--g);margin:6px 0}.pkg-price span{font-size:11px;font-weight:400;color:var(--m)}.pkg-features{list-style:none;padding:0;margin:10px 0 14px;display:flex;flex-direction:column;gap:6px}.pkg-features li{font-size:12px;color:var(--m);display:flex;align-items:center;gap:6px}.pkg-features li::before{content:"✓";color:var(--g);font-weight:700;font-size:11px}.pkg-btn{width:100%;padding:10px;border-radius:999px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;border:none}.pkg-btn.primary{background:linear-gradient(135deg,#d4af37,#c9a430);color:#05060a}.pkg-btn.secondary{background:rgba(255,255,255,.06);border:1px solid var(--b);color:var(--t)}
 .pay{padding:16px}.pay-hdr{font-size:18px;font-weight:700;color:var(--g);margin-bottom:4px;text-align:center}.pay-sub{font-size:11px;color:var(--m);margin-bottom:20px;text-align:center}.pay-field{margin-bottom:12px}.pay-field label{display:block;font-size:11px;color:var(--m);margin-bottom:4px;font-weight:600}.pay-field input,.pay-field select{width:100%;padding:12px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--b);color:var(--t);font-size:14px;font-family:inherit;outline:none;direction:rtl}.pay-field input:focus,.pay-field select:focus{border-color:rgba(212,175,55,.5)}.pay-row{display:flex;gap:10px}.pay-row .pay-field{flex:1}.pay-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:16px;margin-bottom:14px}.pay-card-hdr{font-size:12px;font-weight:600;color:var(--m);margin-bottom:10px;display:flex;align-items:center;gap:6px}.pay-logos{display:flex;gap:6px;margin-bottom:10px;justify-content:center}.pay-logos span{padding:4px 8px;border-radius:6px;background:rgba(255,255,255,.05);font-size:10px;color:var(--m);border:1px solid rgba(255,255,255,.06)}.pay-btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--g),#c9a430);color:#05060a;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:6px}.pay-btn:disabled{opacity:.5;cursor:not-allowed}.pay-secure{text-align:center;font-size:10px;color:var(--m);margin-top:10px;display:flex;align-items:center;justify-content:center;gap:4px}.pay-loader{text-align:center;padding:20px;color:var(--g)}
+.dash-tabs{display:flex;gap:4px;background:rgba(255,255,255,.03);border-radius:999px;padding:4px;margin-bottom:16px}.dash-tab{flex:1;padding:8px;border-radius:999px;border:none;background:transparent;color:var(--m);font-size:11px;font-weight:600;font-family:inherit;cursor:pointer}.dash-tab.on{background:rgba(212,175,55,.15);color:var(--g)}.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.dash-card{padding:14px;border-radius:12px;background:rgba(18,20,30,.6);border:1px solid rgba(255,255,255,.06);text-align:center}.dash-card-v{font-size:22px;font-weight:800;color:var(--g);line-height:1}.dash-card-l{font-size:10px;color:var(--m);margin-top:4px}.dash-card small{font-size:9px;color:var(--green);display:block;margin-top:2px}.dash-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);margin-bottom:6px;font-size:12px}.dash-row-role{padding:2px 8px;border-radius:999px;font-size:9px;font-weight:600}.dash-row-role.owner{background:rgba(212,175,55,.2);color:var(--g)}.dash-row-role.admin{background:rgba(96,165,250,.15);color:#60a5fa}.dash-row-role.agent{background:rgba(74,222,128,.12);color:#4ade80}.dash-row-role.user{background:rgba(255,255,255,.05);color:var(--m)}.dash-act{font-size:10px;padding:4px 10px;border-radius:999px;border:1px solid var(--b);background:transparent;color:var(--m);font-family:inherit;cursor:pointer;margin-right:4px}.dash-act:hover{border-color:rgba(212,175,55,.4);color:var(--g)}.dash-act.danger{color:#f87171;border-color:rgba(248,113,113,.3)}.dash-act.danger:hover{background:rgba(248,113,113,.1)}.dash-city{display:inline-flex;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);font-size:10px;color:var(--m);margin:2px}.dash-city b{color:var(--g);margin-right:4px}
 
 /* Office */
 .off{padding:16px}.off-field{margin-bottom:10px}.off-field label{display:block;font-size:11px;color:var(--m);margin-bottom:4px}.off-field input,.off-field select,.off-field textarea{width:100%;padding:10px 12px;border-radius:999px;background:rgba(18,20,30,.85);border:1px solid var(--b);color:var(--t);font-size:13px;font-family:inherit;outline:none}.off-field textarea{resize:none;border-radius:var(--r)}
@@ -460,6 +461,7 @@
         <div class="ai" onclick="openAds()"><div class="ai-info"><div class="an2">📢 إدارة إعلاناتي</div><div class="al2">تعديل وإدارة إعلاناتك العقارية</div></div></div>
         <div class="ai" onclick="openReq()"><div class="ai-info"><div class="an2">📋 طلب عقار</div><div class="al2">أكمل النموذج وسيتواصل معك ممثلنا</div></div></div>
         <div class="ai" onclick="openPkg()"><div class="ai-info"><div class="an2">📦 الباقة المناسبة</div><div class="al2">اختر الباقة التي تناسبك</div></div></div>
+        <div class="ai" id="dashLink" style="display:none" onclick="openDash()"><div class="ai-info"><div class="an2">📊 لوحة التحكم</div><div class="al2">إدارة المنصة · إحصائيات · صلاحيات · مستخدمين</div></div></div>
         <div class="ai" onclick="openOff()"><div class="ai-info"><div class="an2">🏢 تسجيل مكتب عقاري</div><div class="al2">سجّل مكتبك وابدأ بعرض عقاراتك</div></div></div>
         <div class="ai" onclick="openAIP(null)"><div class="ai-info"><div class="an2">🤖 تحليل أسعار AI</div><div class="al2">توقع سعر العقار بالذكاء الاصطناعي</div></div></div>
         <div class="ai" onclick="nav('pulse')"><div class="ai-info"><div class="an2">📊 مؤشر نبض الحي</div><div class="al2">تقييم ذكي للأحياء — العائد · النمو · جودة الحياة</div></div></div>
@@ -1095,6 +1097,30 @@
     <div class="ap-actions"><button class="cancel" onclick="closeReq()">إلغاء</button><button class="submit" onclick="submitPropertyRequest()">📨 إرسال الطلب</button></div>
   </div></div></div>
 
+  <!-- DASHBOARD OVERLAY (admin/owner) -->
+  <div class="ov" id="dashOv"><div class="ov-p"><button class="cls" onclick="closeDash()">✕</button>
+    <div style="padding-top:44px">
+      <div style="font-size:16px;font-weight:700;color:var(--g);margin-bottom:4px">📊 لوحة التحكم</div>
+      <div style="font-size:11px;color:var(--m);margin-bottom:16px" id="dashRole"></div>
+      <div class="dash-tabs"><button class="dash-tab on" onclick="showDashTab(this,'dashOverview')">الإحصائيات</button><button class="dash-tab" onclick="showDashTab(this,'dashUsers')">المستخدمين</button></div>
+
+      <div id="dashOverview">
+        <div class="dash-grid" id="dashStats"></div>
+        <div style="font-size:13px;font-weight:700;color:var(--g);margin:16px 0 8px">🆕 آخر المستخدمين</div>
+        <div id="dashRecentUsers"></div>
+        <div style="font-size:13px;font-weight:700;color:var(--g);margin:16px 0 8px">🏠 آخر العقارات</div>
+        <div id="dashRecentProps"></div>
+        <div style="font-size:13px;font-weight:700;color:var(--g);margin:16px 0 8px">🌆 التوزيع حسب المدينة</div>
+        <div id="dashCities"></div>
+      </div>
+
+      <div id="dashUsers" style="display:none">
+        <div style="font-size:11px;color:var(--m);margin-bottom:10px">إدارة المستخدمين — اضغط على المستخدم لتعديل صلاحياته</div>
+        <div id="dashUsersList"></div>
+      </div>
+    </div>
+  </div></div>
+
   <!-- TOAST -->
   <div class="tb" id="toasts"></div>
 
@@ -1492,7 +1518,7 @@ document.addEventListener('click',function(e){
   if(!e.target.closest('#map3dSearchInput')&&!e.target.closest('#map3dSearchResults'))document.getElementById('map3dSearchResults').style.display='none';
 });
 document.getElementById('ov').addEventListener('click',function(e){if(e.target===this)closeD()});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeD();closeLogin();closeAIP();closeVR();closeMap();close3D();closeMapPicker();closeUpload();closeFin();closeMkt();closeLeg();closeBiz();closeAddInvoice();closeAddVendor();closeMarket();closePayOv()}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeD();closeLogin();closeAIP();closeVR();closeMap();close3D();closeMapPicker();closeUpload();closeFin();closeMkt();closeLeg();closeBiz();closeAddInvoice();closeAddVendor();closeMarket();closePayOv();closeDash()}});
 
 /* MAP */
 var mapPropertyId=null,mapFullMap=null,map3dInstance=null,MB_TOKEN='',_tokenPromise=null,_tokenReady=false;
@@ -1800,14 +1826,17 @@ function updateUserUI(){
     document.getElementById('prof-avatar').textContent=user.name.charAt(0);
     document.getElementById('prof-name').textContent=user.name;
     document.getElementById('prof-email').textContent=user.email||'—';
+    document.getElementById('dashLink').style.display=(user.role==='admin'||user.role==='owner')?'block':'none';
     if(authToken){api('/users/profile').then(function(r){if(r&&r.success){
-      document.getElementById('prof-stats').innerHTML='<div class="prof-stat"><div class="prof-stat-v">'+r.user.favorites.length+'</div><div class="prof-stat-l">المفضلة</div></div><div class="prof-stat"><div class="prof-stat-v">'+(r.user.role==='agent'?'مكتب':'فرد')+'</div><div class="prof-stat-l">النوع</div></div><div class="prof-stat"><div class="prof-stat-v">—</div><div class="prof-stat-l">الباقة</div></div>';
+      document.getElementById('prof-stats').innerHTML='<div class="prof-stat"><div class="prof-stat-v">'+r.user.favorites.length+'</div><div class="prof-stat-l">المفضلة</div></div><div class="prof-stat"><div class="prof-stat-v">'+(r.user.role==='agent'?'مكتب':'فرد')+'</div><div class="prof-stat-l">النوع</div></div><div class="prof-stat"><div class="prof-stat-v">'+(r.user.role==='admin'?'🔧':r.user.role==='owner'?'👑':'—')+'</div><div class="prof-stat-l">الصلاحية</div></div>';
+      document.getElementById('dashLink').style.display=(r.user.role==='admin'||r.user.role==='owner')?'block':'none'
     }}).catch(function(){})}
   }else{h.innerHTML='<a href="#" onclick="openAbout();return false" class="logo">دارك وحيك</a><div style="display:flex;gap:8px"><a href="#" onclick="openNotif();return false">🔔</a><a href="#" onclick="openLogin();return false">دخول</a></div>';
     document.getElementById('prof-avatar').textContent='؟';
     document.getElementById('prof-name').textContent='زائر';
     document.getElementById('prof-email').textContent='سجّل دخولك للوصول لبياناتك';
     document.getElementById('prof-stats').innerHTML='<div class="prof-stat"><div class="prof-stat-v">0</div><div class="prof-stat-l">المفضلة</div></div><div class="prof-stat"><div class="prof-stat-v">—</div><div class="prof-stat-l">الباقة</div></div>';
+    document.getElementById('dashLink').style.display='none'
   }
 }
 
@@ -2061,6 +2090,40 @@ async function processPayment(){
   }else{showPayErr(d&&d.message||'فشل الدفع، حاول مرة أخرى')}
 }
 function showPayErr(msg){document.getElementById('payError').innerText=msg;document.getElementById('payError').style.display='block';document.getElementById('payBtn').style.display='block';document.getElementById('payCardForm').style.display='block';document.getElementById('paySpinner').style.display='none'}
+
+/* DASHBOARD */
+function openDash(){document.getElementById('dashOv').classList.add('open');loadDashData()}
+function closeDash(){document.getElementById('dashOv').classList.remove('open')}
+function showDashTab(el,id){document.querySelectorAll('#dashOv .dash-tab').forEach(function(t){t.classList.remove('on')});el.classList.add('on');document.getElementById('dashOverview').style.display=id==='dashOverview'?'block':'none';document.getElementById('dashUsers').style.display=id==='dashUsers'?'block':'none';if(id==='dashUsers')loadDashUsers()}
+async function loadDashData(){
+  if(!authToken)return;
+  var d=await api('/dashboard/stats');
+  if(!d||!d.success)return;
+  document.getElementById('dashRole').innerText='مرحباً '+(d.stats.isOwner?'مالك المنصة':'مشرف')+' 👋';
+  var s=d.stats;
+  document.getElementById('dashStats').innerHTML=
+    '<div class="dash-card"><div class="dash-card-v">'+s.users+'</div><div class="dash-card-l">👥 مستخدمين</div></div>'+
+    '<div class="dash-card"><div class="dash-card-v">'+s.properties+'</div><div class="dash-card-l">🏠 عقارات</div></div>'+
+    '<div class="dash-card"><div class="dash-card-v">'+s.agents+'</div><div class="dash-card-l">🏢 مكاتب</div></div>'+
+    '<div class="dash-card"><div class="dash-card-v">'+s.pending+'</div><div class="dash-card-l">⏳ قيد المراجعة</div></div>'+
+    '<div class="dash-card"><div class="dash-card-v">'+fmt(s.monthlyRevenue)+'</div><div class="dash-card-l">💰 شهرياً</div></div>'+
+    '<div class="dash-card"><div class="dash-card-v">'+fmt(s.totalRevenue)+'</div><div class="dash-card-l">💵 إجمالي الإيرادات<small>مدفوع</small></div></div>';
+  document.getElementById('dashRecentUsers').innerHTML=s.recentUsers.length?s.recentUsers.map(function(u){return'<div class="dash-row"><span style="padding:3px 6px;border-radius:6px;font-size:10px;background:rgba(255,255,255,.04)">'+(u.role==='owner'?'👑':u.role==='admin'?'🔧':u.role==='agent'?'🏢':'👤')+'</span><span style="flex:1">'+u.name+'</span><span style="font-size:10px;color:var(--m)">'+u.email+'</span></div>'}).join(''):'<div style="color:var(--m);font-size:11px">لا يوجد مستخدمين</div>';
+  document.getElementById('dashRecentProps').innerHTML=s.recentProperties.length?s.recentProperties.map(function(p){return'<div class="dash-row"><span style="flex:1">'+p.title+'</span><span style="font-size:10px;color:var(--m)">'+p.district+'، '+p.city+'</span><span style="font-size:11px;color:var(--g);font-weight:700">'+fmt(p.price)+' ر.س</span></div>'}).join(''):'<div style="color:var(--m);font-size:11px">لا توجد عقارات</div>';
+  document.getElementById('dashCities').innerHTML=s.cityStats.length?s.cityStats.map(function(c){return'<span class="dash-city">'+c.city+' <b>'+c.count+'</b></span>'}).join(''):'<div style="color:var(--m);font-size:11px">لا توجد بيانات</div>'
+}
+async function loadDashUsers(){
+  if(!authToken)return;
+  var d=await api('/users');
+  if(!d||!d.success)return;
+  var roles={owner:'👑 مالك',admin:'🔧 مشرف',agent:'🏢 وسيط',user:'👤 مستخدم'};
+  var roleCls={owner:'owner',admin:'admin',agent:'agent',user:'user'};
+  document.getElementById('dashUsersList').innerHTML=d.users.map(function(u){
+    return'<div class="dash-row"><span style="padding:3px 6px;border-radius:6px;font-size:10px;background:rgba(255,255,255,.04)">'+(roles[u.role]||u.role)+'</span><span style="flex:1;font-weight:600">'+u.name+'</span><span style="font-size:10px;color:var(--m);flex:1">'+u.email+'</span><span class="dash-row-role '+roleCls[u.role]+'">'+u.role+'</span>'+(u.role!=='owner'?'<button class="dash-act danger" onclick="deleteUser('+u.id+')">🗑</button>':'')+(u.role==='user'?'<button class="dash-act" onclick="promoteUser('+u.id+')">👑 ترقية</button>':'')+'</div>'
+  }).join('')
+}
+async function deleteUser(id){if(!confirm('حذف المستخدم؟'))return;var d=await api('/users/'+id,{method:'DELETE'});if(d&&d.success){toast('تم الحذف');loadDashUsers()}}
+async function promoteUser(id){var r=prompt('الصلاحية الجديدة (agent/admin):');if(!r||!['agent','admin'].includes(r))return;var d=await api('/users/'+id+'/role',{method:'PUT',body:JSON.stringify({role:r})});if(d&&d.success){toast('تم الترقية ✓');loadDashUsers()}}
 
 /* OFFICE */
 function openOff(){document.getElementById('off').classList.add('open')}

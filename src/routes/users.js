@@ -35,14 +35,27 @@ router.post('/favorites/:propertyId', protect, async (req, res) => {
   res.json({ success: true, action: 'added', favorites: favs });
 });
 
-router.get('/', protect, authorize('admin'), async (req, res) => {
+router.get('/', protect, authorize('admin', 'owner'), async (req, res) => {
   const users = await sql`SELECT id, name, email, phone, role, "createdAt" FROM users ORDER BY "createdAt" DESC`;
   res.json({ success: true, users });
 });
 
-router.delete('/:id', protect, authorize('admin'), async (req, res) => {
+router.put('/:id/role', protect, authorize('owner'), async (req, res) => {
+  const { role } = req.body;
+  if (!['user','agent','admin'].includes(role)) return res.status(400).json({ error: 'صلاحية غير صالحة' });
+  await sql`UPDATE users SET role = ${role} WHERE id = ${req.params.id}`;
+  res.json({ success: true, message: 'تم تحديث الصلاحية' });
+});
+
+router.put('/:id/status', protect, authorize('admin', 'owner'), async (req, res) => {
+  const { isActive } = req.body;
+  await sql`UPDATE users SET "isActive" = ${isActive ? 1 : 0} WHERE id = ${req.params.id}`;
+  res.json({ success: true, message: 'تم تحديث الحالة' });
+});
+
+router.delete('/:id', protect, authorize('admin', 'owner'), async (req, res) => {
   await sql`DELETE FROM users WHERE id = ${req.params.id}`;
-  res.json({ success: true });
+  res.json({ success: true, message: 'تم حذف المستخدم' });
 });
 
 export default router;
