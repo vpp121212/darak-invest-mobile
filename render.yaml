@@ -15,7 +15,5 @@ services:
         value: "5000"
       - key: JWT_SECRET
         generateValue: true
-      - key: JWT_REFRESH_SECRET
-        generateValue: true
       - key: MAPBOX_TOKEN
         value: pk.eyJ1IjoidnBwLTY2IiwiYSI6ImNtcndoZW5hdzA2MGYzM3IzbTA4cW1yNnAifQ.bP-Z7H9Wn6WkgF2fXYITQw
