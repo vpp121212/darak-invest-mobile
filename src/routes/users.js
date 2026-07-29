@@ -2,6 +2,8 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import sql from '../config/database.js';
 import { protect, authorize } from '../middleware/auth.js';
+import { validate } from '../middleware/validate.js';
+import { profileUpdateSchema } from '../validators/auth.js';
 
 const router = Router();
 
@@ -10,7 +12,7 @@ router.get('/profile', protect, async (req, res) => {
   res.json({ success: true, user: { ...user, favorites: JSON.parse(user.favorites || '[]') } });
 });
 
-router.put('/profile', protect, async (req, res) => {
+router.put('/profile', protect, validate.body(profileUpdateSchema), async (req, res) => {
   const { name, phone, avatar } = req.body;
   await sql`
     UPDATE users SET name=COALESCE(${name}, name), phone=COALESCE(${phone}, phone), avatar=COALESCE(${avatar}, avatar), "updatedAt"=NOW() WHERE id=${req.user.id}

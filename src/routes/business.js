@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import sql from '../config/database.js';
 import { protect } from '../middleware/auth.js';
+import { validate } from '../middleware/validate.js';
+import { createInvoiceSchema, updateInvoiceSchema, createVendorSchema } from '../validators/business.js';
 
 const router = Router();
 
@@ -37,7 +39,7 @@ router.get('/invoices', protect, async (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
 });
 
-router.post('/invoices', protect, async (req, res) => {
+router.post('/invoices', protect, validate.body(createInvoiceSchema), async (req, res) => {
   try {
     const { type, amount, description, clientName, clientPhone, propertyId, dueDate } = req.body;
     const [{ id }] = await sql`
@@ -49,7 +51,7 @@ router.post('/invoices', protect, async (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
 });
 
-router.put('/invoices/:id', protect, async (req, res) => {
+router.put('/invoices/:id', protect, validate.body(updateInvoiceSchema), async (req, res) => {
   try {
     const { status, paidAt } = req.body;
     const updates = [];
@@ -93,10 +95,9 @@ router.get('/vendors', protect, async (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
 });
 
-router.post('/vendors', protect, async (req, res) => {
+router.post('/vendors', protect, validate.body(createVendorSchema), async (req, res) => {
   try {
     const { name, category, phone, email, city, notes } = req.body;
-    if (!name || !category) return res.status(400).json({ error: 'اسم المورد والفئة مطلوبين' });
 
     const [{ id }] = await sql`
       INSERT INTO vendors ("userId", name, category, phone, email, city, notes)

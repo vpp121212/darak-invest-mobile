@@ -3,16 +3,15 @@ import bcrypt from 'bcryptjs';
 import sql from '../config/database.js';
 import { generateTokens } from '../middleware/auth.js';
 import { createRateLimiter } from '../middleware/security.js';
+import { validate } from '../middleware/validate.js';
+import { registerSchema } from '../validators/auth.js';
 
 const router = Router();
 const authLimiter = createRateLimiter('basic');
 
-router.post('/register', authLimiter, async (req, res) => {
+router.post('/register', authLimiter, validate.body(registerSchema), async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
-    if (!name || !email || !phone || !password) {
-      return res.status(400).json({ error: 'أكمل جميع الحقول' });
-    }
 
     const [exists] = await sql`SELECT id FROM users WHERE email = ${email}`;
     if (exists) return res.status(400).json({ error: 'البريد مسجل مسبقاً' });

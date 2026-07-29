@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import sql from '../config/database.js';
 import { protect } from '../middleware/auth.js';
+import { validate } from '../middleware/validate.js';
+import { createAdSchema } from '../validators/ad.js';
 
 const router = Router();
 
-router.post('/add', protect, async (req, res) => {
+router.post('/add', protect, validate.body(createAdSchema), async (req, res) => {
   try {
     const { title, price, location, description } = req.body;
 

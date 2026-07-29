@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import sql from '../config/database.js';
 import { protect } from '../middleware/auth.js';
+import { validate } from '../middleware/validate.js';
+import { createPropertySchema, updatePropertySchema, propertyQuerySchema } from '../validators/property.js';
 import { propertiesBreaker } from '../services/circuitBreaker.js';
 
 const router = Router();
 
-router.get('/', async (req, res) => {
+router.get('/', validate.query(propertyQuerySchema), async (req, res) => {
   try {
     const { city, type, purpose, minPrice, maxPrice, minArea, maxArea, rooms, sort, page = 1, limit = 20 } = req.query;
     const properties = await propertiesBreaker.fire({ city, type, purpose, limit, offset: (Number(page) - 1) * Number(limit) });
@@ -72,7 +74,7 @@ router.get('/:id', async (req, res) => {
   } catch (err) { res.status(500).json({ error: 'خطأ داخلي' }); }
 });
 
-router.post('/', protect, async (req, res) => {
+router.post('/', protect, validate.body(createPropertySchema), async (req, res) => {
   try {
     const p = req.body;
     const [result] = await sql.unsafe(`
@@ -93,7 +95,7 @@ router.post('/', protect, async (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
 });
 
-router.put('/:id', protect, async (req, res) => {
+router.put('/:id', protect, validate.body(updatePropertySchema), async (req, res) => {
   try {
     const [existing] = await sql`SELECT * FROM properties WHERE id = ${req.params.id}`;
     if (!existing) return res.status(404).json({ error: 'العقار غير موجود' });

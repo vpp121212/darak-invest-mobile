@@ -4,14 +4,15 @@ import bcrypt from 'bcryptjs';
 import sql from '../config/database.js';
 import { generateTokens } from '../middleware/auth.js';
 import { createRateLimiter } from '../middleware/security.js';
+import { validate } from '../middleware/validate.js';
+import { loginSchema, refreshSchema } from '../validators/auth.js';
 
 const router = Router();
 const authLimiter = createRateLimiter('basic');
 
-router.post('/login', authLimiter, async (req, res) => {
+router.post('/login', authLimiter, validate.body(loginSchema), async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ error: 'أدخل البريد وكلمة المرور' });
 
     const [user] = await sql`SELECT * FROM users WHERE email = ${email}`;
     if (!user) return res.status(401).json({ error: 'بيانات الدخول غير صحيحة' });
@@ -33,10 +34,9 @@ router.post('/login', authLimiter, async (req, res) => {
   }
 });
 
-router.post('/refresh', async (req, res) => {
+router.post('/refresh', validate.body(refreshSchema), async (req, res) => {
   try {
     const { refreshToken } = req.body;
-    if (!refreshToken) return res.status(400).json({ error: 'Refresh token مطلوب' });
 
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
     const [user] = await sql`SELECT * FROM users WHERE id = ${decoded.id}`;
