@@ -44,4 +44,22 @@ router.get('/city/:city', async (req, res) => {
   }
 });
 
+router.get('/', async (req, res) => {
+  try {
+    const pulse = await sql`SELECT * FROM neighbourhood_pulse ORDER BY city, district`;
+    res.json({
+      success: true,
+      pulse: pulse.map(p => ({
+        ...p,
+        metro_stations: JSON.parse(p.metro_stations || '[]'),
+        nearby_projects: JSON.parse(p.nearby_projects || '[]'),
+        green_spaces: JSON.parse(p.green_spaces || '[]')
+      }))
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'خطأ داخلي' });
+  }
+});
+
 export default router;
