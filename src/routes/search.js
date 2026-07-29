@@ -3,6 +3,9 @@ import db from '../config/database.js';
 
 const router = Router();
 
+// Test: simple ping handler
+router.get('/ping', (req, res) => res.json({ ok: true }));
+
 router.get('/', (req, res) => {
   handleSearch(req, res);
 });

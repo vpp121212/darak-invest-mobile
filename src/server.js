@@ -109,6 +109,31 @@ app.get('/api/debug/search', async (req, res) => {
   }
 });
 
+// Direct search inline (bypass router)
+app.get('/api/search-direct', async (req, res) => {
+  try {
+    const db = (await import('./config/database.js')).default;
+    const { city, q, type, purpose, minPrice, maxPrice, page = 1, limit = 10 } = req.query;
+    let where = ["status = 'active'"];
+    let params = [];
+
+    if (city) { where.push("city = ?"); params.push(city); }
+    if (type) { where.push("type = ?"); params.push(type); }
+    if (purpose) { where.push("purpose = ?"); params.push(purpose); }
+    if (minPrice) { where.push("price >= ?"); params.push(Number(minPrice)); }
+    if (maxPrice) { where.push("price <= ?"); params.push(Number(maxPrice)); }
+    if (q) { where.push("(title LIKE ? OR description LIKE ?)"); const l = `%${q}%`; params.push(l, l); }
+
+    const offset = (Number(page) - 1) * Number(limit);
+    const props = db.prepare(`SELECT * FROM properties WHERE ${where.join(' AND ')} ORDER BY createdAt DESC LIMIT ? OFFSET ?`).all(...params, Number(limit), offset);
+    const { total } = db.prepare(`SELECT COUNT(*) as total FROM properties WHERE ${where.join(' AND ')}`).get(...params);
+
+    res.json({ success: true, properties: props, total, page: Number(page), t: props.length });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message, stack: e.stack });
+  }
+});
+
 app.get('/api/config/mapbox', (req, res) => {
   res.json({ token: process.env.MAPBOX_TOKEN || '' });
 });
