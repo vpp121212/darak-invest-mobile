@@ -1678,9 +1678,10 @@ function updateFinRate(){
 /* ADD PROPERTY */
 async function fetchDistricts(){
   var city=document.getElementById('ap-city')?document.getElementById('ap-city').value:'';
-  if(!city)return;
   try{
-    var d=await api('/search/districts?city='+encodeURIComponent(city));
+    var url='/search/districts';
+    if(city)url+='?city='+encodeURIComponent(city);
+    var d=await api(url);
     if(d&&d.success&&d.districts){
       var dl=document.getElementById('districts-list');
       dl.innerHTML=d.districts.map(function(x){return '<option value="'+x+'">'}).join('');
@@ -1689,9 +1690,10 @@ async function fetchDistricts(){
 }
 async function fetchMktDistricts(){
   var city=document.getElementById('mkt-city')?document.getElementById('mkt-city').value:'';
-  if(!city)return;
   try{
-    var d=await api('/search/districts?city='+encodeURIComponent(city));
+    var url='/search/districts';
+    if(city)url+='?city='+encodeURIComponent(city);
+    var d=await api(url);
     if(d&&d.success&&d.districts){
       var dl=document.getElementById('mkt-districts-list');
       dl.innerHTML=d.districts.map(function(x){return '<option value="'+x+'">'}).join('');
