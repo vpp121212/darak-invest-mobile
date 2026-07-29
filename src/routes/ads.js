@@ -10,8 +10,8 @@ router.post('/add', protect, async (req, res) => {
 
     const now = new Date().getFullYear();
     const [ad] = await sql`
-      INSERT INTO properties (title, type, purpose, price, area, rooms, baths, description, city, status, "agentUserId", year, age)
-      VALUES (${title}, 'شقة', 'بيع', ${price}, 0, 0, 0, ${description}, ${location}, 'active', ${req.user.id}, ${now}, 0)
+      INSERT INTO properties (title, type, purpose, price, area, rooms, baths, description, city, district, status, "agentUserId", year, age)
+      VALUES (${title}, 'شقة', 'بيع', ${price}, 0, 0, 0, ${description}, ${location}, ${location || 'غير محدد'}, 'active', ${req.user.id}, ${now}, 0)
       RETURNING id, title, price, city as location, description, "createdAt"
     `;
 
