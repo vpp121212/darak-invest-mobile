@@ -787,6 +787,174 @@
     </div>
   </div>
 
+  <!-- REAL ESTATE SERVICES OVERLAY -->
+  <div class="ov" id="docOv">
+    <div class="ov-p">
+      <button class="cls" onclick="closeDoc()">✕</button>
+      <div style="padding-top:44px;font-size:16px;font-weight:700;color:var(--g);margin-bottom:12px">🏛️ الخدمات العقارية</div>
+      <div class="mkt-tabs" style="flex-wrap:wrap;gap:4px">
+        <button class="mkt-tab on" onclick="showDocTab(this,'doc-licenses')">تراخيص</button>
+        <button class="mkt-tab" onclick="showDocTab(this,'doc-contracts')">توثيق عقود</button>
+        <button class="mkt-tab" onclick="showDocTab(this,'doc-delivery')">استلام/تسليم</button>
+        <button class="mkt-tab" onclick="showDocTab(this,'doc-rental-inv')">فواتير إيجار</button>
+        <button class="mkt-tab" onclick="showDocTab(this,'doc-certificates')">شهادات فرز</button>
+        <button class="mkt-tab" onclick="showDocTab(this,'doc-deeds')">صكوك</button>
+      </div>
+
+      <div id="doc-licenses">
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+          <button class="fin-run" style="flex:1;padding:8px;font-size:12px" onclick="openAddLicense()">+ طلب ترخيص جديد</button>
+        </div>
+        <div class="fin-field"><label>بحث</label><input id="docLicSearch" placeholder="اسم المرخص أو رقم الرخصة" oninput="loadLicenses()"></div>
+        <div id="docLicList"><div style="color:var(--m);text-align:center;padding:24px">سجّل دخولك لعرض التراخيص</div></div>
+      </div>
+
+      <div id="doc-contracts" style="display:none">
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+          <button class="fin-run" style="flex:1;padding:8px;font-size:12px" onclick="openAddContract()">+ عقد جديد</button>
+        </div>
+        <div id="docConList"><div style="color:var(--m);text-align:center;padding:24px">سجّل دخولك لعرض العقود</div></div>
+      </div>
+
+      <div id="doc-delivery" style="display:none">
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+          <button class="fin-run" style="flex:1;padding:8px;font-size:12px" onclick="openAddDelivery()">+ نموذج جديد</button>
+        </div>
+        <div id="docDelList"><div style="color:var(--m);text-align:center;padding:24px">سجّل دخولك لعرض النماذج</div></div>
+      </div>
+
+      <div id="doc-rental-inv" style="display:none">
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+          <button class="fin-run" style="flex:1;padding:8px;font-size:12px" onclick="openAddRentalInv()">+ فاتورة إيجار جديدة</button>
+        </div>
+        <div id="docRentInvStats" style="display:flex;gap:6px;margin-bottom:10px">
+          <div style="flex:1;text-align:center;background:rgba(255,255,255,.03);border-radius:8px;padding:8px">
+            <div id="rentInvPaid" style="font-size:14px;font-weight:700;color:#4caf50">0</div>
+            <div style="font-size:10px;color:var(--m)">مدفوعة</div>
+          </div>
+          <div style="flex:1;text-align:center;background:rgba(255,255,255,.03);border-radius:8px;padding:8px">
+            <div id="rentInvPending" style="font-size:14px;font-weight:700;color:var(--g)">0</div>
+            <div style="font-size:10px;color:var(--m)">معلقة</div>
+          </div>
+          <div style="flex:1;text-align:center;background:rgba(255,255,255,.03);border-radius:8px;padding:8px">
+            <div id="rentInvOverdue" style="font-size:14px;font-weight:700;color:#f44336">0</div>
+            <div style="font-size:10px;color:var(--m)">متأخرة</div>
+          </div>
+        </div>
+        <div id="docRentInvList"><div style="color:var(--m);text-align:center;padding:24px">سجّل دخولك لعرض الفواتير</div></div>
+      </div>
+
+      <div id="doc-certificates" style="display:none">
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+          <button class="fin-run" style="flex:1;padding:8px;font-size:12px" onclick="openAddCertificate()">+ طلب شهادة فرز</button>
+        </div>
+        <div id="docCertList"><div style="color:var(--m);text-align:center;padding:24px">سجّل دخولك لعرض الشهادات</div></div>
+      </div>
+
+      <div id="doc-deeds" style="display:none">
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+          <button class="fin-run" style="flex:1;padding:8px;font-size:12px" onclick="openAddDeed()">+ تسجيل صك جديد</button>
+        </div>
+        <div id="docDeedList"><div style="color:var(--m);text-align:center;padding:24px">سجّل دخولك لعرض الصكوك</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LICENSE FORM OVERLAY -->
+  <div class="ov" id="addLicOv">
+    <div class="ov-p">
+      <button class="cls" onclick="closeSubOv('addLicOv')">✕</button>
+      <div style="padding-top:44px;font-size:16px;font-weight:700;color:var(--g);margin-bottom:16px">📜 طلب ترخيص جديد</div>
+      <div class="fin-field"><label>نوع الترخيص *</label><select id="lic-type"><option value="فال">رخصة فال</option><option value="وسيط عقاري">وسيط عقاري</option><option value="مكتب هندسي">مكتب هندسي</option><option value="وساطة">وساطة عقارية</option><option value="إيجار">إيجار</option></select></div>
+      <div class="fin-field"><label>الاسم الكامل *</label><input id="lic-holder" placeholder="الاسم"></div>
+      <div class="fin-field"><label>رقم الهوية</label><input id="lic-id" placeholder="رقم الهوية أو السجل التجاري"></div>
+      <div class="fin-field"><label>المدينة</label><input id="lic-city" placeholder="الرياض"></div>
+      <div class="fin-field"><label>ملاحظات</label><textarea id="lic-notes" rows="2" placeholder="أي ملاحظات..."></textarea></div>
+      <button class="fin-run" onclick="saveLicense()">💾 تقديم الطلب</button>
+    </div>
+  </div>
+
+  <!-- CONTRACT FORM OVERLAY -->
+  <div class="ov" id="addConOv">
+    <div class="ov-p">
+      <button class="cls" onclick="closeSubOv('addConOv')">✕</button>
+      <div style="padding-top:44px;font-size:16px;font-weight:700;color:var(--g);margin-bottom:16px">📝 عقد جديد</div>
+      <div class="fin-field"><label>نوع العقد *</label><select id="con-type"><option value="بيع">بيع</option><option value="إيجار">إيجار</option><option value="وساطة">وساطة</option><option value="مقاولة">مقاولة</option><option value="صيانة">صيانة</option></select></div>
+      <div class="fin-field"><label>الطرف الأول *</label><input id="con-party1" placeholder="اسم الطرف الأول"></div>
+      <div class="fin-field"><label>الطرف الثاني *</label><input id="con-party2" placeholder="اسم الطرف الثاني"></div>
+      <div class="fin-field"><label>وصف العقار</label><input id="con-prop" placeholder="فيلا في حي النرجس"></div>
+      <div class="fin-field"><label>المبلغ (ر.س)</label><input type="number" id="con-amount" placeholder="500000"></div>
+      <div class="fin-field"><label>شروط الدفع</label><input id="con-payment" placeholder="كاش / تقسيط"></div>
+      <div class="fin-field"><label>تاريخ البداية</label><input type="date" id="con-start"></div>
+      <div class="fin-field"><label>تاريخ النهاية</label><input type="date" id="con-end"></div>
+      <button class="fin-run" onclick="saveContract()">💾 إنشاء العقد</button>
+    </div>
+  </div>
+
+  <!-- DELIVERY FORM OVERLAY -->
+  <div class="ov" id="addDelOv">
+    <div class="ov-p">
+      <button class="cls" onclick="closeSubOv('addDelOv')">✕</button>
+      <div style="padding-top:44px;font-size:16px;font-weight:700;color:var(--g);margin-bottom:16px">📦 نموذج استلام/تسليم</div>
+      <div class="fin-field"><label>النوع *</label><select id="del-type"><option value="تسليم">تسليم</option><option value="استلام">استلام</option></select></div>
+      <div class="fin-field"><label>وصف الوحدة *</label><input id="del-unit" placeholder="فيلا - شقة رقم"></div>
+      <div class="fin-field"><label>عنوان العقار</label><input id="del-addr" placeholder="الرياض - حي النرجس"></div>
+      <div class="fin-field"><label>المؤجر/المالك *</label><input id="del-lessor" placeholder="اسم المالك"></div>
+      <div class="fin-field"><label>المستأجر/المستلم *</label><input id="del-lessee" placeholder="اسم المستأجر"></div>
+      <div class="fin-field"><label>تاريخ التسليم</label><input type="date" id="del-date"></div>
+      <div class="fin-field"><label>ملاحظات الحالة</label><textarea id="del-notes" rows="2" placeholder="حالة الوحدة عند التسليم..."></textarea></div>
+      <div class="fin-field"><label>قراءات العداد</label><input id="del-meter" placeholder="عداد الكهرباء والماء"></div>
+      <div class="fin-field"><label>عدد المفاتيح</label><input type="number" id="del-keys" placeholder="0"></div>
+      <button class="fin-run" onclick="saveDelivery()">💾 حفظ النموذج</button>
+    </div>
+  </div>
+
+  <!-- RENTAL INVOICE FORM OVERLAY -->
+  <div class="ov" id="addRentInvOv">
+    <div class="ov-p">
+      <button class="cls" onclick="closeSubOv('addRentInvOv')">✕</button>
+      <div style="padding-top:44px;font-size:16px;font-weight:700;color:var(--g);margin-bottom:16px">🧾 فاتورة إيجار جديدة</div>
+      <div class="fin-field"><label>اسم المستأجر *</label><input id="rentInv-tenant" placeholder="اسم المستأجر"></div>
+      <div class="fin-field"><label>قيمة الإيجار (ر.س) *</label><input type="number" id="rentInv-amount" placeholder="30000"></div>
+      <div class="fin-field"><label>رسوم الخدمات</label><input type="number" id="rentInv-services" placeholder="2000"></div>
+      <div class="fin-field"><label>الضريبة</label><input type="number" id="rentInv-tax" placeholder="0"></div>
+      <div class="fin-field"><label>من تاريخ</label><input type="date" id="rentInv-from"></div>
+      <div class="fin-field"><label>إلى تاريخ</label><input type="date" id="rentInv-to"></div>
+      <div class="fin-field"><label>طريقة الدفع</label><select id="rentInv-method"><option value="نقدي">نقدي</option><option value="تحويل بنكي">تحويل بنكي</option><option value="شيك">شيك</option><option value="بطاقة ائتمان">بطاقة ائتمان</option></select></div>
+      <button class="fin-run" onclick="saveRentalInv()">💾 إصدار الفاتورة</button>
+    </div>
+  </div>
+
+  <!-- CERTIFICATE FORM OVERLAY -->
+  <div class="ov" id="addCertOv">
+    <div class="ov-p">
+      <button class="cls" onclick="closeSubOv('addCertOv')">✕</button>
+      <div style="padding-top:44px;font-size:16px;font-weight:700;color:var(--g);margin-bottom:16px">📋 طلب شهادة فرز</div>
+      <div class="fin-field"><label>نوع الشهادة *</label><select id="cert-type"><option value="فرز">فرز</option><option value="تجزئة">تجزئة</option><option value="ضم">ضم</option><option value="تعديل">تعديل</option></select></div>
+      <div class="fin-field"><label>وصف العقار *</label><input id="cert-prop" placeholder="مبنى سكني في حي"></div>
+      <div class="fin-field"><label>عدد الوحدات</label><input type="number" id="cert-units" placeholder="10"></div>
+      <div class="fin-field"><label>المكتب الهندسي</label><input id="cert-eng" placeholder="اسم المكتب الهندسي"></div>
+      <div class="fin-field"><label>ملاحظات</label><textarea id="cert-notes" rows="2" placeholder="أي ملاحظات..."></textarea></div>
+      <button class="fin-run" onclick="saveCertificate()">💾 تقديم الطلب</button>
+    </div>
+  </div>
+
+  <!-- DEED FORM OVERLAY -->
+  <div class="ov" id="addDeedOv">
+    <div class="ov-p">
+      <button class="cls" onclick="closeSubOv('addDeedOv')">✕</button>
+      <div style="padding-top:44px;font-size:16px;font-weight:700;color:var(--g);margin-bottom:16px">📜 تسجيل صك ملكية</div>
+      <div class="fin-field"><label>نوع الصك</label><select id="deed-type"><option value="صك ملكية">صك ملكية</option><option value="حجة إرث">حجة إرث</option><option value="وصية">وصية</option><option value="وقف">وقف</option><option value="إفراغ">إفراغ</option></select></div>
+      <div class="fin-field"><label>وصف العقار *</label><input id="deed-prop" placeholder="أرض في حي"></div>
+      <div class="fin-field"><label>اسم المالك *</label><input id="deed-owner" placeholder="اسم المالك"></div>
+      <div class="fin-field"><label>المساحة (م²)</label><input type="number" id="deed-area" placeholder="500"></div>
+      <div class="fin-field"><label>المدينة</label><input id="deed-city" placeholder="الرياض"></div>
+      <div class="fin-field"><label>تاريخ الإصدار</label><input type="date" id="deed-date"></div>
+      <div class="fin-field"><label>الحدود</label><textarea id="deed-bounds" rows="2" placeholder="حدود العقار"></textarea></div>
+      <button class="fin-run" onclick="saveDeed()">💾 تسجيل الصك</button>
+    </div>
+  </div>
+
   <!-- ABOUT OVERLAY -->
   <div id="aboutOv" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(5,6,10,.96);z-index:2501;justify-content:center;align-items:center;backdrop-filter:blur(20px);overflow-y:auto" onclick="closeAbout()">
     <div style="background:rgba(14,16,24,.98);padding:32px 24px;width:88%;max-width:480px;border-radius:var(--r);line-height:1.8;border:1px solid rgba(212,175,55,.2);text-align:center;position:relative;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
@@ -1983,6 +2151,130 @@ async function saveVendor(){
     phone:document.getElementById('ven-phone').value,city:document.getElementById('ven-city').value
   })});
   if(d&&d.success){toast('تم إضافة المورد ✓');closeAddVendor();loadBizData()}
+}
+
+/* REAL ESTATE SERVICES */
+function openDoc(){document.getElementById('docOv').classList.add('on');if(authToken)loadDocData()}
+function closeDoc(){document.getElementById('docOv').classList.remove('on')}
+function closeSubOv(id){document.getElementById(id).classList.remove('on')}
+function showDocTab(el,id){document.querySelectorAll('#docOv .mkt-tab').forEach(function(t){t.classList.remove('on')});el.classList.add('on');['doc-licenses','doc-contracts','doc-delivery','doc-rental-inv','doc-certificates','doc-deeds'].forEach(function(s){document.getElementById(s).style.display=s===id?'block':'none'})}
+async function loadDocData(){
+  if(!authToken)return;
+  var l=await api('/realestate/licenses');
+  if(l&&l.success&&l.licenses.length){
+    var badge={فال:'📜', 'وسيط عقاري':'🤝','مكتب هندسي':'📐','وساطة':'⚖️','إيجار':'🔑'};
+    var statusCls={active:'paid',expired:'overdue',suspended:'pending',pending:'pending'};
+    document.getElementById('docLicList').innerHTML=l.licenses.map(function(lic){
+      return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(76,175,80,.12)">'+(badge[lic.license_type]||'📜')+'</div><div class="biz-item-info"><div class="biz-item-title">'+(badge[lic.license_type]||'')+' '+lic.holder_name+'</div><div class="biz-item-sub">'+(lic.license_number||'')+' · '+lic.license_type+'</div><span class="biz-status '+(statusCls[lic.status]||'pending')+'">'+statusText(lic.status)+'</span></div><div style="font-size:11px;color:var(--m)">'+(lic.city||'')+ (lic.expiry_date?' · حتى '+lic.expiry_date:'')+'</div></div>';
+    }).join('');
+  }else{document.getElementById('docLicList').innerHTML='<div style="color:var(--m);text-align:center;padding:24px">لا توجد تراخيص حالياً</div>'}
+  var c=await api('/realestate/contracts');
+  if(c&&c.success&&c.contracts.length){
+    document.getElementById('docConList').innerHTML=c.contracts.map(function(con){
+      return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(33,150,243,.12)">📝</div><div class="biz-item-info"><div class="biz-item-title">'+con.contract_type+' · '+(con.contract_number||'')+'</div><div class="biz-item-sub">'+(con.first_party||'')+' ← '+(con.second_party||'')+'</div><span class="biz-status '+(con.is_authenticated?'paid':'pending')+'">'+(con.is_authenticated?'موثق ✓':'غير موثق')+'</span></div><div style="font-size:11px;color:var(--m)">'+(con.amount?fmt(con.amount)+' ر.س':'')+'</div></div>';
+    }).join('');
+  }else{document.getElementById('docConList').innerHTML='<div style="color:var(--m);text-align:center;padding:24px">لا توجد عقود حالياً</div>'}
+  var d=await api('/realestate/delivery-forms');
+  if(d&&d.success&&d.forms.length){
+    var fCls={pending:'pending',signed:'paid',completed:'paid'};
+    document.getElementById('docDelList').innerHTML=d.forms.map(function(f){
+      return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(255,152,0,.12)">📦</div><div class="biz-item-info"><div class="biz-item-title">'+(f.form_type==='تسليم'?'🔑 تسليم':'📥 استلام')+' — '+f.unit_desc+'</div><div class="biz-item-sub">'+(f.lessor_name||'')+' → '+(f.lessee_name||'')+'</div><span class="biz-status '+(fCls[f.status]||'pending')+'">'+statusText(f.status)+'</span></div></div>';
+    }).join('');
+  }else{document.getElementById('docDelList').innerHTML='<div style="color:var(--m);text-align:center;padding:24px">لا توجد نماذج حالياً</div>'}
+  var ri=await api('/realestate/rental-invoices');
+  if(ri&&ri.success&&ri.stats){
+    document.getElementById('rentInvPaid').innerText=fmt(ri.stats.paid_total);
+    document.getElementById('rentInvPending').innerText=fmt(ri.stats.pending_total);
+    document.getElementById('rentInvOverdue').innerText=fmt(ri.stats.overdue_total);
+  }
+  if(ri&&ri.success&&ri.invoices&&ri.invoices.length){
+    var riCls={paid:'paid',pending:'pending',overdue:'overdue',cancelled:'pending'};
+    document.getElementById('docRentInvList').innerHTML=ri.invoices.map(function(inv){
+      return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(76,175,80,.12)">🧾</div><div class="biz-item-info"><div class="biz-item-title">'+(inv.invoice_number||'')+' — '+inv.tenant_name+'</div><div class="biz-item-sub">'+(inv.period_from||'')+' → '+(inv.period_to||'')+'</div><span class="biz-status '+(riCls[inv.status]||'pending')+'">'+statusText(inv.status)+'</span></div><div style="font-size:12px;font-weight:700;color:var(--g)">'+fmt(inv.total_amount)+' ر.س</div></div>';
+    }).join('');
+  }else{document.getElementById('docRentInvList').innerHTML='<div style="color:var(--m);text-align:center;padding:24px">لا توجد فواتير إيجارية</div>'}
+  var cert=await api('/realestate/certificates');
+  if(cert&&cert.success&&cert.certificates.length){
+    var cCls={pending:'pending',approved:'paid',rejected:'overdue'};
+    document.getElementById('docCertList').innerHTML=cert.certificates.map(function(ct){
+      return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(156,39,176,.12)">📋</div><div class="biz-item-info"><div class="biz-item-title">'+ct.certificate_type+' — '+(ct.certificate_number||'')+'</div><div class="biz-item-sub">'+(ct.property_desc||'')+(ct.engineer_name?' · '+ct.engineer_name:'')+'</div><span class="biz-status '+(cCls[ct.status]||'pending')+'">'+statusText(ct.status)+'</span></div></div>';
+    }).join('');
+  }else{document.getElementById('docCertList').innerHTML='<div style="color:var(--m);text-align:center;padding:24px">لا توجد شهادات فرز</div>'}
+  var deeds=await api('/realestate/deeds');
+  if(deeds&&deeds.success&&deeds.deeds.length){
+    document.getElementById('docDeedList').innerHTML=deeds.deeds.map(function(dd){
+      return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(212,175,55,.12)">📜</div><div class="biz-item-info"><div class="biz-item-title">'+(dd.deed_number||'')+' — '+dd.owner_name+'</div><div class="biz-item-sub">'+(dd.property_desc||'')+(dd.area?' · '+dd.area+' م²':'')+'</div><span class="biz-status '+(dd.is_verified?'paid':'pending')+'">'+(dd.is_verified?'موثق ✓':'غير موثق')+'</span></div></div>';
+    }).join('');
+  }else{document.getElementById('docDeedList').innerHTML='<div style="color:var(--m);text-align:center;padding:24px">لا توجد صكوك مسجلة</div>'}
+}
+function statusText(s){
+  var m={active:'نشط',expired:'منتهي',suspended:'موقوف',pending:'قيد الانتظار',paid:'مدفوع',overdue:'متأخر',signed:'موقع',completed:'مكتمل',draft:'مسودة',approved:'معتمد',rejected:'مرفوض',cancelled:'ملغي'};
+  return m[s]||s;
+}
+function openAddLicense(){if(!authToken){toast('سجّل دخول أولاً');openLogin();return}document.getElementById('addLicOv').classList.add('on')}
+async function saveLicense(){
+  if(!authToken){toast('سجّل دخول أولاً');closeSubOv('addLicOv');openLogin();return}
+  var d=await api('/realestate/licenses',{method:'POST',body:JSON.stringify({
+    license_type:document.getElementById('lic-type').value,holder_name:document.getElementById('lic-holder').value,
+    holder_id:document.getElementById('lic-id').value,city:document.getElementById('lic-city').value,
+    notes:document.getElementById('lic-notes').value
+  })});
+  if(d&&d.success){toast('تم تقديم طلب الترخيص ✓\nالرقم: '+d.license_number);closeSubOv('addLicOv');loadDocData()}
+}
+function openAddContract(){if(!authToken){toast('سجّل دخول أولاً');openLogin();return}document.getElementById('addConOv').classList.add('on')}
+async function saveContract(){
+  if(!authToken){toast('سجّل دخول أولاً');closeSubOv('addConOv');openLogin();return}
+  var d=await api('/realestate/contracts',{method:'POST',body:JSON.stringify({
+    contract_type:document.getElementById('con-type').value,first_party:document.getElementById('con-party1').value,
+    second_party:document.getElementById('con-party2').value,property_desc:document.getElementById('con-prop').value,
+    amount:Number(document.getElementById('con-amount').value)||0,payment_terms:document.getElementById('con-payment').value,
+    start_date:document.getElementById('con-start').value,end_date:document.getElementById('con-end').value
+  })});
+  if(d&&d.success){toast('تم إنشاء العقد ✓\nالرقم: '+d.contract_number);closeSubOv('addConOv');loadDocData()}
+}
+function openAddDelivery(){if(!authToken){toast('سجّل دخول أولاً');openLogin();return}document.getElementById('addDelOv').classList.add('on')}
+async function saveDelivery(){
+  if(!authToken){toast('سجّل دخول أولاً');closeSubOv('addDelOv');openLogin();return}
+  var d=await api('/realestate/delivery-forms',{method:'POST',body:JSON.stringify({
+    form_type:document.getElementById('del-type').value,unit_desc:document.getElementById('del-unit').value,
+    unit_address:document.getElementById('del-addr').value,lessor_name:document.getElementById('del-lessor').value,
+    lessee_name:document.getElementById('del-lessee').value,handover_date:document.getElementById('del-date').value,
+    condition_notes:document.getElementById('del-notes').value,meter_readings:document.getElementById('del-meter').value,
+    keys_count:Number(document.getElementById('del-keys').value)||0
+  })});
+  if(d&&d.success){toast('تم حفظ النموذج ✓');closeSubOv('addDelOv');loadDocData()}
+}
+function openAddRentalInv(){if(!authToken){toast('سجّل دخول أولاً');openLogin();return}document.getElementById('addRentInvOv').classList.add('on')}
+async function saveRentalInv(){
+  if(!authToken){toast('سجّل دخول أولاً');closeSubOv('addRentInvOv');openLogin();return}
+  var d=await api('/realestate/rental-invoices',{method:'POST',body:JSON.stringify({
+    tenant_name:document.getElementById('rentInv-tenant').value,rent_amount:Number(document.getElementById('rentInv-amount').value)||0,
+    services_fee:Number(document.getElementById('rentInv-services').value)||0,tax_amount:Number(document.getElementById('rentInv-tax').value)||0,
+    period_from:document.getElementById('rentInv-from').value,period_to:document.getElementById('rentInv-to').value,
+    payment_method:document.getElementById('rentInv-method').value
+  })});
+  if(d&&d.success){toast('تم إصدار الفاتورة ✓\nالرقم: '+d.invoice_number+' المبلغ: '+fmt(d.total_amount)+' ر.س');closeSubOv('addRentInvOv');loadDocData()}
+}
+function openAddCertificate(){if(!authToken){toast('سجّل دخول أولاً');openLogin();return}document.getElementById('addCertOv').classList.add('on')}
+async function saveCertificate(){
+  if(!authToken){toast('سجّل دخول أولاً');closeSubOv('addCertOv');openLogin();return}
+  var d=await api('/realestate/certificates',{method:'POST',body:JSON.stringify({
+    certificate_type:document.getElementById('cert-type').value,property_desc:document.getElementById('cert-prop').value,
+    total_units:Number(document.getElementById('cert-units').value)||0,engineer_name:document.getElementById('cert-eng').value,
+    notes:document.getElementById('cert-notes').value
+  })});
+  if(d&&d.success){toast('تم تقديم طلب الشهادة ✓');closeSubOv('addCertOv');loadDocData()}
+}
+function openAddDeed(){if(!authToken){toast('سجّل دخول أولاً');openLogin();return}document.getElementById('addDeedOv').classList.add('on')}
+async function saveDeed(){
+  if(!authToken){toast('سجّل دخول أولاً');closeSubOv('addDeedOv');openLogin();return}
+  var d=await api('/realestate/deeds',{method:'POST',body:JSON.stringify({
+    property_desc:document.getElementById('deed-prop').value,owner_name:document.getElementById('deed-owner').value,
+    area:Number(document.getElementById('deed-area').value)||0,property_city:document.getElementById('deed-city').value,
+    deed_type:document.getElementById('deed-type').value,issue_date:document.getElementById('deed-date').value,
+    boundaries:document.getElementById('deed-bounds').value
+  })});
+  if(d&&d.success){toast('تم تسجيل الصك ✓\nالرقم: '+d.deed_number);closeSubOv('addDeedOv');loadDocData()}
 }
 
 /* MARKET DASHBOARD */

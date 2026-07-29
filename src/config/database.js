@@ -305,6 +305,123 @@ await sql.unsafe(`SET client_min_messages = WARNING;
     ('الباحة', 'جرب', 15000, 650000, 4.8, '[]', '[]', false, 30, '[]', 4, 'تحليل السوق 2024-2026'),
     ('الباحة', 'قرن ظبي', 12000, 500000, 5.0, '[]', '[]', false, 25, '[]', 3, 'تحليل السوق 2024-2026')
   ON CONFLICT (city, district) DO NOTHING;
+
+  CREATE TABLE IF NOT EXISTS realestate_licenses (
+    id SERIAL PRIMARY KEY,
+    "userId" INTEGER REFERENCES users(id),
+    license_type TEXT NOT NULL CHECK(license_type IN ('فال','وسيط عقاري','مكتب هندسي','وساطة','إيجار')),
+    license_number TEXT,
+    holder_name TEXT NOT NULL,
+    holder_id TEXT,
+    city TEXT,
+    status TEXT DEFAULT 'active' CHECK(status IN ('active','expired','suspended','pending')),
+    issue_date TEXT,
+    expiry_date TEXT,
+    issuing_authority TEXT DEFAULT 'وزارة الشؤون البلدية والقروية والإسكان',
+    notes TEXT,
+    "createdAt" TEXT DEFAULT (NOW()),
+    "updatedAt" TEXT DEFAULT (NOW())
+  );
+
+  CREATE TABLE IF NOT EXISTS realestate_contracts (
+    id SERIAL PRIMARY KEY,
+    "userId" INTEGER REFERENCES users(id),
+    contract_type TEXT NOT NULL CHECK(contract_type IN ('بيع','إيجار','وساطة','مقاولة','صيانة')),
+    contract_number TEXT UNIQUE,
+    first_party TEXT NOT NULL,
+    second_party TEXT NOT NULL,
+    property_desc TEXT,
+    property_city TEXT,
+    property_district TEXT,
+    amount REAL,
+    payment_terms TEXT,
+    duration TEXT,
+    start_date TEXT,
+    end_date TEXT,
+    is_authenticated INTEGER DEFAULT 0,
+    authenticated_at TEXT,
+    document_url TEXT,
+    notes TEXT,
+    status TEXT DEFAULT 'draft' CHECK(status IN ('draft','active','completed','cancelled')),
+    "createdAt" TEXT DEFAULT (NOW()),
+    "updatedAt" TEXT DEFAULT (NOW())
+  );
+
+  CREATE TABLE IF NOT EXISTS realestate_delivery_forms (
+    id SERIAL PRIMARY KEY,
+    "userId" INTEGER REFERENCES users(id),
+    property_id INTEGER REFERENCES properties(id),
+    form_type TEXT NOT NULL CHECK(form_type IN ('استلام','تسليم')),
+    unit_desc TEXT NOT NULL,
+    unit_address TEXT,
+    lessor_name TEXT NOT NULL,
+    lessee_name TEXT NOT NULL,
+    handover_date TEXT,
+    condition_notes TEXT,
+    meter_readings TEXT,
+    keys_count INTEGER DEFAULT 0,
+    attachments TEXT DEFAULT '[]',
+    status TEXT DEFAULT 'pending' CHECK(status IN ('pending','signed','completed')),
+    "createdAt" TEXT DEFAULT (NOW()),
+    "updatedAt" TEXT DEFAULT (NOW())
+  );
+
+  CREATE TABLE IF NOT EXISTS realestate_rental_invoices (
+    id SERIAL PRIMARY KEY,
+    "userId" INTEGER REFERENCES users(id),
+    invoice_number TEXT UNIQUE,
+    property_id INTEGER REFERENCES properties(id),
+    tenant_name TEXT NOT NULL,
+    period_from TEXT,
+    period_to TEXT,
+    rent_amount REAL NOT NULL,
+    services_fee REAL DEFAULT 0,
+    tax_amount REAL DEFAULT 0,
+    total_amount REAL NOT NULL,
+    payment_method TEXT DEFAULT 'نقدي' CHECK(payment_method IN ('نقدي','تحويل بنكي','شيك','بطاقة ائتمان')),
+    status TEXT DEFAULT 'pending' CHECK(status IN ('pending','paid','overdue','cancelled')),
+    paid_at TEXT,
+    notes TEXT,
+    "createdAt" TEXT DEFAULT (NOW())
+  );
+
+  CREATE TABLE IF NOT EXISTS realestate_certificates (
+    id SERIAL PRIMARY KEY,
+    "userId" INTEGER REFERENCES users(id),
+    certificate_type TEXT NOT NULL CHECK(certificate_type IN ('فرز','تجزئة','ضم','تعديل')),
+    property_id INTEGER REFERENCES properties(id),
+    property_desc TEXT,
+    total_units INTEGER,
+    unit_details TEXT DEFAULT '[]',
+    certificate_number TEXT UNIQUE,
+    issuing_authority TEXT DEFAULT 'أمانة المنطقة',
+    issue_date TEXT,
+    engineer_name TEXT,
+    status TEXT DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),
+    document_url TEXT,
+    notes TEXT,
+    "createdAt" TEXT DEFAULT (NOW())
+  );
+
+  CREATE TABLE IF NOT EXISTS realestate_deeds (
+    id SERIAL PRIMARY KEY,
+    "userId" INTEGER REFERENCES users(id),
+    deed_number TEXT UNIQUE NOT NULL,
+    property_desc TEXT NOT NULL,
+    property_city TEXT,
+    property_district TEXT,
+    area REAL,
+    boundaries TEXT,
+    owner_name TEXT NOT NULL,
+    deed_type TEXT DEFAULT 'صك ملكية' CHECK(deed_type IN ('صك ملكية','حجة إرث','وصية','وقف','إفراغ')),
+    issuing_court TEXT DEFAULT 'المحكمة العامة',
+    issue_date TEXT,
+    is_verified INTEGER DEFAULT 0,
+    document_url TEXT,
+    notes TEXT,
+    "createdAt" TEXT DEFAULT (NOW()),
+    "updatedAt" TEXT DEFAULT (NOW())
+  );
 `);
 
 export default sql;

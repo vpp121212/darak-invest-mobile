@@ -38,6 +38,7 @@ import chatRoutes from './routes/chat.js';
 import adRoutes from './routes/ads.js';
 import pulseRoutes from './routes/pulse.js';
 import panoramaRoutes from './routes/panorama.js';
+import realestateRoutes from './routes/realestate.js';
 
 dotenv.config();
 
@@ -103,6 +104,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/panorama', panoramaRoutes);
 app.use('/api/ads', adRoutes);
 app.use('/api/pulse', pulseRoutes);
+app.use('/api/realestate', realestateRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '1.0.0' });
