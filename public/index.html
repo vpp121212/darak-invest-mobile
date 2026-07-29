@@ -1074,22 +1074,34 @@ function fetchPulse(p){
     var px=d.pulse;
     var metro='',projects='';
     if(px.metro_stations&&px.metro_stations.length){
-      metro='<div style="margin-bottom:8px"><div style="font-size:11px;color:var(--g);font-weight:600;margin-bottom:4px">🚇 محطات مترو قريبة</div>'+
-        px.metro_stations.map(function(m){return'<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--m);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)"><span>'+m.name+'</span><span style="color:var(--green)">'+m.distance+'</span></div>'}).join('')+'</div>';
+      metro='<div style="margin-bottom:8px"><div style="font-size:11px;color:var(--g);font-weight:600;margin-bottom:6px">🚇 أقرب محطات المترو</div>'+
+        px.metro_stations.map(function(m){return'<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--m);padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.02);margin-bottom:4px"><span style="width:8px;height:8px;border-radius:50%;background:'+(m.line==='الأزرق'?'#2196f3':'#ef5350')+';flex-shrink:0"></span><span style="flex:1">'+m.name+'</span><span style="color:var(--green);font-weight:600">'+m.distance+'</span><span style="font-size:9px;color:var(--m)">'+m.year+'</span></div>'}).join('')+'</div>';
     }
     if(px.nearby_projects&&px.nearby_projects.length){
-      projects='<div style="margin-bottom:8px"><div style="font-size:11px;color:var(--g);font-weight:600;margin-bottom:4px">🏗️ مشاريع قريبة</div>'+
-        px.nearby_projects.map(function(m){return'<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--m);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)"><span>'+m.name+'</span><span style="color:var(--blue)">'+m.distance+'</span></div>'}).join('')+'</div>';
+      projects='<div style="margin-bottom:8px"><div style="font-size:11px;color:var(--g);font-weight:600;margin-bottom:6px">🏗️ مشاريع كبرى قريبة</div>'+
+        px.nearby_projects.map(function(m){return'<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--m);padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.02);margin-bottom:4px"><span>'+m.name+'</span><span style="flex:1"></span><span style="color:var(--blue)">'+m.distance+'</span></div>'}).join('')+'</div>';
     }
     var growth=px.future_value_growth?('<span style="color:var(--green)">+'+px.future_value_growth+'%</span>'):'—';
+    var roiColor=px.roi>7?'var(--green)':px.roi>5?'var(--g)':'var(--red)';
+    var growthColor=px.future_value_growth>15?'var(--green)':px.future_value_growth>8?'var(--g)':'var(--m)';
+    
+    var pulseScore=Math.round(((px.roi||0)*3 + (px.walk_score||0)*0.4 + ((px.future_value_growth||0))*1.2)/2);
+    pulseScore=Math.min(100,Math.max(0,pulseScore));
+    var scoreColor=pulseScore>70?'var(--green)':pulseScore>45?'var(--g)':'var(--red)';
+    var scoreBg=pulseScore>70?'rgba(74,222,128,.12)':pulseScore>45?'rgba(212,175,55,.12)':'rgba(248,113,113,.12)';
+    var scoreBorder=pulseScore>70?'rgba(74,222,128,.3)':pulseScore>45?'rgba(212,175,55,.3)':'rgba(248,113,113,.3)';
+    var scoreLabel=pulseScore>70?'ممتاز':pulseScore>45?'جيد جداً':'جيد';
+    
     var cards='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">'+
-      '<div style="padding:10px;border-radius:10px;background:rgba(8,9,14,.95);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">العائد الإيجاري</div><div style="font-size:16px;font-weight:700;color:var(--g)">'+(px.roi||'—')+'%</div></div>'+
-      '<div style="padding:10px;border-radius:10px;background:rgba(8,9,14,.95);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">النمو المتوقع</div><div style="font-size:16px;font-weight:700;color:var(--green)">'+growth+'</div></div>'+
+      '<div style="padding:10px;border-radius:10px;background:rgba(8,9,14,.95);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">العائد الإيجاري</div><div style="font-size:16px;font-weight:700;color:'+roiColor+'">'+(px.roi||'—')+'%</div></div>'+
+      '<div style="padding:10px;border-radius:10px;background:rgba(8,9,14,.95);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">النمو المتوقع</div><div style="font-size:16px;font-weight:700;color:'+growthColor+'">'+growth+'</div></div>'+
       (px.walk_score?'<div style="padding:10px;border-radius:10px;background:rgba(8,9,14,.95);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">مؤشر المشي</div><div style="font-size:16px;font-weight:700;color:var(--blue)">'+px.walk_score+'</div></div>':'')+
-      (px.avg_rent?'<div style="padding:10px;border-radius:10px;background:rgba(8,9,14,.95);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">متوسط الإيجار</div><div style="font-size:14px;font-weight:700;color:var(--g)">'+fmt(px.avg_rent)+'</div></div>':'')+
+      (px.avg_rent?'<div style="padding:10px;border-radius:10px;background:rgba(8,9,14,.95);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">متوسط الإيجار/سنوياً</div><div style="font-size:13px;font-weight:700;color:var(--g)">'+fmt(px.avg_rent)+' ر.س</div></div>':'')+
     '</div>';
-    var sb=px.sports_boulevard?'<div style="display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);font-size:11px;color:var(--green);margin-bottom:8px">🏃 يمر بالحي المسار الرياضي — جودة حياة أعلى</div>':'';
-    document.getElementById('pulse-card-'+p.id).innerHTML='<div class="fd"><h3>📊 مؤشر نبض الحي الذكي</h3><div style="background:rgba(8,9,14,.95);border:1px solid rgba(212,175,55,.15);border-radius:var(--r);padding:14px">'+sb+cards+metro+projects+'<div style="font-size:9px;color:var(--m);text-align:left;margin-top:4px">المصدر: '+px.data_source+'</div></div></div>';
+    var sb=px.sports_boulevard?'<div style="display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);font-size:11px;color:var(--green);margin-bottom:8px">🏃 يمر بالحي <strong>المسار الرياضي</strong> — جودة حياة أعلى</div>':'';
+    document.getElementById('pulse-card-'+p.id).innerHTML='<div class="fd"><h3>📊 مؤشر نبض الحي الذكي</h3><div style="background:rgba(8,9,14,.95);border:1px solid rgba(212,175,55,.15);border-radius:var(--r);padding:14px;animation:pulseIn .4s ease">'+
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;padding:10px;border-radius:10px;background:'+scoreBg+';border:1px solid '+scoreBorder+'"><div style="width:48px;height:48px;border-radius:50%;background:'+scoreColor+';color:#05060a;font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+pulseScore+'</div><div><div style="font-size:14px;font-weight:700;color:'+scoreColor+'">مؤشر نبض الحي: '+scoreLabel+'</div><div style="font-size:10px;color:var(--m);margin-top:2px">تقييم شامل للحي بناءً على العائد، النمو، جودة الحياة</div></div></div>'+
+      sb+cards+metro+projects+'<div style="font-size:9px;color:var(--m);text-align:left;margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,.04)">📊 '+px.data_source+'</div></div></div>';
   }).catch(function(){document.getElementById('pulse-card-'+p.id).innerHTML=''});
 }
 function closeD(){document.getElementById('ov').classList.remove('open');document.body.style.overflow=''}
