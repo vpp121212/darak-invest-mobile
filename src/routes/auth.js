@@ -35,7 +35,7 @@ router.post('/register', authLimiter, async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'خطأ داخلي' });
+    res.status(500).json({ error: 'خطأ داخلي', detail: err.message });
   }
 });
 
