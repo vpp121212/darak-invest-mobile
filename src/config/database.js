@@ -157,6 +157,20 @@ await sql.unsafe(`SET client_min_messages = WARNING;
     FOREIGN KEY ("userId") REFERENCES users(id)
   );
 
+  CREATE TABLE IF NOT EXISTS payments (
+    id SERIAL PRIMARY KEY,
+    "userId" INTEGER NOT NULL REFERENCES users(id),
+    amount REAL NOT NULL,
+    currency TEXT DEFAULT 'SAR',
+    status TEXT DEFAULT 'pending' CHECK(status IN ('pending','paid','failed','refunded')),
+    "paymentMethod" TEXT,
+    "packageId" TEXT NOT NULL,
+    "moyasarId" TEXT,
+    description TEXT,
+    "paidAt" TEXT,
+    "createdAt" TEXT DEFAULT (NOW())
+  );
+
   CREATE TABLE IF NOT EXISTS neighbourhood_pulse (
     id SERIAL PRIMARY KEY,
     city TEXT NOT NULL,

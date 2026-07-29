@@ -64,6 +64,7 @@
 
 /* Packages */
 .pkg{padding:16px}.pkg-card{padding:14px;border-radius:var(--r);background:linear-gradient(135deg,rgba(18,20,30,.85),rgba(8,9,14,.9));border:1px solid var(--b);margin-bottom:10px}.pkg-card.featured{border-color:rgba(212,175,55,.4)}.pkg-name{font-size:15px;font-weight:700;color:var(--t);margin-bottom:2px}.pkg-price{font-size:20px;font-weight:800;color:var(--g);margin:6px 0}.pkg-price span{font-size:11px;font-weight:400;color:var(--m)}.pkg-features{list-style:none;padding:0;margin:10px 0 14px;display:flex;flex-direction:column;gap:6px}.pkg-features li{font-size:12px;color:var(--m);display:flex;align-items:center;gap:6px}.pkg-features li::before{content:"✓";color:var(--g);font-weight:700;font-size:11px}.pkg-btn{width:100%;padding:10px;border-radius:999px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;border:none}.pkg-btn.primary{background:linear-gradient(135deg,#d4af37,#c9a430);color:#05060a}.pkg-btn.secondary{background:rgba(255,255,255,.06);border:1px solid var(--b);color:var(--t)}
+.pay{padding:16px}.pay-hdr{font-size:18px;font-weight:700;color:var(--g);margin-bottom:4px;text-align:center}.pay-sub{font-size:11px;color:var(--m);margin-bottom:20px;text-align:center}.pay-field{margin-bottom:12px}.pay-field label{display:block;font-size:11px;color:var(--m);margin-bottom:4px;font-weight:600}.pay-field input,.pay-field select{width:100%;padding:12px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--b);color:var(--t);font-size:14px;font-family:inherit;outline:none;direction:rtl}.pay-field input:focus,.pay-field select:focus{border-color:rgba(212,175,55,.5)}.pay-row{display:flex;gap:10px}.pay-row .pay-field{flex:1}.pay-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:16px;margin-bottom:14px}.pay-card-hdr{font-size:12px;font-weight:600;color:var(--m);margin-bottom:10px;display:flex;align-items:center;gap:6px}.pay-logos{display:flex;gap:6px;margin-bottom:10px;justify-content:center}.pay-logos span{padding:4px 8px;border-radius:6px;background:rgba(255,255,255,.05);font-size:10px;color:var(--m);border:1px solid rgba(255,255,255,.06)}.pay-btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--g),#c9a430);color:#05060a;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:6px}.pay-btn:disabled{opacity:.5;cursor:not-allowed}.pay-secure{text-align:center;font-size:10px;color:var(--m);margin-top:10px;display:flex;align-items:center;justify-content:center;gap:4px}.pay-loader{text-align:center;padding:20px;color:var(--g)}
 
 /* Office */
 .off{padding:16px}.off-field{margin-bottom:10px}.off-field label{display:block;font-size:11px;color:var(--m);margin-bottom:4px}.off-field input,.off-field select,.off-field textarea{width:100%;padding:10px 12px;border-radius:999px;background:rgba(18,20,30,.85);border:1px solid var(--b);color:var(--t);font-size:13px;font-family:inherit;outline:none}.off-field textarea{resize:none;border-radius:var(--r)}
@@ -1041,6 +1042,26 @@
     <div class="pkg-card"><div class="pkg-name">المؤسسات</div><div class="pkg-price">299 ر.س <span>/ شهرياً</span></div><ul class="pkg-features"><li>إعلانات غير محدودة</li><li>דף مكتب مخصص</li><li>إحصائيات متقدمة</li><li>دعم أولوي</li></ul><button class="pkg-btn secondary" onclick="toast('سيتم التواصل معك قريباً');closePkg()">تواصل معنا</button></div>
   </div></div></div>
 
+  <!-- PAYMENT OVERLAY -->
+  <div class="ov" id="payOv"><div class="ov-p"><button class="cls" onclick="closePayOv()">✕</button><div class="pay" style="padding-top:44px">
+    <div class="pay-hdr">💳 إتمام الدفع</div>
+    <div class="pay-sub" id="paySummary">باقة الاحترافي · 99 ر.س/شهرياً</div>
+    <div class="pay-card" id="payCardForm">
+      <div class="pay-logos"><span>💳 مدى</span><span>💳 فيزا</span><span>💳 ماستركارد</span></div>
+      <div class="pay-field"><label>اسم حامل البطاقة</label><input id="pay-name" placeholder="الاسم على البطاقة" autocomplete="cc-name"></div>
+      <div class="pay-field"><label>رقم البطاقة</label><input id="pay-number" placeholder="0000 0000 0000 0000" maxlength="19" inputmode="numeric"></div>
+      <div class="pay-row">
+        <div class="pay-field"><label>شهر/سنة</label><input id="pay-exp" placeholder="MM/YY" maxlength="5" inputmode="numeric"></div>
+        <div class="pay-field"><label>رمز CVV</label><input id="pay-cvc" placeholder="123" maxlength="4" inputmode="numeric"></div>
+      </div>
+    </div>
+    <div id="payMoyasarForm" style="display:none"></div>
+    <div id="payError" style="color:#f87171;font-size:12px;margin-bottom:8px;display:none;text-align:center"></div>
+    <button class="pay-btn" id="payBtn" onclick="processPayment()">💳 دفع <span id="payAmount">99</span> ر.س</button>
+    <div class="pay-secure">🔒 مشفّر وآمن حسب معايير PCI</div>
+    <div id="paySpinner" style="display:none" class="pay-loader">جاري معالجة الدفع...</div>
+  </div></div></div>
+
   <!-- OFFICE OVERLAY -->
   <div class="ov" id="off"><div class="ov-p"><button class="cls" onclick="closeOff()">✕</button><div class="off" style="padding-top:44px"><div style="font-size:16px;font-weight:700;color:var(--g);margin-bottom:4px">🏢 تسجيل مكتب عقاري</div><div style="font-size:12px;color:var(--m);margin-bottom:16px">سجّل مكتبك وابدأ بعرض عقاراتك</div>
     <div class="off-field"><label>اسم المكتب *</label><input id="off-name" placeholder="مكتب الديار العقارية"></div>
@@ -1461,7 +1482,7 @@ document.addEventListener('click',function(e){
   if(!e.target.closest('#map3dSearchInput')&&!e.target.closest('#map3dSearchResults'))document.getElementById('map3dSearchResults').style.display='none';
 });
 document.getElementById('ov').addEventListener('click',function(e){if(e.target===this)closeD()});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeD();closeLogin();closeAIP();closeVR();closeMap();close3D();closeMapPicker();closeUpload();closeFin();closeMkt();closeLeg();closeBiz();closeAddInvoice();closeAddVendor();closeMarket()}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeD();closeLogin();closeAIP();closeVR();closeMap();close3D();closeMapPicker();closeUpload();closeFin();closeMkt();closeLeg();closeBiz();closeAddInvoice();closeAddVendor();closeMarket();closePayOv()}});
 
 /* MAP */
 var mapPropertyId=null,mapFullMap=null,map3dInstance=null,MB_TOKEN='',_tokenPromise=null,_tokenReady=false;
@@ -1959,10 +1980,64 @@ async function openPkg(){
 }
 async function subscribePkg(id){
   if(!authToken){toast('سجّل دخول أولاً');closePkg();openLogin();return}
-  var d=await api('/packages/subscribe',{method:'POST',body:JSON.stringify({packageId:id})});
-  if(d&&d.success){toast('تم الاشتراك بنجاح ✓');closePkg()}
+  if(id==='basic'){var d=await api('/packages/subscribe',{method:'POST',body:JSON.stringify({packageId:id})});if(d&&d.success){toast('تم الاشتراك ✓');closePkg()}return}
+  var cfg=await api('/payments/config');
+  if(cfg&&cfg.testMode){
+    openPaymentOv(id)
+  }else if(cfg&&cfg.publishableKey){
+    var intent=await api('/payments/create-intent',{method:'POST',body:JSON.stringify({packageId:id})});
+    if(intent&&intent.success&&intent.invoiceUrl){window.location.href=intent.invoiceUrl}
+  }else{
+    openPaymentOv(id)
+  }
 }
 function closePkg(){document.getElementById('pkg').classList.remove('open')}
+var selectedPkgId=null;
+var pkgsData={basic:{name:'الأساسي',price:0},pro:{name:'الاحترافي',price:99},enterprise:{name:'المؤسسات',price:299}};
+function openPaymentOv(id){
+  selectedPkgId=id;
+  var p=pkgsData[id]||{name:'',price:0};
+  document.getElementById('paySummary').innerText='باقة '+p.name+' · '+p.price+' ر.س/شهرياً';
+  document.getElementById('payAmount').innerText=p.price;
+  document.getElementById('payError').style.display='none';
+  document.getElementById('payCardForm').style.display='block';
+  document.getElementById('payMoyasarForm').style.display='none';
+  document.getElementById('payBtn').style.display='block';
+  document.getElementById('paySpinner').style.display='none';
+  ['pay-name','pay-number','pay-exp','pay-cvc'].forEach(function(x){document.getElementById(x).value=''});
+  document.getElementById('payOv').classList.add('open')
+}
+document.getElementById('pay-number').addEventListener('input',function(e){var v=e.target.value.replace(/\D/g,'');e.target.value=v.replace(/(.{4})/g,'$1 ').trim()});
+document.getElementById('pay-exp').addEventListener('input',function(e){var v=e.target.value.replace(/\D/g,'');if(v.length>2){e.target.value=v.slice(0,2)+'/'+v.slice(2,4)}else{e.target.value=v}});
+document.getElementById('pay-cvc').addEventListener('input',function(e){e.target.value=e.target.value.replace(/\D/g,'')});
+function closePayOv(){document.getElementById('payOv').classList.remove('open')}
+async function processPayment(){
+  if(!selectedPkgId)return;
+  var name=document.getElementById('pay-name').value.trim();
+  var number=document.getElementById('pay-number').value.replace(/\s/g,'');
+  var exp=document.getElementById('pay-exp').value.trim();
+  var cvc=document.getElementById('pay-cvc').value.trim();
+  if(!name||!number||!exp||!cvc){showPayErr('أكمل جميع الحقول');return}
+  if(number.length<16){showPayErr('رقم البطاقة غير صحيح');return}
+  var parts=exp.split('/');
+  if(parts.length!==2||!parts[0]||!parts[1]){showPayErr('صيغة التاريخ غير صحيحة (MM/YY)');return}
+  if(cvc.length<3){showPayErr('رمز CVV غير صحيح');return}
+  document.getElementById('payBtn').style.display='none';
+  document.getElementById('payCardForm').style.display='none';
+  document.getElementById('paySpinner').style.display='block';
+  document.getElementById('payError').style.display='none';
+  var intent=await api('/payments/create-intent',{method:'POST',body:JSON.stringify({packageId:selectedPkgId})});
+  if(!intent||!intent.success){showPayErr('فشل إنشاء الدفعة');return}
+  var d=await api('/payments/confirm',{method:'POST',body:JSON.stringify({paymentId:intent.paymentId,card:{number:number,cvc:cvc,month:parts[0],year:parts[1]}})});
+  document.getElementById('paySpinner').style.display='none';
+  if(d&&d.success){
+    await api('/packages/subscribe',{method:'POST',body:JSON.stringify({packageId:selectedPkgId})});
+    toast('✅ تم الدفع والاشتراك بنجاح');
+    closePayOv();
+    closePkg()
+  }else{showPayErr(d&&d.message||'فشل الدفع، حاول مرة أخرى')}
+}
+function showPayErr(msg){document.getElementById('payError').innerText=msg;document.getElementById('payError').style.display='block';document.getElementById('payBtn').style.display='block';document.getElementById('payCardForm').style.display='block';document.getElementById('paySpinner').style.display='none'}
 
 /* OFFICE */
 function openOff(){document.getElementById('off').classList.add('open')}
