@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
-import db from '../config/database.js';
+import sql from '../config/database.js';
 
-export const protect = (req, res, next) => {
+export const protect = async (req, res, next) => {
   let token;
   if (req.headers.authorization?.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
@@ -10,7 +10,7 @@ export const protect = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = db.prepare('SELECT id, name, email, phone, role FROM users WHERE id = ?').get(decoded.id);
+    const [user] = await sql`SELECT id, name, email, phone, role FROM users WHERE id = ${decoded.id}`;
     if (!user) return res.status(401).json({ error: 'المستخدم غير موجود' });
     req.user = user;
     next();

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import db from '../config/database.js';
+import sql from '../config/database.js';
 
 const router = Router();
 
@@ -31,7 +31,7 @@ router.post('/analysis', async (req, res) => {
 
     let prop = null;
     if (propertyId) {
-      prop = db.prepare('SELECT * FROM properties WHERE id = ?').get(propertyId);
+      [prop] = await sql`SELECT * FROM properties WHERE id = ${propertyId}`;
     }
 
     const price = purchasePrice || prop?.price || 0;
@@ -57,10 +57,10 @@ router.post('/analysis', async (req, res) => {
     const grossMargin = annualRent > 0 ? (((annualRent - expenses) / annualRent) * 100) : 0;
     const netMargin = price > 0 ? ((netIncome / price) * 100) : 0;
 
-    const comparable = db.prepare(`
-      SELECT AVG(price) as avgPrice, AVG(price/area) as avgPerSqm, COUNT(*) as count
-      FROM properties WHERE city = ? AND status = 'active'
-    `).get(prop?.city || city || 'الرياض');
+    const [comparable] = await sql`
+      SELECT AVG(price) as "avgPrice", AVG(price/area) as "avgPerSqm", COUNT(*)::int as count
+      FROM properties WHERE city = ${prop?.city || city || 'الرياض'} AND status = 'active'
+    `;
 
     let aiInsight = null;
     const systemPrompt = 'أنت محلل عقاري محترف في السعودية. حلل بيانات الاستثمار العقاري وأعطِ نصيحة مختصرة بالعربي.';
@@ -107,8 +107,10 @@ router.post('/compare', async (req, res) => {
     }
 
     const ids = properties.map(p => p.id || p);
-    const placeholders = ids.map(() => '?').join(',');
-    const props = db.prepare(`SELECT * FROM properties WHERE id IN (${placeholders})`).all(...ids);
+    const props = await sql.unsafe(
+      `SELECT * FROM properties WHERE id IN (${ids.map((_, i) => '$' + (i + 1)).join(',')})`,
+      ids
+    );
 
     const comparison = props.map(p => {
       const annualRent = (p.purpose === 'إيجار' ? p.price : p.price * 0.08);

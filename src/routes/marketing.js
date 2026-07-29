@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import db from '../config/database.js';
+import sql from '../config/database.js';
 
 const router = Router();
 
@@ -54,7 +54,7 @@ router.post('/description', async (req, res) => {
       seoAnalysis = await askAI(seoPrompt, seoMsg);
     }
 
-    const shareText = `🏠 ${title || type}\n📍 ${district}، ${city}\n💰 ${price?.toLocaleString()} ر.س\n📐 ${area} م² | ${rooms} غرف\n\n${aiDescription?.substring(0, 150)}...\n\n🔗 عبر تطبيق دارك وحيك`;
+    const shareText = `${title || type}\n📍 ${district}، ${city}\n💰 ${price?.toLocaleString()} ر.س\n📐 ${area} م² | ${rooms} غرف\n\n${aiDescription?.substring(0, 150)}...\n\n🔗 عبر تطبيق دارك وحيك`;
 
     res.json({ success: true, description: aiDescription, seoAnalysis, shareText });
   } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
@@ -117,17 +117,20 @@ router.post('/leads', async (req, res) => {
   try {
     const { budget, city, type, rooms, minArea, maxArea } = req.body;
 
-    let sql = "SELECT * FROM properties WHERE status = 'active'";
-    const params = [];
-    if (budget) { sql += ' AND price <= ?'; params.push(Number(budget)); }
-    if (city) { sql += ' AND city = ?'; params.push(city); }
-    if (type) { sql += ' AND type = ?'; params.push(type); }
-    if (rooms) { sql += ' AND rooms >= ?'; params.push(Number(rooms)); }
-    if (minArea) { sql += ' AND area >= ?'; params.push(Number(minArea)); }
-    if (maxArea) { sql += ' AND area <= ?'; params.push(Number(maxArea)); }
-    sql += ' ORDER BY createdAt DESC LIMIT 5';
+    let conditions = ["status = 'active'"];
+    let params = [];
+    let idx = 0;
+    if (budget) { conditions.push(`price <= $${++idx}`); params.push(Number(budget)); }
+    if (city) { conditions.push(`city = $${++idx}`); params.push(city); }
+    if (type) { conditions.push(`type = $${++idx}`); params.push(type); }
+    if (rooms) { conditions.push(`rooms >= $${++idx}`); params.push(Number(rooms)); }
+    if (minArea) { conditions.push(`area >= $${++idx}`); params.push(Number(minArea)); }
+    if (maxArea) { conditions.push(`area <= $${++idx}`); params.push(Number(maxArea)); }
 
-    const matches = db.prepare(sql).all(...params);
+    const matches = await sql.unsafe(
+      `SELECT * FROM properties WHERE ${conditions.join(' AND ')} ORDER BY "createdAt" DESC LIMIT 5`,
+      params
+    );
 
     const leadText = matches.length > 0
       ? matches.map(p => `🏠 ${p.title}\n📍 ${p.district}، ${p.city}\n💰 ${p.price.toLocaleString()} ر.س\n📐 ${p.area} م²\n\n`).join('---\n')

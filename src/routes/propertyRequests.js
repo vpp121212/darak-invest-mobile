@@ -1,23 +1,25 @@
 import { Router } from 'express';
-import db from '../config/database.js';
+import sql from '../config/database.js';
 import { protect } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/', protect, (req, res) => {
+router.get('/', protect, async (req, res) => {
   try {
-    const requests = db.prepare('SELECT * FROM propertyRequests WHERE userId = ? ORDER BY createdAt DESC').all(req.user.id);
+    const requests = await sql`SELECT * FROM "propertyRequests" WHERE "userId" = ${req.user.id} ORDER BY "createdAt" DESC`;
     res.json({ success: true, requests });
   } catch (err) { res.status(500).json({ error: 'خطأ داخلي' }); }
 });
 
-router.post('/', protect, (req, res) => {
+router.post('/', protect, async (req, res) => {
   try {
     const { city, district, type, purpose, minPrice, maxPrice, minArea, maxArea, rooms, notes } = req.body;
-    const result = db.prepare(
-      'INSERT INTO propertyRequests (userId, city, district, type, purpose, minPrice, maxPrice, minArea, maxArea, rooms, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-    ).run(req.user.id, city, district, type, purpose, minPrice, maxPrice, minArea, maxArea, rooms, notes);
-    res.status(201).json({ success: true, id: result.lastInsertRowid, message: 'تم إرسال طلبك بنجاح' });
+    const [result] = await sql`
+      INSERT INTO "propertyRequests" ("userId", city, district, type, purpose, "minPrice", "maxPrice", "minArea", "maxArea", rooms, notes)
+      VALUES (${req.user.id}, ${city}, ${district}, ${type}, ${purpose}, ${minPrice}, ${maxPrice}, ${minArea}, ${maxArea}, ${rooms}, ${notes})
+      RETURNING id
+    `;
+    res.status(201).json({ success: true, id: result.id, message: 'تم إرسال طلبك بنجاح' });
   } catch (err) { res.status(500).json({ error: 'خطأ داخلي' }); }
 });
 

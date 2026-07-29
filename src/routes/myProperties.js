@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import db from '../config/database.js';
+import sql from '../config/database.js';
 import { protect } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/', protect, (req, res) => {
+router.get('/', protect, async (req, res) => {
   try {
-    const properties = db.prepare('SELECT * FROM properties WHERE agentUserId = ? ORDER BY createdAt DESC').all(req.user.id);
+    const properties = await sql`SELECT * FROM properties WHERE "agentUserId" = ${req.user.id} ORDER BY "createdAt" DESC`;
     res.json({
       success: true,
       properties: properties.map(p => ({
@@ -19,13 +19,13 @@ router.get('/', protect, (req, res) => {
   } catch (err) { res.status(500).json({ error: 'خطأ داخلي' }); }
 });
 
-router.get('/stats', protect, (req, res) => {
+router.get('/stats', protect, async (req, res) => {
   try {
-    const total = db.prepare('SELECT COUNT(*) as c FROM properties WHERE agentUserId = ?').get(req.user.id).c;
-    const active = db.prepare("SELECT COUNT(*) as c FROM properties WHERE agentUserId = ? AND status = 'active'").get(req.user.id).c;
-    const pending = db.prepare("SELECT COUNT(*) as c FROM properties WHERE agentUserId = ? AND status = 'pending'").get(req.user.id).c;
-    const totalViews = db.prepare('SELECT COALESCE(SUM(views),0) as v FROM properties WHERE agentUserId = ?').get(req.user.id).v;
-    const totalFavs = db.prepare('SELECT COALESCE(SUM(favorites),0) as f FROM properties WHERE agentUserId = ?').get(req.user.id).f;
+    const [{ c: total }] = await sql`SELECT COUNT(*)::int as c FROM properties WHERE "agentUserId" = ${req.user.id}`;
+    const [{ c: active }] = await sql`SELECT COUNT(*)::int as c FROM properties WHERE "agentUserId" = ${req.user.id} AND status = 'active'`;
+    const [{ c: pending }] = await sql`SELECT COUNT(*)::int as c FROM properties WHERE "agentUserId" = ${req.user.id} AND status = 'pending'`;
+    const [{ v: totalViews }] = await sql`SELECT COALESCE(SUM(views),0)::int as v FROM properties WHERE "agentUserId" = ${req.user.id}`;
+    const [{ f: totalFavs }] = await sql`SELECT COALESCE(SUM(favorites),0)::int as f FROM properties WHERE "agentUserId" = ${req.user.id}`;
     res.json({ success: true, stats: { total, active, pending, totalViews, totalFavorites: totalFavs } });
   } catch (err) { res.status(500).json({ error: 'خطأ داخلي' }); }
 });

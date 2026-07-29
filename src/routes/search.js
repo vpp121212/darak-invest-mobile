@@ -1,13 +1,13 @@
 import { Router } from 'express';
-import db from '../config/database.js';
+import sql from '../config/database.js';
 
 const router = Router();
 
-router.get('/', (req, res) => {
-  handleSearch(req, res);
+router.get('/', async (req, res) => {
+  await handleSearch(req, res);
 });
 
-function handleSearch(req, res) {
+async function handleSearch(req, res) {
   try {
     console.log('SEARCH HIT:', req.originalUrl, req.path);
     const start = Date.now();
@@ -15,59 +15,72 @@ function handleSearch(req, res) {
       rooms, baths, facing, trust, sort, age, minStreetWidth, minCars,
       features, page = 1, limit = 50 } = req.query;
 
-    let where = ['status = ?'];
-    let params = ['active'];
+    let conditions = [];
+    let params = [];
+    let idx = 0;
 
-    if (city) { where.push('city = ?'); params.push(city); }
-    if (type) { where.push('type = ?'); params.push(type); }
-    if (purpose) { where.push('purpose = ?'); params.push(purpose); }
-    if (facing) { where.push('facing = ?'); params.push(facing); }
-    if (trust) { where.push('trust = ?'); params.push(trust); }
-    if (rooms) { where.push('rooms >= ?'); params.push(Number(rooms)); }
-    if (baths) { where.push('baths >= ?'); params.push(Number(baths)); }
-    if (minPrice) { where.push('price >= ?'); params.push(Number(minPrice)); }
-    if (maxPrice) { where.push('price <= ?'); params.push(Number(maxPrice)); }
-    if (minArea) { where.push('area >= ?'); params.push(Number(minArea)); }
-    if (maxArea) { where.push('area <= ?'); params.push(Number(maxArea)); }
-    if (minStreetWidth) { where.push('streetWidth >= ?'); params.push(Number(minStreetWidth)); }
-    if (minCars) { where.push('cars >= ?'); params.push(Number(minCars)); }
+    const add = (sql, val) => {
+      if (val !== undefined && val !== null && val !== '') {
+        conditions.push(sql.replace('?', `$${++idx}`));
+        params.push(val);
+      }
+    };
 
-    // Age filter
+    conditions.push(`status = $${++idx}`);
+    params.push('active');
+
+    add('city = ?', city);
+    add('type = ?', type);
+    add('purpose = ?', purpose);
+    add('facing = ?', facing);
+    add('trust = ?', trust);
+    add('rooms >= ?', rooms && Number(rooms));
+    add('baths >= ?', baths && Number(baths));
+    add('price >= ?', minPrice && Number(minPrice));
+    add('price <= ?', maxPrice && Number(maxPrice));
+    add('area >= ?', minArea && Number(minArea));
+    add('area <= ?', maxArea && Number(maxArea));
+    add('"streetWidth" >= ?', minStreetWidth && Number(minStreetWidth));
+    add('cars >= ?', minCars && Number(minCars));
+
     if (age) {
-      if (age === 'new') { where.push('age <= 1'); }
-      else if (age === 'under') { where.push('age = 0'); }
-      else if (age === '1') { where.push('age BETWEEN 1 AND 5'); }
-      else if (age === '5') { where.push('age BETWEEN 5 AND 10'); }
-      else if (age === '10') { where.push('age > 10'); }
+      if (age === 'new') conditions.push('age <= 1');
+      else if (age === 'under') conditions.push('age = 0');
+      else if (age === '1') conditions.push('age BETWEEN 1 AND 5');
+      else if (age === '5') conditions.push('age BETWEEN 5 AND 10');
+      else if (age === '10') conditions.push('age > 10');
     }
 
-    // Text search
     if (q) {
-      where.push("(title LIKE ? OR city LIKE ? OR district LIKE ? OR type LIKE ? OR description LIKE ?)");
+      conditions.push(`(title ILIKE $${++idx} OR city ILIKE $${++idx} OR district ILIKE $${++idx} OR type ILIKE $${++idx} OR description ILIKE $${++idx})`);
       const like = `%${q}%`;
       params.push(like, like, like, like, like);
     }
 
-    // Features filter (comma-separated)
     if (features) {
       const featureList = features.split(',');
       featureList.forEach(f => {
-        where.push('features LIKE ?');
+        conditions.push(`features ILIKE $${++idx}`);
         params.push(`%${f.trim()}%`);
       });
     }
 
-    let orderBy = 'createdAt DESC';
+    let orderBy = '"createdAt" DESC';
     if (sort === 'price_asc') orderBy = 'price ASC';
     if (sort === 'price_desc') orderBy = 'price DESC';
     if (sort === 'area_desc') orderBy = 'area DESC';
 
     const offset = (Number(page) - 1) * Number(limit);
-    const sql = `SELECT * FROM properties WHERE ${where.join(' AND ')} ORDER BY ${orderBy} LIMIT ? OFFSET ?`;
-    const countSql = `SELECT COUNT(*) as total FROM properties WHERE ${where.join(' AND ')}`;
+    const where = conditions.join(' AND ');
 
-    const properties = db.prepare(sql).all(...params, Number(limit), offset);
-    const { total } = db.prepare(countSql).get(...params);
+    const properties = await sql.unsafe(
+      `SELECT * FROM properties WHERE ${where} ORDER BY ${orderBy} LIMIT $${++idx} OFFSET $${++idx}`,
+      [...params, Number(limit), offset]
+    );
+
+    // remove limit/offset params for count query
+    const countParams = params.slice();
+    const [{ total }] = await sql.unsafe(`SELECT COUNT(*)::int as total FROM properties WHERE ${where}`, countParams);
 
     const formatted = properties.map(p => ({
       ...p,
@@ -84,43 +97,53 @@ function handleSearch(req, res) {
   }
 }
 
-router.get('/cities', (req, res) => {
-  const cities = db.prepare("SELECT DISTINCT city FROM properties WHERE status = 'active'").all();
+router.get('/cities', async (req, res) => {
+  const cities = await sql`SELECT DISTINCT city FROM properties WHERE status = 'active'`;
   res.json({ success: true, cities: cities.map(c => c.city) });
 });
 
-router.get('/districts', (req, res) => {
+router.get('/districts', async (req, res) => {
   const { city } = req.query;
-  let sql = "SELECT DISTINCT district FROM properties WHERE status = 'active'";
-  const params = [];
-  if (city) { sql += ' AND city = ?'; params.push(city); }
-  const districts = db.prepare(sql).all(...params);
+  let query = "SELECT DISTINCT district FROM properties WHERE status = 'active'";
+  let params = [];
+  if (city) { query += ' AND city = $1'; params.push(city); }
+  const districts = await sql.unsafe(query, params);
   res.json({ success: true, districts: districts.map(d => d.district) });
 });
 
-router.get('/suggestions', (req, res) => {
+router.get('/suggestions', async (req, res) => {
   try {
     const { city, type, facing, area } = req.query;
-    let where = ['status = ?'];
-    let params = ['active'];
-    if (city) { where.push('city = ?'); params.push(city); }
-    if (type) { where.push('type = ?'); params.push(type); }
-    if (facing) { where.push('facing = ?'); params.push(facing); }
-    if (area) { where.push('area BETWEEN ? AND ?'); params.push(Number(area) * 0.7, Number(area) * 1.3); }
+    let conditions = [`status = 'active'`];
+    let params = [];
+    let idx = 0;
+    const add = (sql, val) => {
+      if (val) { conditions.push(sql.replace('?', `$${++idx}`)); params.push(val); }
+    };
+    add('city = ?', city);
+    add('type = ?', type);
+    add('facing = ?', facing);
+    if (area) { conditions.push(`area BETWEEN $${++idx} AND $${++idx}`); params.push(Number(area) * 0.7, Number(area) * 1.3); }
 
-    const sql = `SELECT AVG(price) as avgPrice, COUNT(*) as count, AVG(area) as avgArea,
-      MIN(price) as minPrice, MAX(price) as maxPrice,
-      AVG(streetWidth) as avgStreetWidth, AVG(cars) as avgCars
-      FROM properties WHERE ${where.join(' AND ')}`;
-    const stats = db.prepare(sql).get(...params);
+    const where = conditions.join(' AND ');
+    const [stats] = await sql.unsafe(
+      `SELECT AVG(price) as "avgPrice", COUNT(*)::int as count, AVG(area) as "avgArea",
+      MIN(price) as "minPrice", MAX(price) as "maxPrice",
+      AVG("streetWidth") as "avgStreetWidth", AVG(cars) as "avgCars"
+      FROM properties WHERE ${where}`, params
+    );
 
-    const byFloor = db.prepare(`SELECT
+    const byFloor = await sql.unsafe(
+      `SELECT
       CASE WHEN age <= 1 THEN 'جديد' WHEN age <= 5 THEN '1-5 سنوات' WHEN age <= 10 THEN '5-10 سنوات' ELSE '+10 سنوات' END as label,
-      COUNT(*) as count, AVG(price) as avgPrice
-      FROM properties WHERE ${where.join(' AND ')} GROUP BY label`).all(...params);
+      COUNT(*)::int as count, AVG(price) as "avgPrice"
+      FROM properties WHERE ${where} GROUP BY label`, params
+    );
 
-    const byFacing = db.prepare(`SELECT facing, COUNT(*) as count, AVG(price) as avgPrice
-      FROM properties WHERE ${where.join(' AND ')} AND facing != '' GROUP BY facing`).all(...params);
+    const byFacing = await sql.unsafe(
+      `SELECT facing, COUNT(*)::int as count, AVG(price) as "avgPrice"
+      FROM properties WHERE ${where} AND facing != '' GROUP BY facing`, params
+    );
 
     res.json({
       success: true,
@@ -142,11 +165,11 @@ router.get('/suggestions', (req, res) => {
   }
 });
 
-router.get('/stats', (req, res) => {
+router.get('/stats', async (req, res) => {
   try {
-    const total = db.prepare("SELECT COUNT(*) as c FROM properties WHERE status='active'").get().c;
-    const byCity = db.prepare("SELECT city as _id, COUNT(*) as count, AVG(price) as avgPrice FROM properties WHERE status='active' GROUP BY city ORDER BY count DESC").all();
-    const byType = db.prepare("SELECT type as _id, COUNT(*) as count FROM properties WHERE status='active' GROUP BY type ORDER BY count DESC").all();
+    const [{ c: total }] = await sql`SELECT COUNT(*)::int as c FROM properties WHERE status='active'`;
+    const byCity = await sql`SELECT city as _id, COUNT(*)::int as count, AVG(price) as "avgPrice" FROM properties WHERE status='active' GROUP BY city ORDER BY count DESC`;
+    const byType = await sql`SELECT type as _id, COUNT(*)::int as count FROM properties WHERE status='active' GROUP BY type ORDER BY count DESC`;
     res.json({ success: true, stats: { total, byCity, byType } });
   } catch (err) { res.status(503).json({ error: 'الإحصائيات غير متاحة' }); }
 });

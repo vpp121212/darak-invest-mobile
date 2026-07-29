@@ -1,15 +1,15 @@
 import { Router } from 'express';
-import db from '../config/database.js';
+import sql from '../config/database.js';
 
 const router = Router();
 
-router.post('/estimate', (req, res) => {
+router.post('/estimate', async (req, res) => {
   try {
     const { city, district, type, purpose, area, rooms, baths, features = [] } = req.body;
-    const similar = db.prepare(`
-      SELECT * FROM properties WHERE city=? AND type=? AND purpose=? AND status='active'
-      AND area BETWEEN ? AND ? AND rooms BETWEEN ? AND ?
-    `).all(city, type, purpose, area * 0.7, area * 1.3, Math.max(1, rooms - 1), rooms + 1);
+    const similar = await sql`
+      SELECT * FROM properties WHERE city=${city} AND type=${type} AND purpose=${purpose} AND status='active'
+      AND area BETWEEN ${area * 0.7} AND ${area * 1.3} AND rooms BETWEEN ${Math.max(1, rooms - 1)} AND ${rooms + 1}
+    `;
 
     if (similar.length === 0) {
       return res.json({ success: true, estimation: { expected: null, suitable: null, maximum: null, saleChance: null, message: 'لا توجد بيانات كافية', sampleSize: 0 } });
@@ -33,18 +33,21 @@ router.post('/estimate', (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
 });
 
-router.post('/match', (req, res) => {
+router.post('/match', async (req, res) => {
   try {
     const { budget, area, rooms, type } = req.body;
-    let sql = "SELECT * FROM properties WHERE status='active'";
-    const params = [];
-    if (budget) { sql += ' AND price <= ?'; params.push(Number(budget) * 1.1); }
-    if (area) { sql += ' AND area BETWEEN ? AND ?'; params.push(Number(area) * 0.8, Number(area) * 1.2); }
-    if (rooms) { sql += ' AND rooms >= ?'; params.push(Math.max(1, Number(rooms) - 1)); }
-    if (type) { sql += ' AND type = ?'; params.push(type); }
-    sql += ' LIMIT 10';
+    let conditions = ["status = 'active'"];
+    let params = [];
+    let idx = 0;
+    if (budget) { conditions.push(`price <= $${++idx}`); params.push(Number(budget) * 1.1); }
+    if (area) { conditions.push(`area BETWEEN $${++idx} AND $${++idx}`); params.push(Number(area) * 0.8, Number(area) * 1.2); }
+    if (rooms) { conditions.push(`rooms >= $${++idx}`); params.push(Math.max(1, Number(rooms) - 1)); }
+    if (type) { conditions.push(`type = $${++idx}`); params.push(type); }
 
-    const matches = db.prepare(sql).all(...params).map(p => {
+    const matches = (await sql.unsafe(
+      `SELECT * FROM properties WHERE ${conditions.join(' AND ')} LIMIT 10`,
+      params
+    )).map(p => {
       let score = 50;
       if (budget && p.price <= budget) score += 20;
       if (area && Math.abs(p.area - area) < area * 0.1) score += 15;

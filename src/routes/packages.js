@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import db from '../config/database.js';
+import sql from '../config/database.js';
 import { protect } from '../middleware/auth.js';
 
 const router = Router();
@@ -14,12 +14,14 @@ router.get('/', (req, res) => {
   res.json({ success: true, packages });
 });
 
-router.post('/subscribe', protect, (req, res) => {
+router.post('/subscribe', protect, async (req, res) => {
   try {
     const { packageId } = req.body;
     const pkg = packages.find(p => p.id === packageId);
     if (!pkg) return res.status(400).json({ error: 'الباقة غير موجودة' });
-    db.prepare('UPDATE users SET package = ?, packageExpiry = datetime("now", "+30 days") WHERE id = ?').run(packageId, req.user.id);
+    await sql`
+      UPDATE users SET package = ${packageId}, "packageExpiry" = NOW() + INTERVAL '30 days' WHERE id = ${req.user.id}
+    `;
     res.json({ success: true, message: 'تم الاشتراك بنجاح', package: pkg });
   } catch (err) { res.status(500).json({ error: 'خطأ داخلي' }); }
 });

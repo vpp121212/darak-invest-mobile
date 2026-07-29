@@ -17,3 +17,5 @@ services:
         generateValue: true
       - key: MAPBOX_TOKEN
         value: pk.eyJ1IjoidnBwLTY2IiwiYSI6ImNtcndoZW5hdzA2MGYzM3IzbTA4cW1yNnAifQ.bP-Z7H9Wn6WkgF2fXYITQw
+      - key: DATABASE_URL
+        value: postgresql://postgres:lRduReiPwvPvfHrSoKrWDPFcsvPweKUd@sakura.proxy.rlwy.net:38495/railway

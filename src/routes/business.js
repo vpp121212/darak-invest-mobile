@@ -1,120 +1,139 @@
 import { Router } from 'express';
-import db from '../config/database.js';
+import sql from '../config/database.js';
 import { protect } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/invoices', protect, (req, res) => {
+router.get('/invoices', protect, async (req, res) => {
   try {
     const { status, type, page = 1, limit = 20 } = req.query;
-    let where = ['userId = ?'];
-    const params = [req.userId];
-    if (status) { where.push('status = ?'); params.push(status); }
-    if (type) { where.push('type = ?'); params.push(type); }
+    let conditions = ['"userId" = $1'];
+    let params = [req.userId];
+    let idx = 2;
+    if (status) { conditions.push(`status = $${idx++}`); params.push(status); }
+    if (type) { conditions.push(`type = $${idx++}`); params.push(type); }
 
-    const sql = `SELECT * FROM invoices WHERE ${where.join(' AND ')} ORDER BY createdAt DESC LIMIT ? OFFSET ?`;
     const offset = (Number(page) - 1) * Number(limit);
-    const invoices = db.prepare(sql).all(...params, Number(limit), offset);
-    const { total } = db.prepare(`SELECT COUNT(*) as total FROM invoices WHERE ${where.join(' AND ')}`).get(...params);
+    const invoices = await sql.unsafe(
+      `SELECT * FROM invoices WHERE ${conditions.join(' AND ')} ORDER BY "createdAt" DESC LIMIT $${idx++} OFFSET $${idx++}`,
+      [...params, Number(limit), offset]
+    );
 
-    const stats = db.prepare(`
+    const [{ total }] = await sql.unsafe(
+      `SELECT COUNT(*)::int as total FROM invoices WHERE ${conditions.join(' AND ')}`,
+      params
+    );
+
+    const [stats] = await sql.unsafe(`
       SELECT
-        SUM(CASE WHEN status = 'مدفوعة' THEN amount ELSE 0 END) as paid,
-        SUM(CASE WHEN status = 'معلقة' THEN amount ELSE 0 END) as pending,
-        SUM(CASE WHEN status = 'متأخرة' THEN amount ELSE 0 END) as overdue,
-        COUNT(*) as count
-      FROM invoices WHERE userId = ?
-    `).get(req.userId);
+        COALESCE(SUM(CASE WHEN status = 'مدفوعة' THEN amount ELSE 0 END), 0) as paid,
+        COALESCE(SUM(CASE WHEN status = 'معلقة' THEN amount ELSE 0 END), 0) as pending,
+        COALESCE(SUM(CASE WHEN status = 'متأخرة' THEN amount ELSE 0 END), 0) as overdue,
+        COUNT(*)::int as count
+      FROM invoices WHERE "userId" = $1
+    `, [req.userId]);
 
     res.json({ success: true, invoices, total, stats });
   } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
 });
 
-router.post('/invoices', protect, (req, res) => {
+router.post('/invoices', protect, async (req, res) => {
   try {
     const { type, amount, description, clientName, clientPhone, propertyId, dueDate } = req.body;
-    const result = db.prepare(`
-      INSERT INTO invoices (userId, propertyId, type, amount, description, clientName, clientPhone, dueDate)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(req.userId, propertyId || null, type, amount, description || '', clientName || '', clientPhone || '', dueDate || null);
-
-    res.json({ success: true, id: result.lastInsertRowid, message: 'تم إضافة الفاتورة' });
+    const [{ id }] = await sql`
+      INSERT INTO invoices ("userId", "propertyId", type, amount, description, "clientName", "clientPhone", "dueDate")
+      VALUES (${req.userId}, ${propertyId || null}, ${type}, ${amount}, ${description || ''}, ${clientName || ''}, ${clientPhone || ''}, ${dueDate || null})
+      RETURNING id
+    `;
+    res.json({ success: true, id, message: 'تم إضافة الفاتورة' });
   } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
 });
 
-router.put('/invoices/:id', protect, (req, res) => {
+router.put('/invoices/:id', protect, async (req, res) => {
   try {
     const { status, paidAt } = req.body;
     const updates = [];
-    const params = [];
-    if (status) { updates.push('status = ?'); params.push(status); }
-    if (paidAt) { updates.push('paidAt = ?'); params.push(paidAt); }
-    if (status === 'مدفوعة' && !paidAt) { updates.push("paidAt = datetime('now')"); }
+    let params = [];
+    let idx = 0;
+    if (status) { updates.push(`status = $${++idx}`); params.push(status); }
+    if (paidAt) { updates.push(`"paidAt" = $${++idx}`); params.push(paidAt); }
+    if (status === 'مدفوعة' && !paidAt) { updates.push(`"paidAt" = NOW()`); }
     if (updates.length === 0) return res.status(400).json({ error: 'لا توجد تحديثات' });
 
     params.push(req.params.id, req.userId);
-    db.prepare(`UPDATE invoices SET ${updates.join(', ')} WHERE id = ? AND userId = ?`).run(...params);
+    await sql.unsafe(
+      `UPDATE invoices SET ${updates.join(', ')} WHERE id = $${++idx} AND "userId" = $${++idx}`,
+      params
+    );
     res.json({ success: true, message: 'تم تحديث الفاتورة' });
   } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
 });
 
-router.delete('/invoices/:id', protect, (req, res) => {
+router.delete('/invoices/:id', protect, async (req, res) => {
   try {
-    db.prepare('DELETE FROM invoices WHERE id = ? AND userId = ?').run(req.params.id, req.userId);
+    await sql`DELETE FROM invoices WHERE id = ${req.params.id} AND "userId" = ${req.userId}`;
     res.json({ success: true, message: 'تم حذف الفاتورة' });
   } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
 });
 
-router.get('/vendors', protect, (req, res) => {
+router.get('/vendors', protect, async (req, res) => {
   try {
     const { category, search } = req.query;
-    let where = ['userId = ?'];
-    const params = [req.userId];
-    if (category) { where.push('category = ?'); params.push(category); }
-    if (search) { where.push('(name LIKE ? OR phone LIKE ?)'); params.push(`%${search}%`, `%${search}%`); }
+    let conditions = ['"userId" = $1'];
+    let params = [req.userId];
+    let idx = 2;
+    if (category) { conditions.push(`category = $${idx++}`); params.push(category); }
+    if (search) { conditions.push(`(name ILIKE $${idx++} OR phone ILIKE $${idx++})`); params.push(`%${search}%`, `%${search}%`); }
 
-    const vendors = db.prepare(`SELECT * FROM vendors WHERE ${where.join(' AND ')} ORDER BY totalDeals DESC, rating DESC`).all(...params);
+    const vendors = await sql.unsafe(
+      `SELECT * FROM vendors WHERE ${conditions.join(' AND ')} ORDER BY "totalDeals" DESC, rating DESC`,
+      params
+    );
     res.json({ success: true, vendors });
   } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
 });
 
-router.post('/vendors', protect, (req, res) => {
+router.post('/vendors', protect, async (req, res) => {
   try {
     const { name, category, phone, email, city, notes } = req.body;
     if (!name || !category) return res.status(400).json({ error: 'اسم المورد والفئة مطلوبين' });
 
-    const result = db.prepare(`
-      INSERT INTO vendors (userId, name, category, phone, email, city, notes)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(req.userId, name, category, phone || '', email || '', city || '', notes || '');
-
-    res.json({ success: true, id: result.lastInsertRowid, message: 'تم إضافة المورد' });
+    const [{ id }] = await sql`
+      INSERT INTO vendors ("userId", name, category, phone, email, city, notes)
+      VALUES (${req.userId}, ${name}, ${category}, ${phone || ''}, ${email || ''}, ${city || ''}, ${notes || ''})
+      RETURNING id
+    `;
+    res.json({ success: true, id, message: 'تم إضافة المورد' });
   } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
 });
 
-router.put('/vendors/:id', protect, (req, res) => {
+router.put('/vendors/:id', protect, async (req, res) => {
   try {
     const { name, category, phone, email, city, rating, notes } = req.body;
     const updates = [];
-    const params = [];
-    if (name) { updates.push('name = ?'); params.push(name); }
-    if (category) { updates.push('category = ?'); params.push(category); }
-    if (phone) { updates.push('phone = ?'); params.push(phone); }
-    if (email) { updates.push('email = ?'); params.push(email); }
-    if (city) { updates.push('city = ?'); params.push(city); }
-    if (rating !== undefined) { updates.push('rating = ?'); params.push(rating); }
-    if (notes) { updates.push('notes = ?'); params.push(notes); }
+    let params = [];
+    let idx = 0;
+    if (name) { updates.push(`name = $${++idx}`); params.push(name); }
+    if (category) { updates.push(`category = $${++idx}`); params.push(category); }
+    if (phone) { updates.push(`phone = $${++idx}`); params.push(phone); }
+    if (email) { updates.push(`email = $${++idx}`); params.push(email); }
+    if (city) { updates.push(`city = $${++idx}`); params.push(city); }
+    if (rating !== undefined) { updates.push(`rating = $${++idx}`); params.push(rating); }
+    if (notes) { updates.push(`notes = $${++idx}`); params.push(notes); }
     if (updates.length === 0) return res.status(400).json({ error: 'لا توجد تحديثات' });
 
     params.push(req.params.id, req.userId);
-    db.prepare(`UPDATE vendors SET ${updates.join(', ')} WHERE id = ? AND userId = ?`).run(...params);
+    await sql.unsafe(
+      `UPDATE vendors SET ${updates.join(', ')} WHERE id = $${++idx} AND "userId" = $${++idx}`,
+      params
+    );
     res.json({ success: true, message: 'تم تحديث المورد' });
   } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
 });
 
-router.delete('/vendors/:id', protect, (req, res) => {
+router.delete('/vendors/:id', protect, async (req, res) => {
   try {
-    db.prepare('DELETE FROM vendors WHERE id = ? AND userId = ?').run(req.params.id, req.userId);
+    await sql`DELETE FROM vendors WHERE id = ${req.params.id} AND "userId" = ${req.userId}`;
     res.json({ success: true, message: 'تم حذف المورد' });
   } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
 });
