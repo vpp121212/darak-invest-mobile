@@ -219,7 +219,7 @@
   </style>
 </head>
 <body>
-  <header class="hd"><div class="wrap"><a href="/" class="logo">دارك وحيك</a><div style="display:flex;gap:8px"><a href="#" onclick="openNotif();return false">🔔</a><a href="#" onclick="openLogin();return false">دخول</a></div></div></header>
+  <header class="hd"><div class="wrap"><a href="#" onclick="openAbout();return false" class="logo">دارك وحيك</a><div style="display:flex;gap:8px"><a href="#" onclick="openNotif();return false">🔔</a><a href="#" onclick="openLogin();return false">دخول</a></div></div></header>
 
   <!-- HOME PAGE -->
   <div class="pg on" id="pg-home">
@@ -674,6 +674,26 @@
         <button class="fin-run" onclick="runCompliance()">🔍 فحص الامتثال</button>
         <div id="legComplianceResult" style="display:none"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- ABOUT OVERLAY -->
+  <div class="logino" id="aboutOv" style="z-index:2501;backdrop-filter:blur(20px)">
+    <div class="login-box" style="padding:40px 24px">
+      <div class="login-close" onclick="closeAbout()" style="position:absolute;top:16px;left:16px;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</div>
+      <div class="login-logo">د</div>
+      <div class="login-title">دارك وحيك</div>
+      <div class="login-sub" style="margin-bottom:20px">منصة عقارية سعودية متكاملة</div>
+      <div style="text-align:right;font-size:13px;color:var(--m);line-height:2;margin-bottom:20px;padding:16px;border-radius:var(--r);background:rgba(8,9,14,.9);border:1px solid rgba(255,255,255,.06)">
+        <p style="margin-bottom:12px">منصتنا تجمع بين البائعين والمشترين والمستأجرين في جميع مدن المملكة، مع أحدث التقنيات لمساعدتك في إيجاد عقارك المثالي.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
+          <div style="padding:10px;border-radius:10px;background:rgba(18,20,30,.7);border:1px solid rgba(255,255,255,.04);text-align:center"><div style="font-size:14px;margin-bottom:4px">🔍</div><div style="font-size:11px;color:var(--t)">بحث ذكي</div></div>
+          <div style="padding:10px;border-radius:10px;background:rgba(18,20,30,.7);border:1px solid rgba(255,255,255,.04);text-align:center"><div style="font-size:14px;margin-bottom:4px">🌐</div><div style="font-size:11px;color:var(--t)">جولة 360</div></div>
+          <div style="padding:10px;border-radius:10px;background:rgba(18,20,30,.7);border:1px solid rgba(255,255,255,.04);text-align:center"><div style="font-size:14px;margin-bottom:4px">🤖</div><div style="font-size:11px;color:var(--t)">تقدير بالذكاء الاصطناعي</div></div>
+          <div style="padding:10px;border-radius:10px;background:rgba(18,20,30,.7);border:1px solid rgba(255,255,255,.04);text-align:center"><div style="font-size:14px;margin-bottom:4px">⚖️</div><div style="font-size:11px;color:var(--t)">أدوات قانونية</div></div>
+        </div>
+      </div>
+      <div style="text-align:center;font-size:11px;color:var(--m);margin-top:8px">الإصدار 1.0.0</div>
     </div>
   </div>
 
@@ -1298,14 +1318,14 @@ function doLogout(){
 }
 function updateUserUI(){
   var h=document.querySelector('.hd .wrap');
-  if(user){h.innerHTML='<a href="/" class="logo">دارك وحيك</a><div style="display:flex;gap:8px"><a href="#" onclick="openNotif();return false">🔔</a><a href="#" onclick="nav(\'profile\');return false" style="background:rgba(212,175,55,.15);border-color:rgba(212,175,55,.4);color:var(--g)">👤 '+user.name+'</a></div>';
+  if(user){h.innerHTML='<a href="#" onclick="openAbout();return false" class="logo">دارك وحيك</a><div style="display:flex;gap:8px"><a href="#" onclick="openNotif();return false">🔔</a><a href="#" onclick="nav(\'profile\');return false" style="background:rgba(212,175,55,.15);border-color:rgba(212,175,55,.4);color:var(--g)">👤 '+user.name+'</a></div>';
     document.getElementById('prof-avatar').textContent=user.name.charAt(0);
     document.getElementById('prof-name').textContent=user.name;
     document.getElementById('prof-email').textContent=user.email||'—';
     if(authToken){api('/users/profile').then(function(r){if(r&&r.success){
       document.getElementById('prof-stats').innerHTML='<div class="prof-stat"><div class="prof-stat-v">'+r.user.favorites.length+'</div><div class="prof-stat-l">المفضلة</div></div><div class="prof-stat"><div class="prof-stat-v">'+(r.user.role==='agent'?'مكتب':'فرد')+'</div><div class="prof-stat-l">النوع</div></div><div class="prof-stat"><div class="prof-stat-v">—</div><div class="prof-stat-l">الباقة</div></div>';
     }}).catch(function(){})}
-  }else{h.innerHTML='<a href="/" class="logo">دارك وحيك</a><div style="display:flex;gap:8px"><a href="#" onclick="openNotif();return false">🔔</a><a href="#" onclick="openLogin();return false">دخول</a></div>';
+  }else{h.innerHTML='<a href="#" onclick="openAbout();return false" class="logo">دارك وحيك</a><div style="display:flex;gap:8px"><a href="#" onclick="openNotif();return false">🔔</a><a href="#" onclick="openLogin();return false">دخول</a></div>';
     document.getElementById('prof-avatar').textContent='؟';
     document.getElementById('prof-name').textContent='زائر';
     document.getElementById('prof-email').textContent='سجّل دخولك للوصول لبياناتك';
@@ -1600,6 +1620,10 @@ async function runSeo(){
     el.innerHTML='<div class="mkt-seo-score">'+s.score+'/100</div><div class="mkt-seo-bar"><div class="mkt-seo-bar-fill" style="width:'+s.score+'%;background:'+scoreColor+'"></div></div><div style="font-size:12px;color:var(--m);margin-bottom:12px">'+s.keywords.join(' · ')+'</div><div style="font-size:11px;font-weight:600;color:var(--g);margin-bottom:6px">💡 نصائح التحسين:</div>'+s.tips.map(function(t){return'<div class="mkt-tip"><div class="mkt-tip-icon">💡</div><div>'+t+'</div></div>'}).join('')+'<div style="margin-top:10px;padding:10px;border-radius:8px;background:rgba(212,175,55,.05);border:1px solid rgba(212,175,55,.2);font-size:11px;color:var(--m)">'+s.hashtags+'</div>';
   }
 }
+
+/* ABOUT */
+function openAbout(){document.getElementById('aboutOv').classList.add('on')}
+function closeAbout(){document.getElementById('aboutOv').classList.remove('on')}
 
 /* LEGAL */
 function openLeg(){document.getElementById('legOv').classList.add('on')}
