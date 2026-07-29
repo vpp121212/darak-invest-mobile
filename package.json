@@ -4,10 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --port 3000",
-    "build": "next build",
-    "start": "next start",
-    "seed": "node scripts/seed.js"
+    "start": "node src/server.js",
+    "seed": "node scripts/seed.js",
+    "setup": "node scripts/seed.js && node src/server.js"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.3",
