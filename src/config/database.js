@@ -27,6 +27,10 @@ await sql.unsafe(`SET client_min_messages = WARNING;
     "packageExpiry" TEXT
   );
 
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS "phoneVerified" INTEGER DEFAULT 0;
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS "otpCode" TEXT;
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS "otpExpires" TEXT;
+
   CREATE TABLE IF NOT EXISTS properties (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
@@ -414,6 +418,16 @@ await sql.unsafe(`SET client_min_messages = WARNING;
     status TEXT DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),
     document_url TEXT,
     notes TEXT,
+    "createdAt" TEXT DEFAULT (NOW())
+  );
+
+  CREATE TABLE IF NOT EXISTS reports (
+    id SERIAL PRIMARY KEY,
+    "userId" INTEGER REFERENCES users(id),
+    "propertyId" INTEGER REFERENCES properties(id),
+    reason TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    status TEXT DEFAULT 'pending' CHECK(status IN ('pending','reviewed','dismissed')),
     "createdAt" TEXT DEFAULT (NOW())
   );
 

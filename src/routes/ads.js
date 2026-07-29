@@ -18,6 +18,8 @@ router.post('/add', protect, validate.body(createAdSchema), async (req, res) => 
       RETURNING id, title, price, city as location, description, "createdAt"
     `;
 
+    ad.user = req.user.id;
+
     res.status(201).json({
       message: 'تم إضافة الإعلان بنجاح',
       ad

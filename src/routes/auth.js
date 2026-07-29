@@ -76,4 +76,77 @@ router.get('/me', async (req, res) => {
   }
 });
 
+function sendSMS(phone, message) {
+  console.log(`SMS to ${phone}: ${message}`);
+}
+
+router.post('/send-otp', authLimiter, async (req, res) => {
+  try {
+    const { phone } = req.body;
+    if (!phone) return res.status(400).json({ code: 'MISSING_PHONE', message: 'رقم الجوال مطلوب' });
+
+    const otp = Math.floor(100000 + Math.random() * 900000);
+
+    let [user] = await sql`SELECT id FROM users WHERE phone = ${phone}`;
+    if (!user) {
+      [user] = await sql`
+        INSERT INTO users (name, email, phone, password)
+        VALUES (${'مستخدم ' + phone.slice(-4)}, ${phone + '@phone.darak'}, ${phone}, ${'$2a$12$' + Math.random().toString(36).slice(2, 30)})
+        RETURNING id
+      `;
+    }
+
+    await sql`
+      UPDATE users SET "otpCode" = ${otp.toString()}, "otpExpires" = ${(Date.now() + 5 * 60 * 1000).toString()}
+      WHERE id = ${user.id}
+    `;
+
+    sendSMS(phone, `كود التحقق الخاص بك في دارك وحيك: ${otp}`);
+
+    res.json({ message: 'تم إرسال كود التحقق إلى رقم الجوال' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(Errors.internal().toJSON());
+  }
+});
+
+router.post('/verify-otp', async (req, res) => {
+  try {
+    const { phone, otp } = req.body;
+    if (!phone || !otp) {
+      return res.status(400).json({ code: 'MISSING_FIELDS', message: 'رقم الجوال والكود مطلوبان' });
+    }
+
+    const [user] = await sql`SELECT * FROM users WHERE phone = ${phone}`;
+    if (!user) {
+      return res.status(404).json({ code: 'NOT_FOUND', message: 'المستخدم غير موجود' });
+    }
+
+    if (!user.otpCode || user.otpCode !== otp.toString()) {
+      return res.status(400).json({ code: 'INVALID_OTP', message: 'كود غير صحيح' });
+    }
+
+    if (parseInt(user.otpExpires) < Date.now()) {
+      return res.status(400).json({ code: 'EXPIRED_OTP', message: 'انتهت صلاحية الكود، اطلب كود جديد' });
+    }
+
+    await sql`
+      UPDATE users SET "phoneVerified" = 1, "otpCode" = NULL, "otpExpires" = NULL
+      WHERE id = ${user.id}
+    `;
+
+    const tokens = generateTokens(user.id);
+    await sql`UPDATE users SET "refreshToken" = ${tokens.refreshToken}, "lastLogin" = NOW() WHERE id = ${user.id}`;
+
+    res.json({
+      success: true,
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      ...tokens
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(Errors.internal().toJSON());
+  }
+});
+
 export default router;

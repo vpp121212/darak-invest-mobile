@@ -39,6 +39,7 @@
 
 /* Detail */
 .dt{font-size:18px;font-weight:700;margin-bottom:4px}.dl{font-size:12px;color:var(--m);margin-bottom:6px}.dp{font-size:24px;font-weight:800;color:var(--g);margin-bottom:14px;font-variant-numeric:tabular-nums}.db{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:999px;font-size:11px;font-weight:700;margin-bottom:14px}.db-v{background:rgba(74,222,128,.12);color:#4ade80;border:1px solid rgba(74,222,128,.3)}.db-o{background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.3)}.db-d{background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3)}.sp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}.si{background:rgba(255,255,255,.03);border:1px solid var(--b);border-radius:12px;padding:12px 8px;text-align:center}.si-v{font-size:15px;font-weight:700;color:var(--g)}.si-l{font-size:10px;color:var(--m);margin-top:2px}.fd{margin-bottom:14px}.fd h3{font-size:14px;font-weight:700;color:var(--g);margin-bottom:8px}.fc{display:flex;flex-wrap:wrap;gap:6px}.fc span{padding:6px 12px;border-radius:999px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.15);font-size:11px;color:var(--m)}.desc{margin-bottom:14px}.desc h3{font-size:14px;font-weight:700;color:var(--g);margin-bottom:8px}.desc p{font-size:13px;color:var(--m);line-height:1.8}.ag{background:var(--c);border:1px solid var(--b);border-radius:var(--r);padding:16px;margin-bottom:16px}.ag-n{font-size:14px;font-weight:700;margin-bottom:2px}.ag-r{font-size:11px;color:var(--m);margin-bottom:12px}.ag-b{display:flex;flex-direction:column;gap:8px}.ag-btn{width:100%;padding:12px;border-radius:12px;border:none;font-size:13px;font-weight:600;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px}.ag-w{background:#25d366;color:#fff}.ag-c{background:linear-gradient(135deg,var(--g),#c9a430);color:#05060a}.dacts{display:flex;gap:8px;margin-top:14px}.dbt{flex:1;padding:12px;border-radius:var(--r);border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}.dbt.p{background:linear-gradient(135deg,rgba(212,175,55,.9),rgba(180,140,40,.95));color:#05060a}.dbt.s{background:rgba(18,20,30,.9);border:1px solid rgba(255,255,255,.1);color:var(--t)}
+.dbt.d{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:#f87171}
 
 /* 360 VR */
 .v3{position:fixed;inset:0;background:#000;z-index:3000;display:none;flex-direction:column}.v3.on{display:flex}.v3h{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(0,0,0,.8);z-index:2}.v3t{font-size:14px;font-weight:600;color:var(--g)}.v3x{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}.v3v{flex:1;position:relative;overflow:hidden;cursor:grab;touch-action:none;background:#0a0b10}.v3v:active{cursor:grabbing}.v3canvas{width:100%;height:100%;display:block}.v3hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;animation:hp 2s ease-in-out infinite;z-index:3}@keyframes hp{0%,100%{opacity:.8}50%{opacity:.4}}.v3hint-i{font-size:32px;margin-bottom:8px}.v3hint-t{font-size:12px;color:var(--m);background:rgba(0,0,0,.6);padding:6px 14px;border-radius:999px;backdrop-filter:blur(10px)}.v3rooms{position:absolute;bottom:0;left:0;right:0;padding:12px;background:linear-gradient(transparent,rgba(0,0,0,.9));z-index:2}.v3rb{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}.v3rb::-webkit-scrollbar{display:none}.v3rb button{padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);color:var(--m);font-size:12px;font-family:inherit;cursor:pointer;white-space:nowrap}.v3rb button.on{background:rgba(212,175,55,.2);border-color:rgba(212,175,55,.5);color:var(--g)}
@@ -459,6 +460,16 @@
 
       <!-- Toggle sidebar button -->
       <button id="mapSidebarToggle" onclick="toggleSidebar()" style="position:absolute;bottom:120px;right:12px;z-index:10;width:42px;height:42px;border-radius:50%;background:rgba(14,16,24,.95);border:1px solid rgba(212,175,55,.3);color:var(--g);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px)" title="القائمة الجانبية">📋</button>
+      <!-- Pulse display -->
+      <div id="mapPulseCard" style="position:absolute;bottom:70px;left:12px;right:12px;z-index:10;display:none;background:rgba(14,16,24,.97);border:1px solid rgba(212,175,55,.3);border-radius:14px;padding:14px;backdrop-filter:blur(16px);direction:rtl">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div id="mapPulseScore" style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#05060a;flex-shrink:0"></div>
+          <div style="flex:1">
+            <div id="mapPulseLabel" style="font-size:14px;font-weight:700;color:var(--g)"></div>
+            <div id="mapPulseDetails" style="font-size:10px;color:var(--m);margin-top:2px;line-height:1.6"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -710,8 +721,9 @@
 
   <!-- LOGIN OVERLAY -->
   <div class="logino" id="login"><div class="login-box" style="position:relative"><div class="login-close" onclick="closeLogin()">✕</div><div class="login-logo">د</div><div class="login-title">دارك وحيك</div><div class="login-sub">سجّل دخولك للوصول إلى عقاراتك وإعداداتك</div>
-    <div class="login-tabs"><button class="login-tab on" onclick="switchLoginTab(this,'login-form')">تسجيل الدخول</button><button class="login-tab" onclick="switchLoginTab(this,'register-form')">حساب جديد</button></div>
+    <div class="login-tabs"><button class="login-tab on" onclick="switchLoginTab(this,'login-form')">بريد</button><button class="login-tab" onclick="switchLoginTab(this,'phone-form')">جوال</button><button class="login-tab" onclick="switchLoginTab(this,'register-form')">جديد</button></div>
     <div class="login-form" id="login-form"><div class="login-field"><input type="email" id="login-email" placeholder="البريد الإلكتروني"></div><div class="login-field"><input type="password" id="login-pass" placeholder="كلمة المرور"></div><button class="login-btn" onclick="doLogin()">تسجيل الدخول</button></div>
+    <div class="login-form" id="phone-form" style="display:none"><div class="login-field" id="otp-field-group"><input type="tel" id="otp-phone" placeholder="رقم الجوال (05XXXXXXXX)" maxlength="13" oninput="formatOtpPhone(this)" style="direction:ltr;text-align:left"></div><button class="login-btn" id="otp-send-btn" onclick="doSendOtp()">إرسال كود التحقق</button><div class="login-field" id="otp-code-group" style="display:none;margin-top:10px"><input type="text" id="otp-code" placeholder="كود التحقق (6 أرقام)" maxlength="6" style="direction:ltr;text-align:center;font-size:20px;letter-spacing:6px"></div><button class="login-btn" id="otp-verify-btn" style="display:none" onclick="doVerifyOtp()">تأكيد الدخول</button><div id="otp-timer" style="text-align:center;font-size:11px;color:var(--m);margin-top:8px;display:none"></div></div>
     <div class="login-form" id="register-form" style="display:none"><div class="login-field"><input type="text" id="reg-name" placeholder="الاسم الكامل"></div><div class="login-field"><input type="email" id="reg-email" placeholder="البريد الإلكتروني"></div><div class="login-field"><input type="tel" id="reg-phone" placeholder="رقم الجوال"></div><div class="login-field"><input type="password" id="reg-pass" placeholder="كلمة المرور"></div><label class="agree" style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--m);text-align:right;cursor:pointer;margin-top:4px"><input type="checkbox" id="reg-agree" style="width:16px;height:16px;accent-color:var(--g);flex-shrink:0">أوافق على <a href="#" onclick="nav('legal');closeLogin();return false" style="color:var(--g);text-decoration:underline">الصفحة القانونية</a> وشروط الخدمة</label><button class="login-btn" onclick="doRegister()">إنشاء حساب</button></div>
   </div></div>
 
@@ -1489,6 +1501,23 @@ async function toggleFav(id,e){
   render();
 }
 
+/* REPORT */
+async function reportAd(id){
+  if(!authToken){alert('يرجى تسجيل الدخول أولاً');openLogin();return}
+  var reason=prompt('سبب البلاغ:\n- إعلان وهمي\n- سعر غير واقعي\n- صور مضللة\n- مكرر\n- مخالف للشروط\n- أخرى');
+  if(!reason)return;
+  if(reason.length<3){alert('يرجى كتابة سبب واضح (3 أحرف على الأقل)');return}
+  var desc=prompt('تفاصيل إضافية (اختياري):');
+  try{
+    var r=await api('/reports',{method:'POST',body:{propertyId:id,reason:reason,description:desc||''}});
+    if(r&&r.message){alert(r.message)}
+  }catch(e){
+    if(e.code==='DUPLICATE'){alert('لقد أبلغت عن هذا العقار مسبقًا');return}
+    if(e.code==='NOT_FOUND'){alert('العقار غير موجود');return}
+    alert('حدث خطأ أثناء الإبلاغ، حاول مرة أخرى')
+  }
+}
+
 /* DETAIL */
 var currentDetail=null;
 function showDetail(id){
@@ -1505,7 +1534,7 @@ function showDetail(id){
   html+='<div id="pulse-card-'+p.id+'"><div class="load" style="padding:16px">جاري تحميل مؤشر نبض الحي...</div></div>'
   var ph=(p.agent&&p.agent.phone)?p.agent.phone.replace(/[^0-9]/g,''):'';
   html+='<div class="ag"><div class="ag-n">'+(p.agent&&p.agent.name||'دارك وحيك')+'</div><div class="ag-r">'+(p.agent&&p.agent.role||'بائع مباشر')+'</div><div class="ag-b">'+(ph?'<a class="ag-btn ag-w" href="https://wa.me/'+ph+'" target="_blank">💬 واتساب</a><a class="ag-btn ag-c" href="tel:+('+ph+')">📞 اتصال</a>':'')+'</div></div>';
-  html+='<div class="dacts"><button class="dbt p" onclick="openAIP(currentDetail)">🤖 تحليل السعر</button>'+(p.lat&&p.lng?'<button class="dbt s" onclick="open3D(currentDetail)">🏗️ عرض 3D</button>':'')+'<button class="dbt s" onclick="shareProp('+p.id+')">📤 مشاركة</button></div>';
+  html+='<div class="dacts"><button class="dbt p" onclick="openAIP(currentDetail)">🤖 تحليل السعر</button>'+(p.lat&&p.lng?'<button class="dbt s" onclick="open3D(currentDetail)">🏗️ عرض 3D</button>':'')+'<button class="dbt s" onclick="shareProp('+p.id+')">📤 مشاركة</button><button class="dbt d" onclick="reportAd('+p.id+')">🚩 بلاغ</button></div>';
   document.getElementById('ovp').innerHTML=html;
   document.getElementById('ov').classList.add('open');
   document.body.style.overflow='hidden';
@@ -1529,7 +1558,13 @@ function fetchPulse(p){
     var roiColor=px.roi>7?'var(--green)':px.roi>5?'var(--g)':'var(--red)';
     var growthColor=px.future_value_growth>15?'var(--green)':px.future_value_growth>8?'var(--g)':'var(--m)';
     
-    var pulseScore=Math.round(((px.roi||0)*3 + (px.walk_score||0)*0.4 + ((px.future_value_growth||0))*1.2)/2);
+    var rentalYield=px.roi||0;
+    var growthRate=px.future_value_growth||0;
+    var walkScore=px.walk_score||0;
+    var avgRent=px.avg_rent||0;
+    var pulseScore=Math.round(
+      (rentalYield*0.25)+(growthRate*0.20)+(walkScore*0.15)+(walkScore*0.15)+(walkScore*0.15)+(Math.min(100,(avgRent/50000)*100)*0.10)
+    );
     pulseScore=Math.min(100,Math.max(0,pulseScore));
     var scoreColor=pulseScore>70?'var(--green)':pulseScore>45?'var(--g)':'var(--red)';
     var scoreBg=pulseScore>70?'rgba(74,222,128,.12)':pulseScore>45?'rgba(212,175,55,.12)':'rgba(248,113,113,.12)';
@@ -1969,7 +2004,7 @@ function addNeighborhoodsLayer(){
   map3dInstance2.addLayer({id:'neighborhoods-fill',type:'fill',source:map3dNeighborhoodSource,paint:{'fill-color':['get','color'],'fill-opacity':0.2}});
   map3dInstance2.addLayer({id:'neighborhoods-outline',type:'line',source:map3dNeighborhoodSource,paint:{'line-color':['get','color'],'line-width':1.5,'line-opacity':0.6}});
   map3dInstance2.addLayer({id:'neighborhoods-labels',type:'symbol',source:map3dNeighborhoodSource,layout:{'text-field':['get','name'],'text-font':['Cairo Regular'],'text-size':10,'text-offset':[0,-0.5]},paint:{'text-color':'#fff','text-halo-color':'rgba(0,0,0,.8)','text-halo-width':1}});
-  map3dInstance2.on('click','neighborhoods-fill',function(e){var f=e.features[0];if(f){selectMapArea(f.properties.name)}});
+  map3dInstance2.on('click','neighborhoods-fill',function(e){var f=e.features[0];if(f){selectMapArea(f.properties.name);fetchNeighborhoodPulse(f.properties.name)}});
   map3dInstance2.on('mouseenter','neighborhoods-fill',function(){map3dInstance2.getCanvas().style.cursor='pointer'});
   map3dInstance2.on('mouseleave','neighborhoods-fill',function(){map3dInstance2.getCanvas().style.cursor=''});
 }
@@ -1979,6 +2014,32 @@ function selectMapArea(name){
   document.getElementById('mapSelectedAreaName').textContent=name;
   loadMapAds();
   if(!map3dSidebarOpen)toggleSidebar();
+}
+async function fetchNeighborhoodPulse(name){
+  try{
+    var r=await fetch('/api/pulse/neighborhood/'+encodeURIComponent(name));
+    var d=await r.json();
+    if(d&&d.success){showPulseOnUI(d.pulse)}else{document.getElementById('mapPulseCard').style.display='none'}
+  }catch(e){document.getElementById('mapPulseCard').style.display='none'}
+}
+function showPulseOnUI(px){
+  var pulseScore=Math.round(
+    ((px.roi||0)*0.25)+((px.future_value_growth||0)*0.20)+((px.walk_score||0)*0.15)+((px.walk_score||0)*0.15)+((px.walk_score||0)*0.15)+(Math.min(100,((px.avg_rent||0)/50000)*100)*0.10)
+  );
+  pulseScore=Math.min(100,Math.max(0,pulseScore));
+  var color=pulseScore>70?'#4ade80':pulseScore>45?'#d4af37':'#f87171';
+  var bg=pulseScore>70?'rgba(74,222,128,.15)':pulseScore>45?'rgba(212,175,55,.15)':'rgba(248,113,113,.15)';
+  var label=pulseScore>70?'ممتاز':pulseScore>45?'جيد جداً':'جيد';
+  document.getElementById('mapPulseScore').style.background=bg;
+  document.getElementById('mapPulseScore').style.color=color;
+  document.getElementById('mapPulseScore').textContent=pulseScore;
+  document.getElementById('mapPulseLabel').textContent='📊 مؤشر نبض الحي: '+label;
+  document.getElementById('mapPulseDetails').innerHTML=
+    '<span style="color:'+color+'">العائد: '+(px.roi||'—')+'%</span> · '+
+    'النمو: '+(px.future_value_growth||'—')+'% · '+
+    'المشي: '+(px.walk_score||'—')+' · '+
+    'الإيجار: '+fmt(px.avg_rent||0)+' ر.س';
+  document.getElementById('mapPulseCard').style.display='block';
 }
 async function loadMapAds(){
   var type=document.getElementById('mapTypeFilter').value;
@@ -2041,7 +2102,50 @@ function switchLoginTab(el,formId){
   document.querySelectorAll('.login-tab').forEach(function(t){t.classList.remove('on')});
   el.classList.add('on');
   document.getElementById('login-form').style.display=formId==='login-form'?'flex':'none';
+  document.getElementById('phone-form').style.display=formId==='phone-form'?'flex':'none';
   document.getElementById('register-form').style.display=formId==='register-form'?'flex':'none';
+  document.getElementById('otp-code-group').style.display='none';
+  document.getElementById('otp-verify-btn').style.display='none';
+  document.getElementById('otp-timer').style.display='none';
+  document.getElementById('otp-send-btn').style.display='block';
+  document.getElementById('otp-send-btn').textContent='إرسال كود التحقق';
+  document.getElementById('otp-send-btn').disabled=false;
+}
+function formatOtpPhone(i){i.value=i.value.replace(/[^0-9]/g,'').slice(0,13)}
+var otpTimer=null;
+async function doSendOtp(){
+  var ph=document.getElementById('otp-phone').value;
+  if(ph.length<10){toast('أدخل رقم جوال صحيح');return}
+  var btn=document.getElementById('otp-send-btn');
+  btn.disabled=true;btn.textContent='جاري الإرسال...';
+  try{
+    var d=await api('/auth/send-otp',{method:'POST',body:JSON.stringify({phone:ph})});
+    if(d&&!d.code){toast('تم إرسال الكود');document.getElementById('otp-code-group').style.display='block';document.getElementById('otp-verify-btn').style.display='block';startOtpTimer()}
+    else{toast(d.message||'فشل الإرسال');btn.disabled=false;btn.textContent='إرسال كود التحقق'}
+  }catch(e){toast('فشل الإرسال');btn.disabled=false;btn.textContent='إرسال كود التحقق'}
+}
+function startOtpTimer(){
+  var t=300;
+  var el=document.getElementById('otp-timer');el.style.display='block';
+  if(otpTimer)clearInterval(otpTimer);
+  otpTimer=setInterval(function(){
+    var m=Math.floor(t/60),s=t%60;el.textContent='⏱ '+(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    if(--t<0){clearInterval(otpTimer);el.textContent='انتهت صلاحية الكود، أعد الإرسال';document.getElementById('otp-send-btn').disabled=false;document.getElementById('otp-send-btn').textContent='إعادة إرسال'}
+  },1000);
+}
+async function doVerifyOtp(){
+  var ph=document.getElementById('otp-phone').value;
+  var otp=document.getElementById('otp-code').value;
+  if(!otp||otp.length<6){toast('أدخل الكود كاملاً');return}
+  var btn=document.getElementById('otp-verify-btn');
+  btn.disabled=true;btn.textContent='جاري التحقق...';
+  try{
+    var d=await api('/auth/verify-otp',{method:'POST',body:JSON.stringify({phone:ph,otp:otp})});
+    if(d&&d.success){
+      authToken=d.accessToken;localStorage.setItem('darak_token',d.accessToken);
+      user=d.user;closeLogin();toast('مرحباً '+d.user.name+'! ✓');updateUserUI();
+    }else{toast(d.message||'كود غير صحيح');btn.disabled=false;btn.textContent='تأكيد الدخول'}
+  }catch(e){toast('خطأ في التحقق');btn.disabled=false;btn.textContent='تأكيد الدخول'}
 }
 async function doLogin(){
   var em=document.getElementById('login-email')?document.getElementById('login-email').value:'';
