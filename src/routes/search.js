@@ -5,6 +5,7 @@ const router = Router();
 
 router.get('/', (req, res) => {
   try {
+    const start = Date.now();
     const { q, city, type, purpose, minPrice, maxPrice, minArea, maxArea,
       rooms, baths, facing, trust, sort, age, minStreetWidth, minCars,
       features, page = 1, limit = 50 } = req.query;
@@ -71,10 +72,10 @@ router.get('/', (req, res) => {
       loc: `${p.district}، ${p.city}`,
     }));
 
-    res.json({ success: true, properties: formatted, total, pages: Math.ceil(total / Number(limit)), page: Number(page) });
+    res.json({ success: true, properties: formatted, total, pages: Math.ceil(total / Number(limit)), page: Number(page), ms: Date.now() - start });
   } catch (err) {
     console.error(err);
-    res.status(503).json({ error: 'البحث غير متاح مؤقتاً', fallback: true });
+    res.status(503).json({ error: 'البحث غير متاح مؤقتاً', fallback: true, message: err.message });
   }
 });
 
