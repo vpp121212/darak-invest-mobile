@@ -3,7 +3,14 @@ import db from '../config/database.js';
 
 const router = Router();
 
-router.get(['/', ''], (req, res) => {
+router.get('/', (req, res) => {
+  handleSearch(req, res);
+});
+router.get('', (req, res) => {
+  handleSearch(req, res);
+});
+
+function handleSearch(req, res) {
   try {
     console.log('SEARCH HIT:', req.originalUrl, req.path);
     const start = Date.now();
@@ -78,7 +85,7 @@ router.get(['/', ''], (req, res) => {
     console.error(err);
     res.status(503).json({ error: 'البحث غير متاح مؤقتاً', fallback: true, message: err.message });
   }
-});
+}
 
 router.get('/cities', (req, res) => {
   const cities = db.prepare("SELECT DISTINCT city FROM properties WHERE status = 'active'").all();
