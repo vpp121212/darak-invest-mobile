@@ -415,6 +415,7 @@
         <div class="ai" onclick="openPkg()"><div class="ai-info"><div class="an2">📦 الباقة المناسبة</div><div class="al2">اختر الباقة التي تناسبك</div></div></div>
         <div class="ai" onclick="openOff()"><div class="ai-info"><div class="an2">🏢 تسجيل مكتب عقاري</div><div class="al2">سجّل مكتبك وابدأ بعرض عقاراتك</div></div></div>
         <div class="ai" onclick="openAIP(null)"><div class="ai-info"><div class="an2">🤖 تحليل أسعار AI</div><div class="al2">توقع سعر العقار بالذكاء الاصطناعي</div></div></div>
+        <div class="ai" onclick="nav('legal')" style="margin-top:6px;opacity:.7"><div class="ai-info"><div class="an2">⚖️ الصفحة القانونية</div><div class="al2">شروط الخدمة · الخصوصية · السياسات</div></div></div>
       </div>
     </div>
   </div>
@@ -432,6 +433,111 @@
         <div class="ai" onclick="openBiz()"><div style="font-size:24px;margin-left:10px">🧾</div><div class="ai-info"><div class="an2">الفواتير والموردين</div><div class="al2">إدارة الفواتير · الموردون · الإحصائيات</div></div></div>
         <div class="ai" onclick="openAIP(null)"><div style="font-size:24px;margin-left:10px">🤖</div><div class="ai-info"><div class="an2">تحليل أسعار AI</div><div class="al2">توقع سعر العقار بالذكاء الاصطناعي</div></div></div>
         <div class="ai" onclick="openUpload()"><div style="font-size:24px;margin-left:10px">📸</div><div class="ai-info"><div class="an2">إضافة صور + جولة 360°</div><div class="al2">أضف صور حقيقية وبانورامية 360°</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEGAL PAGE -->
+  <div class="pg" id="pg-legal">
+    <div class="wrap" style="padding-top:16px;padding-bottom:32px">
+      <div style="display:flex;align-items:center;margin-bottom:20px">
+        <button onclick="nav('more')" style="background:none;border:none;font-size:20px;cursor:pointer;margin-left:10px">→</button>
+        <div style="font-size:18px;font-weight:700;color:var(--g)">⚖️ الصفحة القانونية</div>
+      </div>
+
+      <div style="font-size:13px;line-height:1.9;color:var(--t)">
+        <p style="font-weight:700;font-size:14px;margin-bottom:12px">تطبيق دارك وحيك — المملوك للمهندس / سعد الرويس</p>
+
+        <div style="background:rgba(74,222,128,.08);padding:12px 14px;border-radius:10px;margin:14px 0">
+          <p style="font-weight:700;color:var(--g)">🟩 1) المقدمة</p>
+          <p>تطبيق دارك وحيك هو منصة إلكترونية لعرض الإعلانات العقارية، ويهدف إلى تسهيل التواصل بين المعلنين والمشترين بطريقة آمنة ومنظمة. باستخدام التطبيق، يوافق المستخدم على جميع السياسات والشروط المذكورة في هذه الصفحة القانونية.</p>
+        </div>
+
+        <div style="background:rgba(96,165,250,.08);padding:12px 14px;border-radius:10px;margin:14px 0">
+          <p style="font-weight:700;color:#60a5fa">🟦 2) شروط الخدمة</p>
+          <ul style="padding-right:16px;margin:6px 0">
+            <li>المنصة توفر خدمة عرض الإعلانات العقارية فقط.</li>
+            <li>المنصة ليست وسيطًا عقاريًا ولا طرفًا في أي عملية بيع أو شراء.</li>
+            <li>يحق للمنصة حذف أو إيقاف أي إعلان مخالف دون إشعار مسبق.</li>
+            <li>يلتزم المستخدم بعدم إساءة استخدام التطبيق أو نشر محتوى مخالف للأنظمة.</li>
+            <li>استمرار استخدام التطبيق يعني الموافقة على شروط الخدمة.</li>
+          </ul>
+        </div>
+
+        <div style="background:rgba(251,146,60,.08);padding:12px 14px;border-radius:10px;margin:14px 0">
+          <p style="font-weight:700;color:#fb923c">🟧 3) اتفاقية المستخدم</p>
+          <ul style="padding-right:16px;margin:6px 0">
+            <li>يلتزم المستخدم بتقديم معلومات صحيحة أثناء التسجيل أو التواصل.</li>
+            <li>يحق للمنصة تعليق أو حذف أي حساب مخالف.</li>
+            <li>يتحمل المعلن المسؤولية الكاملة عن محتوى إعلانه.</li>
+            <li>يتحمل المشتري مسؤولية التحقق من صحة المعلومات قبل الشراء.</li>
+            <li>يمنع نشر أي محتوى مضلل أو غير لائق أو مخالف للأنظمة.</li>
+          </ul>
+        </div>
+
+        <div style="background:rgba(74,222,128,.08);padding:12px 14px;border-radius:10px;margin:14px 0">
+          <p style="font-weight:700;color:var(--g)">🟩 4) سياسة الخصوصية</p>
+          <ul style="padding-right:16px;margin:6px 0">
+            <li>يتم جمع بيانات محدودة لتحسين الخدمة مثل: الاسم، رقم الجوال، بيانات الإعلان.</li>
+            <li>لا يتم مشاركة بيانات المستخدمين مع أي طرف ثالث إلا عند الضرورة القانونية.</li>
+            <li>يتم تخزين البيانات في بيئة آمنة تتوافق مع المعايير التقنية الحديثة.</li>
+            <li>لا يتم جمع بيانات الأطفال دون سن 13 عامًا.</li>
+            <li>يحق للمنصة تعديل سياسة الخصوصية في أي وقت.</li>
+          </ul>
+        </div>
+
+        <div style="background:rgba(96,165,250,.08);padding:12px 14px;border-radius:10px;margin:14px 0">
+          <p style="font-weight:700;color:#60a5fa">🟦 5) سياسة الإعلانات</p>
+          <ul style="padding-right:16px;margin:6px 0">
+            <li>يجب أن تكون جميع الإعلانات العقارية صحيحة ودقيقة وغير مضللة.</li>
+            <li>يمنع نشر إعلانات تحتوي على محتوى مخالف أو مسيء أو غير لائق.</li>
+            <li>يحق للمنصة حذف أو رفض أي إعلان دون ذكر الأسباب.</li>
+            <li>يتحمل المعلن المسؤولية القانونية الكاملة عن محتوى الإعلان.</li>
+          </ul>
+        </div>
+
+        <div style="background:rgba(251,146,60,.08);padding:12px 14px;border-radius:10px;margin:14px 0">
+          <p style="font-weight:700;color:#fb923c">🟧 6) التعاملات المالية</p>
+          <ul style="padding-right:16px;margin:6px 0">
+            <li>المنصة لا تستقبل أي مبالغ مالية بين المعلن والمشتري.</li>
+            <li>أي اتفاق مالي يتم خارج التطبيق هو مسؤولية الطرفين فقط.</li>
+            <li>المنصة غير مسؤولة عن أي خسائر أو نزاعات مالية.</li>
+          </ul>
+        </div>
+
+        <div style="background:rgba(74,222,128,.08);padding:12px 14px;border-radius:10px;margin:14px 0">
+          <p style="font-weight:700;color:var(--g)">🟩 7) حدود المسؤولية</p>
+          <ul style="padding-right:16px;margin:6px 0">
+            <li>المنصة غير مسؤولة عن دقة أو صحة الإعلانات المنشورة.</li>
+            <li>المنصة غير مسؤولة عن أي ضرر مباشر أو غير مباشر ناتج عن استخدام التطبيق.</li>
+            <li>المنصة غير مسؤولة عن أي تعاملات تتم خارج التطبيق بين المعلن والمشتري.</li>
+            <li>استخدام التطبيق يعني موافقة المستخدم على حدود المسؤولية.</li>
+          </ul>
+        </div>
+
+        <div style="background:rgba(96,165,250,.08);padding:12px 14px;border-radius:10px;margin:14px 0">
+          <p style="font-weight:700;color:#60a5fa">🟦 8) الملكية الفكرية</p>
+          <ul style="padding-right:16px;margin:6px 0">
+            <li>جميع الحقوق محفوظة للمهندس / سعد الرويس.</li>
+            <li>يمنع نسخ أو إعادة نشر أو استخدام أي جزء من التطبيق أو محتواه دون إذن رسمي.</li>
+            <li>العلامة التجارية "دارك وحيك" محمية قانونيًا.</li>
+          </ul>
+        </div>
+
+        <div style="background:rgba(251,146,60,.08);padding:12px 14px;border-radius:10px;margin:14px 0">
+          <p style="font-weight:700;color:#fb923c">🟧 9) التعديلات على الصفحة القانونية</p>
+          <ul style="padding-right:16px;margin:6px 0">
+            <li>يحق للمهندس / سعد الرويس تعديل أي بند من هذه الصفحة القانونية في أي وقت.</li>
+            <li>استمرار استخدام التطبيق بعد التعديل يعني الموافقة على البنود الجديدة.</li>
+          </ul>
+        </div>
+
+        <div style="background:rgba(74,222,128,.08);padding:12px 14px;border-radius:10px;margin:14px 0">
+          <p style="font-weight:700;color:var(--g)">🟩 10) التواصل</p>
+          <p>للاستفسارات أو الشكاوى المتعلقة بالسياسات أو الاستخدام:</p>
+          <p>البريد الإلكتروني: (تضيفه لاحقًا)</p>
+          <p>رقم التواصل: (تضيفه لاحقًا)</p>
+        </div>
       </div>
     </div>
   </div>
@@ -677,7 +783,7 @@
   <div class="pb" id="pb"><span class="pb-t">أضف للشاشة الرئيسية</span><button class="pb-a" onclick="doInstall()">تثبيت</button><button class="pb-x" onclick="closePB()">×</button></div>
   <div class="ios-hint" id="ios"><button class="close-ios" onclick="document.getElementById('ios').style.display='none'">×</button>للتثبيت: اضغط زر المشاركة <b>⬆</b> ثم "إضافة إلى الشاشة الرئيسية"</div>
 
-  <footer class="ft"><div class="wrap">دارك وحيك © 2026 — جميع الحقوق محفوظة</div></footer>
+  <footer class="ft"><div class="wrap">دارك وحيك © 2026 — جميع الحقوق محفوظة · <a href="#" onclick="nav('legal');return false" style="color:var(--g)">الصفحة القانونية</a></div></footer>
 
 <script>
 var A=[],F=JSON.parse(localStorage.getItem('darak_favs')||'[]'),cur='',user=null,mapInstance=null,currentDetailImages=[];
@@ -714,7 +820,8 @@ function nav(page){
   document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on')});
   document.querySelectorAll('.bi').forEach(function(b){b.classList.remove('on')});
   document.getElementById('pg-'+page).classList.add('on');
-  document.getElementById('nav-'+page).classList.add('on');
+  var nb=document.getElementById('nav-'+page);
+  if(nb)nb.classList.add('on');
   if(page==='map')initMapPage();
   if(page==='add')setTimeout(fetchDistricts,100);
 }
