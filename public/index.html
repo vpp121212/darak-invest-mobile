@@ -1295,7 +1295,11 @@ function mapSelectPlace(lat,lng,resultsId){
   if(map){map.flyTo({center:[lng,lat],zoom:14,duration:1500})}
 }
 
+var _mapSearchTimer=null;
+function mapSearchDebounced(){clearTimeout(_mapSearchTimer);_mapSearchTimer=setTimeout(mapSearchNow,400)}
 function mapSearchNow(){doMapSearch(document.getElementById('mapSearchInput').value,'mapSearchResults','mapSearchInput')}
+var _mapFullSearchTimer=null;
+function mapFullSearchDebounced(){clearTimeout(_mapFullSearchTimer);_mapFullSearchTimer=setTimeout(mapFullSearchNow,400)}
 function mapFullSearchNow(){doMapSearch(document.getElementById('mapFullSearchInput').value,'mapFullSearchResults','mapFullSearchInput')}
 var _map3dSearchTimer=null;
 function map3dSearchDebounced(){clearTimeout(_map3dSearchTimer);_map3dSearchTimer=setTimeout(map3dSearchNow,400)}
@@ -1742,7 +1746,7 @@ async function loadBizData(){
     var cats={مقاول:'🔨',سمسار:'🤝',محامي:'⚖️',مهندس:'📐',مقايس:'📊',أخرى:'👤'};
     document.getElementById('bizVenList').innerHTML=v.vendors.map(function(vn){
       var stars='★'.repeat(Math.round(vn.rating||0))+'☆'.repeat(5-Math.round(vn.rating||0));
-      return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(96,165,250,.12)">'+(cats[vn.category]||'👤')+'</div><div class="biz-item-info"><div class="biz-item-title">'+vn.name+'</div><div class="biz-item-sub">'+vn.category+(vn.city?' · '+vn.city:'')+'</div><div class="biz-rating" style="color:var(--g)">'+stars+'</div></div><div style="font-size:11px;color:var(--m)">'+vn.phone||''+'</div></div>';
+      return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(96,165,250,.12)">'+(cats[vn.category]||'👤')+'</div><div class="biz-item-info"><div class="biz-item-title">'+vn.name+'</div><div class="biz-item-sub">'+vn.category+(vn.city?' · '+vn.city:'')+'</div><div class="biz-rating" style="color:var(--g)">'+stars+'</div></div><div style="font-size:11px;color:var(--m)">'+(vn.phone||'')+'</div></div>';
     }).join('');
   }else{document.getElementById('bizVenList').innerHTML='<div style="color:var(--m);text-align:center;padding:30px">لا يوجد موردون</div>'}
 }
