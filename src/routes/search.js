@@ -3,8 +3,9 @@ import db from '../config/database.js';
 
 const router = Router();
 
-router.get('/', (req, res) => {
+router.get(['/', ''], (req, res) => {
   try {
+    console.log('SEARCH HIT:', req.originalUrl, req.path);
     const start = Date.now();
     const { q, city, type, purpose, minPrice, maxPrice, minArea, maxArea,
       rooms, baths, facing, trust, sort, age, minStreetWidth, minCars,
