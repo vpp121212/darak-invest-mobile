@@ -25,7 +25,9 @@ export const authorize = (...roles) => (req, res, next) => {
 };
 
 export const generateTokens = (userId) => {
-  const accessToken = jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '15m' });
-  const refreshToken = jwt.sign({ id: userId }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+  const secret = process.env.JWT_SECRET || 'fallback-jwt-secret-darak-2026';
+  const refreshSecret = process.env.JWT_REFRESH_SECRET || 'fallback-refresh-secret-darak-2026';
+  const accessToken = jwt.sign({ id: userId }, secret, { expiresIn: '15m' });
+  const refreshToken = jwt.sign({ id: userId }, refreshSecret, { expiresIn: '7d' });
   return { accessToken, refreshToken };
 };
