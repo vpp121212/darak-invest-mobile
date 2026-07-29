@@ -1058,12 +1058,39 @@ function showDetail(id){
   html+='<div class="sp"><div class="si"><div class="si-v">'+fmt(p.area)+' م²</div><div class="si-l">المساحة</div></div><div class="si"><div class="si-v">'+(p.rooms||'—')+'</div><div class="si-l">الغرف</div></div><div class="si"><div class="si-v">'+(p.baths||'—')+'</div><div class="si-l">الحمامات</div></div><div class="si"><div class="si-v">'+(p.cars||'—')+'</div><div class="si-l">مواقف</div></div><div class="si"><div class="si-v">'+(p.facing||'—')+'</div><div class="si-l">الواجهة</div></div><div class="si"><div class="si-v">'+(p.year||'—')+'</div><div class="si-l">البناء</div></div></div>';
   if(p.features&&p.features.length){html+='<div class="fd"><h3>المميزات</h3><div class="fch">'+p.features.map(function(f){return'<span style="padding:6px 12px;border-radius:999px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.15);font-size:11px;color:var(--m)">'+f+'</span>'}).join('')+'</div></div>'}
   if(p.desc){html+='<div class="desc"><h3>الوصف</h3><p>'+p.desc+'</p></div>'}
+  html+='<div id="pulse-card-'+p.id+'"><div class="load" style="padding:16px">جاري تحميل مؤشر نبض الحي...</div></div>'
   var ph=(p.agent&&p.agent.phone)?p.agent.phone.replace(/[^0-9]/g,''):'';
   html+='<div class="ag"><div class="ag-n">'+(p.agent&&p.agent.name||'دارك وحيك')+'</div><div class="ag-r">'+(p.agent&&p.agent.role||'بائع مباشر')+'</div><div class="ag-b">'+(ph?'<a class="ag-btn ag-w" href="https://wa.me/'+ph+'" target="_blank">💬 واتساب</a><a class="ag-btn ag-c" href="tel:+('+ph+')">📞 اتصال</a>':'')+'</div></div>';
   html+='<div class="dacts"><button class="dbt p" onclick="openAIP(currentDetail)">🤖 تحليل السعر</button>'+(p.lat&&p.lng?'<button class="dbt s" onclick="open3D(currentDetail)">🏗️ عرض 3D</button>':'')+'<button class="dbt s" onclick="shareProp('+p.id+')">📤 مشاركة</button></div>';
   document.getElementById('ovp').innerHTML=html;
   document.getElementById('ov').classList.add('open');
   document.body.style.overflow='hidden';
+  fetchPulse(p);
+}
+function fetchPulse(p){
+  var district=encodeURIComponent(p.district);
+  api('/pulse/'+district).then(function(d){
+    if(!d||!d.success){document.getElementById('pulse-card-'+p.id).innerHTML='';return}
+    var px=d.pulse;
+    var metro='',projects='';
+    if(px.metro_stations&&px.metro_stations.length){
+      metro='<div style="margin-bottom:8px"><div style="font-size:11px;color:var(--g);font-weight:600;margin-bottom:4px">🚇 محطات مترو قريبة</div>'+
+        px.metro_stations.map(function(m){return'<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--m);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)"><span>'+m.name+'</span><span style="color:var(--green)">'+m.distance+'</span></div>'}).join('')+'</div>';
+    }
+    if(px.nearby_projects&&px.nearby_projects.length){
+      projects='<div style="margin-bottom:8px"><div style="font-size:11px;color:var(--g);font-weight:600;margin-bottom:4px">🏗️ مشاريع قريبة</div>'+
+        px.nearby_projects.map(function(m){return'<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--m);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)"><span>'+m.name+'</span><span style="color:var(--blue)">'+m.distance+'</span></div>'}).join('')+'</div>';
+    }
+    var growth=px.future_value_growth?('<span style="color:var(--green)">+'+px.future_value_growth+'%</span>'):'—';
+    var cards='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">'+
+      '<div style="padding:10px;border-radius:10px;background:rgba(8,9,14,.95);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">العائد الإيجاري</div><div style="font-size:16px;font-weight:700;color:var(--g)">'+(px.roi||'—')+'%</div></div>'+
+      '<div style="padding:10px;border-radius:10px;background:rgba(8,9,14,.95);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">النمو المتوقع</div><div style="font-size:16px;font-weight:700;color:var(--green)">'+growth+'</div></div>'+
+      (px.walk_score?'<div style="padding:10px;border-radius:10px;background:rgba(8,9,14,.95);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">مؤشر المشي</div><div style="font-size:16px;font-weight:700;color:var(--blue)">'+px.walk_score+'</div></div>':'')+
+      (px.avg_rent?'<div style="padding:10px;border-radius:10px;background:rgba(8,9,14,.95);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">متوسط الإيجار</div><div style="font-size:14px;font-weight:700;color:var(--g)">'+fmt(px.avg_rent)+'</div></div>':'')+
+    '</div>';
+    var sb=px.sports_boulevard?'<div style="display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);font-size:11px;color:var(--green);margin-bottom:8px">🏃 يمر بالحي المسار الرياضي — جودة حياة أعلى</div>':'';
+    document.getElementById('pulse-card-'+p.id).innerHTML='<div class="fd"><h3>📊 مؤشر نبض الحي الذكي</h3><div style="background:rgba(8,9,14,.95);border:1px solid rgba(212,175,55,.15);border-radius:var(--r);padding:14px">'+sb+cards+metro+projects+'<div style="font-size:9px;color:var(--m);text-align:left;margin-top:4px">المصدر: '+px.data_source+'</div></div></div>';
+  }).catch(function(){document.getElementById('pulse-card-'+p.id).innerHTML=''});
 }
 function closeD(){document.getElementById('ov').classList.remove('open');document.body.style.overflow=''}
 

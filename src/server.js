@@ -36,6 +36,7 @@ import placeholderRoutes from './routes/placeholder.js';
 import tileRoutes from './routes/tiles.js';
 import chatRoutes from './routes/chat.js';
 import adRoutes from './routes/ads.js';
+import pulseRoutes from './routes/pulse.js';
 import panoramaRoutes from './routes/panorama.js';
 
 dotenv.config();
@@ -101,6 +102,7 @@ app.use('/api/tiles', tileRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/panorama', panoramaRoutes);
 app.use('/api/ads', adRoutes);
+app.use('/api/pulse', pulseRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '1.0.0' });
