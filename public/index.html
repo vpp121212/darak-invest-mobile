@@ -534,8 +534,8 @@
       </div>
       <div id="mkt-desc">
         <div class="fin-field"><label>نوع العقار</label><select id="mkt-type"><option>فيلا</option><option>شقة</option><option>بنتهاوس</option><option>أرض</option><option>مكتب</option><option>محل</option></select></div>
-        <div class="fin-field"><label>المدينة</label><select id="mkt-city"><option>الرياض</option><option>جدة</option><option>مكة</option><option>الدمام</option><option>الخبر</option></select></div>
-        <div class="fin-field"><label>الحي</label><input id="mkt-district" placeholder="حي النرجس"></div>
+        <div class="fin-field"><label>المدينة</label><select id="mkt-city" onchange="fetchMktDistricts()"><option>الرياض</option><option>جدة</option><option>مكة</option><option>الدمام</option><option>الخبر</option></select></div>
+        <div class="fin-field"><label>الحي</label><input id="mkt-district" list="mkt-districts-list" placeholder="حي النرجس"><datalist id="mkt-districts-list"></datalist></div>
         <div class="fin-field"><label>المساحة (م²)</label><input type="number" id="mkt-area" placeholder="450"></div>
         <div class="fin-field"><label>عدد الغرف</label><input type="number" id="mkt-rooms" placeholder="5"></div>
         <div class="fin-field"><label>السعر (ر.س)</label><input type="number" id="mkt-price" placeholder="2500000"></div>
@@ -716,6 +716,7 @@ function nav(page){
   document.getElementById('pg-'+page).classList.add('on');
   document.getElementById('nav-'+page).classList.add('on');
   if(page==='map')initMapPage();
+  if(page==='add')setTimeout(fetchDistricts,100);
 }
 
 /* RENDER */
@@ -1682,6 +1683,17 @@ async function fetchDistricts(){
     var d=await api('/search/districts?city='+encodeURIComponent(city));
     if(d&&d.success&&d.districts){
       var dl=document.getElementById('districts-list');
+      dl.innerHTML=d.districts.map(function(x){return '<option value="'+x+'">'}).join('');
+    }
+  }catch(e){}
+}
+async function fetchMktDistricts(){
+  var city=document.getElementById('mkt-city')?document.getElementById('mkt-city').value:'';
+  if(!city)return;
+  try{
+    var d=await api('/search/districts?city='+encodeURIComponent(city));
+    if(d&&d.success&&d.districts){
+      var dl=document.getElementById('mkt-districts-list');
       dl.innerHTML=d.districts.map(function(x){return '<option value="'+x+'">'}).join('');
     }
   }catch(e){}
