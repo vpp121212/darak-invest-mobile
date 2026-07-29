@@ -678,22 +678,16 @@
   </div>
 
   <!-- ABOUT OVERLAY -->
-  <div class="logino" id="aboutOv" style="z-index:2501;backdrop-filter:blur(20px)">
-    <div class="login-box" style="padding:40px 24px">
-      <div class="login-close" onclick="closeAbout()" style="position:absolute;top:16px;left:16px;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</div>
-      <div class="login-logo">د</div>
-      <div class="login-title">دارك وحيك</div>
-      <div class="login-sub" style="margin-bottom:20px">منصة عقارية سعودية متكاملة</div>
-      <div style="text-align:right;font-size:13px;color:var(--m);line-height:2;margin-bottom:20px;padding:16px;border-radius:var(--r);background:rgba(8,9,14,.9);border:1px solid rgba(255,255,255,.06)">
-        <p style="margin-bottom:12px">منصتنا تجمع بين البائعين والمشترين والمستأجرين في جميع مدن المملكة، مع أحدث التقنيات لمساعدتك في إيجاد عقارك المثالي.</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
-          <div style="padding:10px;border-radius:10px;background:rgba(18,20,30,.7);border:1px solid rgba(255,255,255,.04);text-align:center"><div style="font-size:14px;margin-bottom:4px">🔍</div><div style="font-size:11px;color:var(--t)">بحث ذكي</div></div>
-          <div style="padding:10px;border-radius:10px;background:rgba(18,20,30,.7);border:1px solid rgba(255,255,255,.04);text-align:center"><div style="font-size:14px;margin-bottom:4px">🌐</div><div style="font-size:11px;color:var(--t)">جولة 360</div></div>
-          <div style="padding:10px;border-radius:10px;background:rgba(18,20,30,.7);border:1px solid rgba(255,255,255,.04);text-align:center"><div style="font-size:14px;margin-bottom:4px">🤖</div><div style="font-size:11px;color:var(--t)">تقدير بالذكاء الاصطناعي</div></div>
-          <div style="padding:10px;border-radius:10px;background:rgba(18,20,30,.7);border:1px solid rgba(255,255,255,.04);text-align:center"><div style="font-size:14px;margin-bottom:4px">⚖️</div><div style="font-size:11px;color:var(--t)">أدوات قانونية</div></div>
-        </div>
+  <div id="aboutOv" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(5,6,10,.96);z-index:2501;justify-content:center;align-items:center;backdrop-filter:blur(20px)" onclick="closeAbout()">
+    <div style="background:rgba(14,16,24,.98);padding:32px 24px;width:88%;max-width:480px;border-radius:var(--r);line-height:1.8;border:1px solid rgba(212,175,55,.2);text-align:center;position:relative" onclick="event.stopPropagation()">
+      <button onclick="closeAbout()" style="position:absolute;top:14px;left:14px;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+      <div style="width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 30% 0%,#f5d47b,#d4af37 35%,#7b5a1f);display:flex;align-items:center;justify-content:center;color:#05060a;font-size:24px;font-weight:800;margin:0 auto 12px">د</div>
+      <h2 style="font-size:20px;font-weight:700;color:var(--g);margin-bottom:4px">دارك وحيك</h2>
+      <p style="font-size:12px;color:var(--m);margin-bottom:16px">منصة عقارية رقمية حديثة</p>
+      <div style="text-align:right;font-size:13px;color:var(--m);line-height:1.9;padding:16px;border-radius:var(--r);background:rgba(8,9,14,.9);border:1px solid rgba(255,255,255,.06);margin-bottom:16px">
+        تطبيق دارك وحيك هو منصة عقارية رقمية حديثة تستهدف واحدًا من أكبر القطاعات الاقتصادية في المملكة العربية السعودية. نقدم حلولًا مبتكرة للبحث عن العقارات، البيع، والإيجار مع تقنيات الذكاء الاصطناعي والجولات الافتراضية 360 لجعل تجربتك العقارية أكثر سهولة وشفافية.
       </div>
-      <div style="text-align:center;font-size:11px;color:var(--m);margin-top:8px">الإصدار 1.0.0</div>
+      <button onclick="closeAbout()" style="padding:12px 28px;border-radius:999px;border:none;background:linear-gradient(135deg,var(--g),#c9a430);color:#05060a;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">إغلاق</button>
     </div>
   </div>
 
@@ -1622,8 +1616,8 @@ async function runSeo(){
 }
 
 /* ABOUT */
-function openAbout(){document.getElementById('aboutOv').classList.add('on')}
-function closeAbout(){document.getElementById('aboutOv').classList.remove('on')}
+function openAbout(){document.getElementById('aboutOv').style.display='flex'}
+function closeAbout(){document.getElementById('aboutOv').style.display='none'}
 
 /* LEGAL */
 function openLeg(){document.getElementById('legOv').classList.add('on')}
