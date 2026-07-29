@@ -863,15 +863,19 @@ var API=(location.port==='5000'||location.hostname==='localhost'||location.hostn
 if(window.location.protocol==='file:')API='http://172.20.10.3:5000/api';
 var authToken=localStorage.getItem('darak_token')||null;
 
+function fmtErr(d){
+  if(d.details&&d.details.length)return d.details.map(function(e){return e.message||e.field+': '+e.message}).join(' | ');
+  return d.message||d.error||'خطأ في الخادم';
+}
 async function api(path,opts){
   var headers={'Content-Type':'application/json'};
   if(authToken)headers['Authorization']='Bearer '+authToken;
   try{
     var r=await fetch(API+path,{...opts,headers:{...headers,...(opts&&opts.headers||{})},signal:AbortSignal.timeout?AbortSignal.timeout(10000):undefined});
     var d=await r.json().catch(function(){return{}});
-    if(!r.ok){return {error:d.error||d.message||'خطأ في الخادم',status:r.status}}
+    if(!r.ok){return {error:fmtErr(d),code:d.code||'UNKNOWN',status:r.status}}
     return d;
-  }catch(e){return {error:'تعذر الاتصال بالخادم'}}
+  }catch(e){return {error:'تعذر الاتصال بالخادم',code:'NETWORK_ERROR'}}
 }
 
 function fmt(n){return Number(n||0).toLocaleString('en')}

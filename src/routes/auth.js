@@ -6,6 +6,7 @@ import { generateTokens } from '../middleware/auth.js';
 import { createRateLimiter } from '../middleware/security.js';
 import { validate } from '../middleware/validate.js';
 import { loginSchema, refreshSchema } from '../validators/auth.js';
+import { Errors } from '../utils/errors.js';
 
 const router = Router();
 const authLimiter = createRateLimiter('basic');
@@ -15,10 +16,10 @@ router.post('/login', authLimiter, validate.body(loginSchema), async (req, res) 
     const { email, password } = req.body;
 
     const [user] = await sql`SELECT * FROM users WHERE email = ${email}`;
-    if (!user) return res.status(401).json({ error: 'بيانات الدخول غير صحيحة' });
+    if (!user) return res.status(401).json(Errors.unauthorized('بيانات الدخول غير صحيحة').toJSON());
 
     const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(401).json({ error: 'بيانات الدخول غير صحيحة' });
+    if (!valid) return res.status(401).json(Errors.unauthorized('بيانات الدخول غير صحيحة').toJSON());
 
     const tokens = generateTokens(user.id);
     await sql`UPDATE users SET "refreshToken" = ${tokens.refreshToken}, "lastLogin" = NOW() WHERE id = ${user.id}`;
@@ -30,7 +31,7 @@ router.post('/login', authLimiter, validate.body(loginSchema), async (req, res) 
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'خطأ داخلي' });
+    res.status(500).json(Errors.internal().toJSON());
   }
 });
 
@@ -41,7 +42,7 @@ router.post('/refresh', validate.body(refreshSchema), async (req, res) => {
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
     const [user] = await sql`SELECT * FROM users WHERE id = ${decoded.id}`;
     if (!user || user.refreshToken !== refreshToken) {
-      return res.status(401).json({ error: 'Token غير صالح' });
+      return res.status(401).json(Errors.invalidToken('Token غير صالح').toJSON());
     }
 
     const tokens = generateTokens(user.id);
@@ -49,7 +50,7 @@ router.post('/refresh', validate.body(refreshSchema), async (req, res) => {
 
     res.json({ success: true, ...tokens });
   } catch (err) {
-    res.status(401).json({ error: 'Token غير صالح' });
+    res.status(401).json(Errors.invalidToken().toJSON());
   }
 });
 
@@ -64,14 +65,14 @@ router.get('/me', async (req, res) => {
   if (req.headers.authorization?.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
   }
-  if (!token) return res.status(401).json({ error: 'غير مصرح' });
+  if (!token) return res.status(401).json(Errors.unauthorized().toJSON());
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const [user] = await sql`SELECT id, name, email, phone, role FROM users WHERE id = ${decoded.id}`;
-    if (!user) return res.status(401).json({ error: 'المستخدم غير موجود' });
+    if (!user) return res.status(401).json(Errors.unauthorized('المستخدم غير موجود').toJSON());
     res.json({ success: true, user });
   } catch (err) {
-    return res.status(401).json({ error: 'رمز غير صالح' });
+    return res.status(401).json(Errors.invalidToken().toJSON());
   }
 });
 

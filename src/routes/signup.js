@@ -5,6 +5,7 @@ import { generateTokens } from '../middleware/auth.js';
 import { createRateLimiter } from '../middleware/security.js';
 import { validate } from '../middleware/validate.js';
 import { registerSchema } from '../validators/auth.js';
+import { Errors } from '../utils/errors.js';
 
 const router = Router();
 const authLimiter = createRateLimiter('basic');
@@ -14,7 +15,7 @@ router.post('/register', authLimiter, validate.body(registerSchema), async (req,
     const { name, email, phone, password } = req.body;
 
     const [exists] = await sql`SELECT id FROM users WHERE email = ${email}`;
-    if (exists) return res.status(400).json({ error: 'البريد مسجل مسبقاً' });
+    if (exists) return res.status(400).json(Errors.duplicate('البريد').toJSON());
 
     const hashedPassword = await bcrypt.hash(password, 12);
     const [result] = await sql`
@@ -32,7 +33,7 @@ router.post('/register', authLimiter, validate.body(registerSchema), async (req,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'خطأ داخلي' });
+    res.status(500).json(Errors.internal().toJSON());
   }
 });
 

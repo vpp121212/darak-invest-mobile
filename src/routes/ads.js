@@ -3,6 +3,7 @@ import sql from '../config/database.js';
 import { protect } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { createAdSchema } from '../validators/ad.js';
+import { Errors } from '../utils/errors.js';
 
 const router = Router();
 
@@ -23,7 +24,7 @@ router.post('/add', protect, validate.body(createAdSchema), async (req, res) => 
     });
   } catch (error) {
     console.error('Add Ad Error:', error);
-    res.status(500).json({ message: 'حدث خطأ غير متوقع', error: error.message });
+    res.status(500).json(Errors.internal().toJSON());
   }
 });
 

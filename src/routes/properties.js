@@ -4,6 +4,7 @@ import { protect } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { createPropertySchema, updatePropertySchema, propertyQuerySchema } from '../validators/property.js';
 import { propertiesBreaker } from '../services/circuitBreaker.js';
+import { Errors } from '../utils/errors.js';
 
 const router = Router();
 
@@ -24,7 +25,7 @@ router.get('/', validate.query(propertyQuerySchema), async (req, res) => {
     if (maxArea) { conditions.push(`area <= $${idx++}`); params.push(Number(maxArea)); }
     const [{ total }] = await sql.unsafe(`SELECT COUNT(*)::int as total FROM properties WHERE ${conditions.join(' AND ')}`, params);
     res.json({ success: true, properties: properties.map(formatProperty), total, pages: Math.ceil(total / Number(limit)), page: Number(page) });
-  } catch (err) { console.error(err); res.status(503).json({ error: 'الخدمة غير متاحة مؤقتاً', fallback: true }); }
+  } catch (err) { console.error(err); res.status(503).json({ code: 'SERVICE_UNAVAILABLE', message: 'الخدمة غير متاحة مؤقتاً', fallback: true }); }
 });
 
 router.get('/all', async (req, res) => {
@@ -68,10 +69,10 @@ router.get('/all', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const [property] = await sql`SELECT * FROM properties WHERE id = ${req.params.id}`;
-    if (!property) return res.status(404).json({ error: 'العقار غير موجود' });
+    if (!property) return res.status(404).json(Errors.notFound('العقار').toJSON());
     await sql`UPDATE properties SET views = views + 1 WHERE id = ${req.params.id}`;
     res.json({ success: true, property: formatProperty(property) });
-  } catch (err) { res.status(500).json({ error: 'خطأ داخلي' }); }
+  } catch (err) { res.status(500).json(Errors.internal().toJSON()); }
 });
 
 router.post('/', protect, validate.body(createPropertySchema), async (req, res) => {
@@ -92,15 +93,15 @@ router.post('/', protect, validate.body(createPropertySchema), async (req, res) 
     ]);
     const [property] = await sql`SELECT * FROM properties WHERE id = ${result.id}`;
     res.status(201).json({ success: true, property: formatProperty(property) });
-  } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
+  } catch (err) { console.error(err); res.status(500).json(Errors.internal().toJSON()); }
 });
 
 router.put('/:id', protect, validate.body(updatePropertySchema), async (req, res) => {
   try {
     const [existing] = await sql`SELECT * FROM properties WHERE id = ${req.params.id}`;
-    if (!existing) return res.status(404).json({ error: 'العقار غير موجود' });
+    if (!existing) return res.status(404).json(Errors.notFound('العقار').toJSON());
     if (existing.agentUserId !== req.user.id && req.user.role !== 'admin') {
-      return res.status(403).json({ error: 'غير مصرح بالتعديل' });
+      return res.status(403).json(Errors.forbidden('غير مصرح بالتعديل').toJSON());
     }
     const p = req.body;
     await sql.unsafe(`
@@ -118,19 +119,19 @@ router.put('/:id', protect, validate.body(updatePropertySchema), async (req, res
     ]);
     const [property] = await sql`SELECT * FROM properties WHERE id = ${req.params.id}`;
     res.json({ success: true, property: formatProperty(property) });
-  } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
+  } catch (err) { console.error(err); res.status(500).json(Errors.internal().toJSON()); }
 });
 
 router.delete('/:id', protect, async (req, res) => {
   try {
     const [existing] = await sql`SELECT * FROM properties WHERE id = ${req.params.id}`;
-    if (!existing) return res.status(404).json({ error: 'العقار غير موجود' });
+    if (!existing) return res.status(404).json(Errors.notFound('العقار').toJSON());
     if (existing.agentUserId !== req.user.id && req.user.role !== 'admin') {
-      return res.status(403).json({ error: 'غير مصرح بالحذف' });
+      return res.status(403).json(Errors.forbidden('غير مصرح بالحذف').toJSON());
     }
     await sql`DELETE FROM properties WHERE id = ${req.params.id}`;
     res.json({ success: true, message: 'تم حذف العقار' });
-  } catch (err) { res.status(500).json({ error: 'خطأ داخلي' }); }
+  } catch (err) { res.status(500).json(Errors.internal().toJSON()); }
 });
 
 router.post('/:id/favorite', protect, async (req, res) => {
@@ -138,7 +139,7 @@ router.post('/:id/favorite', protect, async (req, res) => {
     await sql`UPDATE properties SET favorites = favorites + 1 WHERE id = ${req.params.id}`;
     const [p] = await sql`SELECT favorites FROM properties WHERE id = ${req.params.id}`;
     res.json({ success: true, favorites: p?.favorites || 0 });
-  } catch (err) { res.status(500).json({ error: 'خطأ داخلي' }); }
+  } catch (err) { res.status(500).json(Errors.internal().toJSON()); }
 });
 
 function formatProperty(p) {

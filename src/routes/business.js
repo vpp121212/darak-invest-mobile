@@ -3,6 +3,7 @@ import sql from '../config/database.js';
 import { protect } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { createInvoiceSchema, updateInvoiceSchema, createVendorSchema } from '../validators/business.js';
+import { Errors } from '../utils/errors.js';
 
 const router = Router();
 
@@ -36,7 +37,7 @@ router.get('/invoices', protect, async (req, res) => {
     `, [req.userId]);
 
     res.json({ success: true, invoices, total, stats });
-  } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
+  } catch (err) { console.error(err); res.status(500).json(Errors.internal().toJSON()); }
 });
 
 router.post('/invoices', protect, validate.body(createInvoiceSchema), async (req, res) => {
@@ -48,7 +49,7 @@ router.post('/invoices', protect, validate.body(createInvoiceSchema), async (req
       RETURNING id
     `;
     res.json({ success: true, id, message: 'تم إضافة الفاتورة' });
-  } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
+  } catch (err) { console.error(err); res.status(500).json(Errors.internal().toJSON()); }
 });
 
 router.put('/invoices/:id', protect, validate.body(updateInvoiceSchema), async (req, res) => {
@@ -60,7 +61,7 @@ router.put('/invoices/:id', protect, validate.body(updateInvoiceSchema), async (
     if (status) { updates.push(`status = $${++idx}`); params.push(status); }
     if (paidAt) { updates.push(`"paidAt" = $${++idx}`); params.push(paidAt); }
     if (status === 'مدفوعة' && !paidAt) { updates.push(`"paidAt" = NOW()`); }
-    if (updates.length === 0) return res.status(400).json({ error: 'لا توجد تحديثات' });
+    if (updates.length === 0) return res.status(400).json(Errors.custom('NO_UPDATES', 'لا توجد تحديثات').toJSON());
 
     params.push(req.params.id, req.userId);
     await sql.unsafe(
@@ -68,14 +69,14 @@ router.put('/invoices/:id', protect, validate.body(updateInvoiceSchema), async (
       params
     );
     res.json({ success: true, message: 'تم تحديث الفاتورة' });
-  } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
+  } catch (err) { console.error(err); res.status(500).json(Errors.internal().toJSON()); }
 });
 
 router.delete('/invoices/:id', protect, async (req, res) => {
   try {
     await sql`DELETE FROM invoices WHERE id = ${req.params.id} AND "userId" = ${req.userId}`;
     res.json({ success: true, message: 'تم حذف الفاتورة' });
-  } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
+  } catch (err) { console.error(err); res.status(500).json(Errors.internal().toJSON()); }
 });
 
 router.get('/vendors', protect, async (req, res) => {
@@ -92,7 +93,7 @@ router.get('/vendors', protect, async (req, res) => {
       params
     );
     res.json({ success: true, vendors });
-  } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
+  } catch (err) { console.error(err); res.status(500).json(Errors.internal().toJSON()); }
 });
 
 router.post('/vendors', protect, validate.body(createVendorSchema), async (req, res) => {
@@ -105,7 +106,7 @@ router.post('/vendors', protect, validate.body(createVendorSchema), async (req, 
       RETURNING id
     `;
     res.json({ success: true, id, message: 'تم إضافة المورد' });
-  } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
+  } catch (err) { console.error(err); res.status(500).json(Errors.internal().toJSON()); }
 });
 
 router.put('/vendors/:id', protect, async (req, res) => {
@@ -121,7 +122,7 @@ router.put('/vendors/:id', protect, async (req, res) => {
     if (city) { updates.push(`city = $${++idx}`); params.push(city); }
     if (rating !== undefined) { updates.push(`rating = $${++idx}`); params.push(rating); }
     if (notes) { updates.push(`notes = $${++idx}`); params.push(notes); }
-    if (updates.length === 0) return res.status(400).json({ error: 'لا توجد تحديثات' });
+    if (updates.length === 0) return res.status(400).json(Errors.custom('NO_UPDATES', 'لا توجد تحديثات').toJSON());
 
     params.push(req.params.id, req.userId);
     await sql.unsafe(
@@ -129,14 +130,14 @@ router.put('/vendors/:id', protect, async (req, res) => {
       params
     );
     res.json({ success: true, message: 'تم تحديث المورد' });
-  } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
+  } catch (err) { console.error(err); res.status(500).json(Errors.internal().toJSON()); }
 });
 
 router.delete('/vendors/:id', protect, async (req, res) => {
   try {
     await sql`DELETE FROM vendors WHERE id = ${req.params.id} AND "userId" = ${req.userId}`;
     res.json({ success: true, message: 'تم حذف المورد' });
-  } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
+  } catch (err) { console.error(err); res.status(500).json(Errors.internal().toJSON()); }
 });
 
 export default router;
