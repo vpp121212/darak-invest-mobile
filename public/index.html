@@ -1757,7 +1757,7 @@ async function saveUpload(){
 
 /* ADS */
 async function openAds(){
-  document.getElementById('ads').classList.add('on');
+  document.getElementById('ads').classList.add('open');
   if(!authToken){document.getElementById('adsList').innerHTML='<div style="color:var(--m);text-align:center;padding:40px">سجّل دخولك لعرض إعلاناتك</div>';return}
   var d=await api('/my-properties');
   if(d&&d.success&&d.properties.length){
@@ -1769,11 +1769,11 @@ async function openAds(){
     document.getElementById('adsList').innerHTML='<div style="color:var(--m);text-align:center;padding:40px">لا توجد إعلانات نشطة<br><small>أضف عقارك من صفحة الإضافة</small></div>';
   }
 }
-function closeAds(){document.getElementById('ads').classList.remove('on')}
+function closeAds(){document.getElementById('ads').classList.remove('open')}
 
 /* PACKAGES */
 async function openPkg(){
-  document.getElementById('pkg').classList.add('on');
+  document.getElementById('pkg').classList.add('open');
   var d=await api('/packages');
   if(d&&d.success){
     var html='<button class="cls" onclick="closePkg()">✕</button><div class="pkg" style="padding-top:44px"><div style="font-size:16px;font-weight:700;color:var(--g);margin-bottom:16px">📦 الباقة المناسبة</div>';
@@ -1794,11 +1794,11 @@ async function subscribePkg(id){
   var d=await api('/packages/subscribe',{method:'POST',body:JSON.stringify({packageId:id})});
   if(d&&d.success){toast('تم الاشتراك بنجاح ✓');closePkg()}
 }
-function closePkg(){document.getElementById('pkg').classList.remove('on')}
+function closePkg(){document.getElementById('pkg').classList.remove('open')}
 
 /* OFFICE */
-function openOff(){document.getElementById('off').classList.add('on')}
-function closeOff(){document.getElementById('off').classList.remove('on')}
+function openOff(){document.getElementById('off').classList.add('open')}
+function closeOff(){document.getElementById('off').classList.remove('open')}
 async function submitOffice(){
   var nm=document.getElementById('off-name').value;
   var ph=document.getElementById('off-phone').value;
@@ -1813,8 +1813,8 @@ async function submitOffice(){
 }
 
 /* REQUEST */
-function openReq(){document.getElementById('req').classList.add('on')}
-function closeReq(){document.getElementById('req').classList.remove('on')}
+function openReq(){document.getElementById('req').classList.add('open')}
+function closeReq(){document.getElementById('req').classList.remove('open')}
 async function submitPropertyRequest(){
   var nm=document.getElementById('req-name').value;
   var tp=document.getElementById('req-type').value;
