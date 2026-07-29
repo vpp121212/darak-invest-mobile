@@ -98,6 +98,17 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '1.0.0' });
 });
 
+// Debug: test DB query
+app.get('/api/debug/search', async (req, res) => {
+  try {
+    const db = (await import('./config/database.js')).default;
+    const props = db.prepare("SELECT * FROM properties WHERE status = 'active' LIMIT 2").all();
+    res.json({ ok: true, count: props.length, first: props[0]?.title });
+  } catch (e) {
+    res.json({ ok: false, error: e.message });
+  }
+});
+
 app.get('/api/config/mapbox', (req, res) => {
   res.json({ token: process.env.MAPBOX_TOKEN || '' });
 });
