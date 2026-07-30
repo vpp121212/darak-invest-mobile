@@ -2168,7 +2168,7 @@ async function doSendOtp(){
   btn.disabled=true;btn.textContent='جاري الإرسال...';
   try{
     var d=await api('/auth/send-otp',{method:'POST',body:JSON.stringify({phone:ph})});
-    if(d&&!d.code){toast('تم إرسال الكود');document.getElementById('otp-code-group').style.display='block';document.getElementById('otp-verify-btn').style.display='block';startOtpTimer()}
+    if(d&&!d.code){toast('تم إرسال الكود');document.getElementById('otp-code-group').style.display='block';document.getElementById('otp-verify-btn').style.display='block';startOtpTimer();if(d.otp){document.getElementById('otp-code').value=d.otp;var el=document.createElement('div');el.style.cssText='text-align:center;font-size:16px;color:var(--g);font-weight:700;margin-top:8px;padding:8px;border-radius:8px;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.3)';el.textContent='🔑 الكود التجريبي: '+d.otp;document.getElementById('otp-code-group').appendChild(el)}}
     else{toast(d.message||'فشل الإرسال');btn.disabled=false;btn.textContent='إرسال كود التحقق'}
   }catch(e){toast('فشل الإرسال');btn.disabled=false;btn.textContent='إرسال كود التحقق'}
 }

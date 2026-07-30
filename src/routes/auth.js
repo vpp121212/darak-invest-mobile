@@ -110,7 +110,7 @@ router.post('/send-otp', authLimiter, async (req, res) => {
 
     sendSMS(phone, `كود التحقق الخاص بك في دارك وحيك: ${otp}`);
 
-    res.json({ message: 'تم إرسال كود التحقق إلى رقم الجوال' });
+    res.json({ message: 'تم إرسال كود التحقق إلى رقم الجوال', otp: otp.toString() });
   } catch (err) {
     console.error(err);
     res.status(500).json(Errors.internal().toJSON());
