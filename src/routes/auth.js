@@ -77,7 +77,14 @@ router.get('/me', async (req, res) => {
 });
 
 function sendSMS(phone, message) {
-  console.log(`SMS to ${phone}: ${message}`);
+  const appSid = process.env.UNIFONIC_APP_SID;
+  if (!appSid) { console.log(`[SMS Mock] To ${phone}: ${message}`); return }
+  const recipient = phone.startsWith('0') ? '966' + phone.slice(1) : phone;
+  fetch('https://api.unifonic.com/rest/Messages/Send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ AppSid: appSid, Recipient: recipient, Body: message })
+  }).catch(err => console.error('SMS Error:', err));
 }
 
 router.post('/send-otp', authLimiter, async (req, res) => {
