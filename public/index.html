@@ -1822,7 +1822,7 @@ function fallbackStyle(dark){
     :['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png','https://b.tile.openstreetmap.org/{z}/{x}/{y}.png','https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'];
   return {version:8,name:'darak-fallback',sources:{base:{type:'raster',tiles:tiles,tileSize:256,attribution:'© OpenStreetMap contributors'}},layers:[{id:'base',type:'raster',source:'base'}]};
 }
-function mapStyle(){return window._mbBlocked?fallbackStyle(isNight()):(isNight()?'mapbox://styles/mapbox/dark-v11':'mapbox://styles/mapbox/streets-v12')}
+function mapStyle(){return window._mbBlocked?fallbackStyle(true):'mapbox://styles/mapbox/dark-v11'}
 
 function probeMapbox(){
   if(window._mbBlocked!==undefined)return Promise.resolve(window._mbBlocked===false);
@@ -1993,7 +1993,7 @@ function createMap(opts){
   m.addControl(new mapboxgl.NavigationControl(),'top-left');
   m.on('load',function(){
     loaded=true;
-    if(!window._mbBlocked){try{m.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512});m.setTerrain({source:'mapbox-dem',exaggeration:1})}catch(e){};try{m.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',type:'fill-extrusion',minzoom:15,paint:{'fill-extrusion-color':isNight()?'#2a2d35':'#c8ccd4','fill-extrusion-height':['get','height'],'fill-extrusion-base':['get','min_height'],'fill-extrusion-opacity':isNight()?0.6:0.4}})}catch(e){}}
+    if(!window._mbBlocked){try{m.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512});m.setTerrain({source:'mapbox-dem',exaggeration:1})}catch(e){};try{m.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',type:'fill-extrusion',minzoom:15,paint:{'fill-extrusion-color':'#2a2d35','fill-extrusion-height':['get','height'],'fill-extrusion-base':['get','min_height'],'fill-extrusion-opacity':0.6}})}catch(e){}}
     if(opts._addMarkers!==false){addMarkersToMap(m);addLegend(m)}
     if(opts._onLoad)opts._onLoad(m);
   });
@@ -2525,7 +2525,7 @@ function initMap3d(){
     map3dInstance2.addControl(new mapboxgl.NavigationControl(),'top-left');
     map3dInstance2.on('load',function(){
       loaded=true;
-      if(!window._mbBlocked){try{map3dInstance2.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512});map3dInstance2.setTerrain({source:'mapbox-dem',exaggeration:1})}catch(e){};try{map3dInstance2.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',type:'fill-extrusion',minzoom:15,paint:{'fill-extrusion-color':isNight()?'#2a2d35':'#c8ccd4','fill-extrusion-height':['get','height'],'fill-extrusion-base':['get','min_height'],'fill-extrusion-opacity':isNight()?0.6:0.4}})}catch(e){}}
+      if(!window._mbBlocked){try{map3dInstance2.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512});map3dInstance2.setTerrain({source:'mapbox-dem',exaggeration:1})}catch(e){};try{map3dInstance2.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',type:'fill-extrusion',minzoom:15,paint:{'fill-extrusion-color':'#2a2d35','fill-extrusion-height':['get','height'],'fill-extrusion-base':['get','min_height'],'fill-extrusion-opacity':0.6}})}catch(e){}}
       addNeighborhoodsLayer();
     });
     map3dInstance2.on('moveend',loadMapAdsByBounds);
