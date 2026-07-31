@@ -7,7 +7,7 @@ services:
     buildCommand: |
       pip3 install --no-cache-dir -r requirements.txt --break-system-packages || pip3 install --no-cache-dir -r requirements.txt
       npm install
-    startCommand: node scripts/seed.js && node scripts/import_rega.js && node src/server.js
+    startCommand: node src/server.js
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:

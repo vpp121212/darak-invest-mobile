@@ -1,5 +1,12 @@
 import sql from '../src/config/database.js';
 
+const force = process.argv.includes('--force');
+const [{ count }] = await sql`SELECT COUNT(*)::int as count FROM properties`;
+if (count > 0 && !force) {
+  console.log(`properties table already has ${count} rows — skipping seed. Use --force to reseed.`);
+  process.exit(0);
+}
+
 console.log('Clearing existing properties...');
 await sql`DELETE FROM properties`;
 console.log('Existing properties cleared');

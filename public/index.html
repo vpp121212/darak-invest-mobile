@@ -3448,7 +3448,12 @@ var FALLBACK=[
 ];
 
 async function loadProperties(){
-  var d=await api('/properties/all');
+  var d=null;
+  for(var attempt=0;attempt<4;attempt++){
+    d=await api('/properties/all');
+    if(d&&Array.isArray(d)&&d.length)break;
+    if(attempt<3)await new Promise(function(r){setTimeout(r,3000)});
+  }
   if(d&&Array.isArray(d)&&d.length){
     A=d.map(function(p){return Object.assign({},p,{loc:p.loc||(p.district+'، '+p.city),status:p.isFeatured?'حصري':'متاح',agent:p.agent||{name:p.agentName||'مكتب الديار العقارية',role:'وسيط مرخص',phone:p.agentPhone||'+966501234567'}})});
   }else{
