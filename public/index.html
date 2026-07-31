@@ -1993,8 +1993,7 @@ function createMap(opts){
   m.addControl(new mapboxgl.NavigationControl(),'top-left');
   m.on('load',function(){
     loaded=true;
-    try{m.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512});m.setTerrain({source:'mapbox-dem',exaggeration:1})}catch(e){}
-    try{m.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',type:'fill-extrusion',minzoom:15,paint:{'fill-extrusion-color':isNight()?'#2a2d35':'#c8ccd4','fill-extrusion-height':['get','height'],'fill-extrusion-base':['get','min_height'],'fill-extrusion-opacity':isNight()?0.6:0.4}})}catch(e){}
+    if(!window._mbBlocked){try{m.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512});m.setTerrain({source:'mapbox-dem',exaggeration:1})}catch(e){};try{m.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',type:'fill-extrusion',minzoom:15,paint:{'fill-extrusion-color':isNight()?'#2a2d35':'#c8ccd4','fill-extrusion-height':['get','height'],'fill-extrusion-base':['get','min_height'],'fill-extrusion-opacity':isNight()?0.6:0.4}})}catch(e){}}
     if(opts._addMarkers!==false){addMarkersToMap(m);addLegend(m)}
     if(opts._onLoad)opts._onLoad(m);
   });
@@ -2027,6 +2026,9 @@ function initHeatMap(){
   withMap('heatMap',function(){
     if(heatMapInstance)return;
     heatMapInstance=createMap({container:'heatMap',_addMarkers:false,_onLoad:function(m){renderHeatLayer(m)}});
+    heatMapInstance.on('moveend',drawHeatOverlay);
+    heatMapInstance.on('zoomend',drawHeatOverlay);
+    heatMapInstance.on('resize',drawHeatOverlay);
   });
 }
 function heatDistrictMap(){
@@ -2062,19 +2064,83 @@ function renderHeatLayer(m){
   try{
     if(m.getLayer('heat'))m.removeLayer('heat');
     if(m.getSource('heatSrc'))m.removeSource('heatSrc');
-    m.addSource('heatSrc',{type:'geojson',data:heatFeatureCollection()});
-    m.addLayer({
-      id:'heat',type:'heatmap',source:'heatSrc',
-      paint:{
-        'heatmap-weight':['interpolate',['linear'],['get','w'],0,0,1,1],
-        'heatmap-intensity':['interpolate',['linear'],['zoom'],0,1.3,9,3.2],
-        'heatmap-color':['interpolate',['linear'],['heatmap-density'],0,'rgba(33,102,172,0)',0.15,'rgba(66,150,240,.55)',0.35,'rgba(60,220,180,.7)',0.55,'rgba(255,220,80,.8)',0.75,'rgba(255,140,40,.9)',1,'rgba(255,50,50,1)'],
-        'heatmap-radius':['interpolate',['linear'],['zoom'],0,28,9,55],
-        'heatmap-opacity':0.85
-      }
-    });
-    renderHeatLegend();
   }catch(e){}
+  drawHeatOverlay();
+  renderHeatLegend();
+}
+var _heatCanvas=null,_heatCtx=null;
+function ensureHeatCanvas(){
+  var c=document.getElementById('heatMap');
+  if(!c||!heatMapInstance)return null;
+  if(!_heatCanvas||!_heatCanvas.parentNode){
+    _heatCanvas=document.createElement('canvas');
+    _heatCanvas.className='heat-overlay';
+    _heatCanvas.style.cssText='position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:1';
+    c.appendChild(_heatCanvas);
+  }
+  var dpr=window.devicePixelRatio||1;
+  var w=c.clientWidth,h=c.clientHeight;
+  if(!w||!h)return null;
+  if(_heatCanvas.width!==Math.round(w*dpr)||_heatCanvas.height!==Math.round(h*dpr)){
+    _heatCanvas.width=Math.round(w*dpr);
+    _heatCanvas.height=Math.round(h*dpr);
+  }
+  _heatCtx=_heatCanvas.getContext('2d');
+  return {w:w,h:h,dpr:dpr};
+}
+function heatRampColor(t){
+  var stops=[[0,[33,102,172]],[0.2,[66,150,240]],[0.4,[60,220,180]],[0.6,[255,220,80]],[0.8,[255,140,40]],[1,[255,50,50]]];
+  if(t<=0)return [33,102,172];
+  if(t>=1)return [255,50,50];
+  for(var i=1;i<stops.length;i++){
+    if(t<=stops[i][0]){
+      var a=stops[i-1],b=stops[i],f=(t-a[0])/(b[0]-a[0]);
+      return [Math.round(a[1][0]+(b[1][0]-a[1][0])*f),Math.round(a[1][1]+(b[1][1]-a[1][1])*f),Math.round(a[1][2]+(b[1][2]-a[1][2])*f)];
+    }
+  }
+  return [255,50,50];
+}
+function drawHeatOverlay(){
+  var env=ensureHeatCanvas();
+  if(!env||!_heatCtx)return;
+  var ctx=_heatCtx,dpr=env.dpr,w=env.w,h=env.h;
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.clearRect(0,0,_heatCanvas.width,_heatCanvas.height);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  var fc=heatFeatureCollection();
+  var pts=[];
+  if(fc&&fc.features)fc.features.forEach(function(f){
+    if(!f.geometry||f.properties.w==null||!(f.properties.w>0))return;
+    pts.push({c:f.geometry.coordinates,w:f.properties.w});
+  });
+  if(!pts.length)return;
+  var zoom=heatMapInstance.getZoom();
+  var radius=Math.max(24,Math.min(90,28+zoom*6));
+  ctx.globalCompositeOperation='lighter';
+  for(var i=0;i<pts.length;i++){
+    var pr=heatMapInstance.project(pts[i].c);
+    if(pr.x<-radius||pr.y<-radius||pr.x>w+radius||pr.y>h+radius)continue;
+    var g=ctx.createRadialGradient(pr.x,pr.y,0,pr.x,pr.y,radius);
+    g.addColorStop(0,'rgba(255,255,255,'+(0.15+0.85*pts[i].w)+')');
+    g.addColorStop(0.5,'rgba(255,255,255,'+(0.05+0.4*pts[i].w)+')');
+    g.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=g;
+    ctx.beginPath();
+    ctx.arc(pr.x,pr.y,radius,0,Math.PI*2);
+    ctx.fill();
+  }
+  ctx.globalCompositeOperation='source-over';
+  var img=ctx.getImageData(0,0,_heatCanvas.width,_heatCanvas.height);
+  var data=img.data,maxA=1;
+  for(var j=3;j<data.length;j+=4){if(data[j]>maxA)maxA=data[j]}
+  for(var k=0;k<data.length;k+=4){
+    var a=data[k+3];
+    if(a<4){data[k]=0;data[k+1]=0;data[k+2]=0;data[k+3]=0;continue}
+    var t=(a/255)*(255/maxA);
+    var c=heatRampColor(t>1?1:t);
+    data[k]=c[0];data[k+1]=c[1];data[k+2]=c[2];
+  }
+  ctx.putImageData(img,0,0);
 }
 function renderHeatLegend(){
   var el=document.getElementById('heatLegend');
@@ -2459,8 +2525,7 @@ function initMap3d(){
     map3dInstance2.addControl(new mapboxgl.NavigationControl(),'top-left');
     map3dInstance2.on('load',function(){
       loaded=true;
-      try{map3dInstance2.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512});map3dInstance2.setTerrain({source:'mapbox-dem',exaggeration:1})}catch(e){}
-      try{map3dInstance2.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',type:'fill-extrusion',minzoom:15,paint:{'fill-extrusion-color':isNight()?'#2a2d35':'#c8ccd4','fill-extrusion-height':['get','height'],'fill-extrusion-base':['get','min_height'],'fill-extrusion-opacity':isNight()?0.6:0.4}})}catch(e){}
+      if(!window._mbBlocked){try{map3dInstance2.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512});map3dInstance2.setTerrain({source:'mapbox-dem',exaggeration:1})}catch(e){};try{map3dInstance2.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',type:'fill-extrusion',minzoom:15,paint:{'fill-extrusion-color':isNight()?'#2a2d35':'#c8ccd4','fill-extrusion-height':['get','height'],'fill-extrusion-base':['get','min_height'],'fill-extrusion-opacity':isNight()?0.6:0.4}})}catch(e){}}
       addNeighborhoodsLayer();
     });
     map3dInstance2.on('moveend',loadMapAdsByBounds);
