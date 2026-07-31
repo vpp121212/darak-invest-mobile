@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import rateLimit from 'express-rate-limit';
 import sql from '../config/database.js';
 import { generateTokens } from '../middleware/auth.js';
 import { createRateLimiter } from '../middleware/security.js';
@@ -10,6 +11,7 @@ import { Errors } from '../utils/errors.js';
 
 const router = Router();
 const authLimiter = createRateLimiter('basic');
+const verifyOtpLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 15, standardHeaders: true, legacyHeaders: false });
 
 router.post('/login', authLimiter, validate.body(loginSchema), async (req, res) => {
   try {
@@ -110,14 +112,18 @@ router.post('/send-otp', authLimiter, async (req, res) => {
 
     sendSMS(phone, `كود التحقق الخاص بك في دارك وحيك: ${otp}`);
 
-    res.json({ message: 'تم إرسال كود التحقق إلى رقم الجوال', otp: otp.toString() });
+    const smsConfigured = !!process.env.UNIFONIC_APP_SID;
+    const payload = { message: 'تم إرسال كود التحقق إلى رقم الجوال' };
+    if (!smsConfigured) payload.otp = otp.toString();
+
+    res.json(payload);
   } catch (err) {
     console.error(err);
     res.status(500).json(Errors.internal().toJSON());
   }
 });
 
-router.post('/verify-otp', async (req, res) => {
+router.post('/verify-otp', verifyOtpLimiter, async (req, res) => {
   try {
     const { phone, otp } = req.body;
     if (!phone || !otp) {

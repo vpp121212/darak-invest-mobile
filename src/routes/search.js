@@ -83,9 +83,10 @@ async function handleSearch(req, res) {
     const countParams = params.slice();
     const [{ total }] = await sql.unsafe(`SELECT COUNT(*)::int as total FROM properties WHERE ${where}`, countParams);
 
+    const escapeHtml = (v) => String(v).replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const formatted = properties.map(p => ({
       ...p,
-      features: JSON.parse(p.features || '[]'),
+      features: (JSON.parse(p.features || '[]') || []).map(escapeHtml),
       images: JSON.parse(p.images || '[]'),
       isFeatured: !!p.isFeatured,
       loc: `${p.district}، ${p.city}`,

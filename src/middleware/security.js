@@ -13,6 +13,19 @@ export const createRateLimiter = (type = 'basic') => {
   return rateLimit({ windowMs: cfg.windowMs, limit: cfg.limit, standardHeaders: true, legacyHeaders: false });
 };
 
+const escapeString = (v) => v.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+const sanitizeValue = (v) => {
+  if (typeof v === 'string') return escapeString(v);
+  if (Array.isArray(v)) return v.map(sanitizeValue);
+  if (v && typeof v === 'object') {
+    const out = {};
+    for (const key in v) out[key] = sanitizeValue(v[key]);
+    return out;
+  }
+  return v;
+};
+
 export const securityMiddleware = (app) => {
   app.use(helmet({ contentSecurityPolicy: false }));
 
@@ -27,11 +40,7 @@ export const securityMiddleware = (app) => {
 
   app.use((req, res, next) => {
     if (req.body) {
-      for (const key in req.body) {
-        if (typeof req.body[key] === 'string') {
-          req.body[key] = req.body[key].trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        }
-      }
+      for (const key in req.body) req.body[key] = sanitizeValue(req.body[key]);
     }
     next();
   });

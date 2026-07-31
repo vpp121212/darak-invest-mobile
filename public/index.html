@@ -1159,11 +1159,10 @@
     <div class="pay-sub" id="paySummary">باقة الاحترافي · 99 ر.س/شهرياً</div>
     <div id="payTestNotice" style="display:none;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);border-radius:12px;padding:12px;margin-bottom:14px;font-size:11px;color:#fbbf24;text-align:center">
       <div style="font-weight:700;margin-bottom:4px">🧪 نسخة تجريبية</div>
-      استخدم: <b dir="ltr" style="font-family:monospace;background:rgba(0,0,0,.3);padding:2px 6px;border-radius:4px">4111 1111 1111 1111</b> فيزا &nbsp;·&nbsp; <b dir="ltr" style="font-family:monospace;background:rgba(0,0,0,.3);padding:2px 6px;border-radius:4px">5123 4567 8901 2346</b> مدى<br>
-      أي تاريخ مستقبلي · أي CVV (مثلاً <b dir="ltr" style="font-family:monospace;background:rgba(0,0,0,.3);padding:2px 6px;border-radius:4px">123</b>)<br>
-      <span style="font-size:10px;color:var(--m)">تنبيه: هذه بطاقات اختبار وهمية، لا تُستخدم للدفع الحقيقي</span>
+      سيتم تفعيل الباقة مباشرة بدون دفع فعلي أو إدخال بيانات بطاقة.<br>
+      <span style="font-size:10px;color:var(--m)">الباقات المدفوعة في الإنتاج تتم عبر بوابة Moyasar الآمنة</span>
     </div>
-    <div class="pay-card" id="payCardForm">
+    <div class="pay-card" id="payCardForm" style="display:none">
       <div class="pay-logos"><span>💳 مدى</span><span>💳 فيزا</span><span>💳 ماستركارد</span></div>
       <div class="pay-field"><label>اسم حامل البطاقة</label><input id="pay-name" placeholder="الاسم على البطاقة" autocomplete="cc-name"></div>
       <div class="pay-field"><label>رقم البطاقة</label><input id="pay-number" placeholder="0000 0000 0000 0000" maxlength="19" inputmode="numeric"></div>
@@ -2540,14 +2539,12 @@ async function subscribePkg(id){
   if(!authToken){toast('سجّل دخول أولاً');closePkg();openLogin();return}
   if(id==='basic'){var d=await api('/packages/subscribe',{method:'POST',body:JSON.stringify({packageId:id})});if(d&&d.success){toast('تم الاشتراك ✓');closePkg()}return}
   var cfg=await api('/payments/config');
-  if(cfg&&cfg.testMode){
-    openPaymentOv(id)
-  }else if(cfg&&cfg.publishableKey){
+  if(cfg&&cfg.publishableKey&&!cfg.testMode){
     var intent=await api('/payments/create-intent',{method:'POST',body:JSON.stringify({packageId:id})});
-    if(intent&&intent.success&&intent.invoiceUrl){window.location.href=intent.invoiceUrl}
-  }else{
-    openPaymentOv(id)
+    if(intent&&intent.success&&intent.invoiceUrl){window.location.href=intent.invoiceUrl;return}
+    toast(intent&&intent.message||'فشل إنشاء الدفعة')
   }
+  openPaymentOv(id)
 }
 function closePkg(){document.getElementById('pkg').classList.remove('open')}
 var selectedPkgId=null;
@@ -2556,19 +2553,20 @@ async function openPaymentOv(id){
   selectedPkgId=id;
   var p=pkgsData[id]||{name:'',price:0};
   document.getElementById('paySummary').innerText='باقة '+p.name+' · '+p.price+' ر.س/شهرياً';
-  document.getElementById('payAmount').innerText=p.price;
   document.getElementById('payError').style.display='none';
-  document.getElementById('payCardForm').style.display='block';
-  document.getElementById('payMoyasarForm').style.display='none';
-  document.getElementById('payBtn').style.display='block';
   document.getElementById('paySpinner').style.display='none';
-  document.getElementById('payQuickFill').style.display='none';
-  document.getElementById('payTestNotice').style.display='none';
-  ['pay-name','pay-number','pay-exp','pay-cvc'].forEach(function(x){document.getElementById(x).value=''});
   var cfg=await api('/payments/config');
   if(cfg&&cfg.testMode){
+    document.getElementById('payCardForm').style.display='none';
+    document.getElementById('payMoyasarForm').style.display='none';
     document.getElementById('payTestNotice').style.display='block';
-    document.getElementById('payQuickFill').style.display='flex'
+    document.getElementById('payBtn').style.display='block';
+    document.getElementById('payBtn').textContent='✅ تفعيل الباقة تجريبياً';
+  }else{
+    document.getElementById('payCardForm').style.display='none';
+    document.getElementById('payTestNotice').style.display='block';
+    document.getElementById('payTestNotice').innerHTML='سيتم تحويلك إلى بوابة الدفع الآمنة...';
+    document.getElementById('payBtn').style.display='none';
   }
   document.getElementById('payOv').classList.add('open')
 }
@@ -2584,31 +2582,23 @@ document.getElementById('pay-cvc').addEventListener('input',function(e){e.target
 function closePayOv(){document.getElementById('payOv').classList.remove('open')}
 async function processPayment(){
   if(!selectedPkgId)return;
-  var name=document.getElementById('pay-name').value.trim();
-  var number=document.getElementById('pay-number').value.replace(/\s/g,'');
-  var exp=document.getElementById('pay-exp').value.trim();
-  var cvc=document.getElementById('pay-cvc').value.trim();
-  if(!name||!number||!exp||!cvc){showPayErr('أكمل جميع الحقول');return}
-  if(number.length<16){showPayErr('رقم البطاقة غير صحيح');return}
-  var parts=exp.split('/');
-  if(parts.length!==2||!parts[0]||!parts[1]){showPayErr('صيغة التاريخ غير صحيحة (MM/YY)');return}
-  if(cvc.length<3){showPayErr('رمز CVV غير صحيح');return}
   document.getElementById('payBtn').style.display='none';
   document.getElementById('payCardForm').style.display='none';
   document.getElementById('paySpinner').style.display='block';
   document.getElementById('payError').style.display='none';
   var intent=await api('/payments/create-intent',{method:'POST',body:JSON.stringify({packageId:selectedPkgId})});
   if(!intent||!intent.success){showPayErr('فشل إنشاء الدفعة');return}
-  var d=await api('/payments/confirm',{method:'POST',body:JSON.stringify({paymentId:intent.paymentId,card:{number:number,cvc:cvc,month:parts[0],year:parts[1]}})});
+  var d=await api('/payments/test-complete',{method:'POST',body:JSON.stringify({paymentId:intent.paymentId})});
   document.getElementById('paySpinner').style.display='none';
-  if(d&&d.success){
-    await api('/packages/subscribe',{method:'POST',body:JSON.stringify({packageId:selectedPkgId})});
-    toast('✅ تم الدفع والاشتراك بنجاح');
-    closePayOv();
-    closePkg()
-  }else{showPayErr(d&&d.message||'فشل الدفع، حاول مرة أخرى')}
+  if(d&&d.success){toast('✅ تم تفعيل الباقة تجريبياً');closePayOv();closePkg()}
+  else{showPayErr(d&&d.message||'فشل التفعيل، حاول مرة أخرى')}
 }
-function showPayErr(msg){document.getElementById('payError').innerText=msg;document.getElementById('payError').style.display='block';document.getElementById('payBtn').style.display='block';document.getElementById('payCardForm').style.display='block';document.getElementById('paySpinner').style.display='none'}
+function showPayErr(msg){
+  document.getElementById('payError').innerText=msg;
+  document.getElementById('payError').style.display='block';
+  document.getElementById('payBtn').style.display='block';
+  document.getElementById('paySpinner').style.display='none'
+}
 
 /* DASHBOARD */
 function openDash(){document.getElementById('dashOv').classList.add('open');loadDashData()}

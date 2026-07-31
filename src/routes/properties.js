@@ -86,8 +86,8 @@ router.post('/', protect, validate.body(createPropertySchema), async (req, res) 
       RETURNING id
     `, [
       p.title, p.type, p.purpose, p.price, p.area, p.rooms, p.baths, p.cars || 0, p.apartments || 0, p.facing || 'شمالي',
-      p.year, p.age || 0, p.description, p.city, p.district, p.area_name, p.street, p.streetWidth,
-      p.lat, p.lng, JSON.stringify(p.features || []), p.trust || 'direct', 'active',
+      p.year ?? null, p.age || 0, p.description ?? '', p.city, p.district, p.area_name ?? null, p.street ?? null,
+      p.streetWidth ?? null, p.lat ?? null, p.lng ?? null, JSON.stringify(p.features || []), p.trust || 'direct', 'active',
       JSON.stringify(p.images || []), p.panoramicImage || null,
       req.user.name, req.user.phone, '', req.user.id
     ]);
@@ -143,9 +143,10 @@ router.post('/:id/favorite', protect, async (req, res) => {
 });
 
 function formatProperty(p) {
+  const escapeHtml = (v) => String(v).replace(/</g, '&lt;').replace(/>/g, '&gt;');
   return {
     ...p,
-    features: JSON.parse(p.features || '[]'),
+    features: (JSON.parse(p.features || '[]') || []).map(escapeHtml),
     images: JSON.parse(p.images || '[]'),
     isFeatured: !!p.isFeatured,
     isActive: !!p.isActive,

@@ -71,18 +71,13 @@ router.post('/create-intent', protect, async (req, res) => {
   }
 });
 
-router.post('/confirm', protect, async (req, res) => {
+router.post('/test-complete', protect, async (req, res) => {
   try {
-    const { paymentId, card } = req.body;
-
     if (process.env.MOYASAR_SECRET_KEY) {
       return res.status(400).json(Errors.custom('USE_MOYASAR', 'استخدم بوابة الدفع لإتمام الدفع').toJSON());
     }
 
-    if (!card || !card.number || !card.cvc || !card.month || !card.year) {
-      return res.status(400).json(Errors.custom('INVALID_CARD', 'بيانات البطاقة غير مكتملة').toJSON());
-    }
-
+    const { paymentId } = req.body;
     const [payment] = await sql`SELECT * FROM payments WHERE id = ${paymentId} AND "userId" = ${req.user.id} AND status = 'pending'`;
     if (!payment) return res.status(404).json(Errors.custom('PAYMENT_NOT_FOUND', 'الدفعة غير موجودة').toJSON());
 
@@ -90,31 +85,40 @@ router.post('/confirm', protect, async (req, res) => {
     if (!pkg) return res.status(400).json(Errors.custom('INVALID_PACKAGE', 'الباقة غير موجودة').toJSON());
 
     await sql`
-      UPDATE payments SET status = 'paid', "paymentMethod" = 'card', "paidAt" = NOW() WHERE id = ${paymentId}
+      UPDATE payments SET status = 'paid', "paymentMethod" = 'test', "paidAt" = NOW() WHERE id = ${paymentId}
     `;
 
     await sql`
       UPDATE users SET package = ${payment.packageId}, "packageExpiry" = ${new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]} WHERE id = ${req.user.id}
     `;
 
-    res.json({ success: true, message: 'تم الدفع والاشتراك بنجاح ✓', package: pkg });
+    res.json({ success: true, message: 'تم تفعيل الباقة تجريبياً ✓', package: pkg });
   } catch (err) {
-    console.error('Confirm payment error:', err);
+    console.error('Complete test payment error:', err);
     res.status(500).json(Errors.internal().toJSON());
   }
 });
 
 router.post('/callback', async (req, res) => {
   try {
-    const { id, status, metadata } = req.body;
+    const { id } = req.body;
     if (!id) return res.status(400).json({ error: 'Missing id' });
 
-    if (status === 'paid') {
-      const userId = metadata?.userId;
-      const packageId = metadata?.packageId;
-      if (userId && packageId) {
-        await sql`UPDATE payments SET status = 'paid', "paidAt" = NOW() WHERE "moyasarId" = ${id}`;
-        await sql`UPDATE users SET package = ${packageId}, "packageExpiry" = ${new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]} WHERE id = ${userId}`;
+    if (!process.env.MOYASAR_SECRET_KEY) return res.json({ success: true, ignored: true });
+
+    const moyasarRes = await fetch(`https://api.moyasar.com/v1/invoices/${encodeURIComponent(id)}`, {
+      headers: {
+        'Authorization': 'Basic ' + Buffer.from(process.env.MOYASAR_SECRET_KEY + ':').toString('base64')
+      }
+    });
+    if (!moyasarRes.ok) return res.status(502).json({ error: 'Verification failed' });
+    const invoice = await moyasarRes.json();
+
+    if (invoice.status === 'paid') {
+      const [payment] = await sql`SELECT * FROM payments WHERE "moyasarId" = ${id} AND status = 'pending'`;
+      if (payment) {
+        await sql`UPDATE payments SET status = 'paid', "paidAt" = NOW() WHERE id = ${payment.id}`;
+        await sql`UPDATE users SET package = ${payment.packageId}, "packageExpiry" = ${new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]} WHERE id = ${payment.userId}`;
       }
     }
     res.json({ success: true });

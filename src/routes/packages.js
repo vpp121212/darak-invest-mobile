@@ -19,8 +19,11 @@ router.post('/subscribe', protect, async (req, res) => {
     const { packageId } = req.body;
     const pkg = packages.find(p => p.id === packageId);
     if (!pkg) return res.status(400).json({ error: 'الباقة غير موجودة' });
+    if (pkg.price > 0) {
+      return res.status(400).json({ code: 'PAID_PACKAGE', error: 'الباقات المدفوعة تتطلب الدفع عبر بوابة الدفع' });
+    }
     await sql`
-      UPDATE users SET package = ${packageId}, "packageExpiry" = NOW() + INTERVAL '30 days' WHERE id = ${req.user.id}
+      UPDATE users SET package = 'basic', "packageExpiry" = NULL WHERE id = ${req.user.id}
     `;
     res.json({ success: true, message: 'تم الاشتراك بنجاح', package: pkg });
   } catch (err) { res.status(500).json({ error: 'خطأ داخلي' }); }
