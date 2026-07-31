@@ -548,6 +548,7 @@
         <div class="ai" onclick="openBiz()"><div style="font-size:24px;margin-left:10px">🧾</div><div class="ai-info"><div class="an2">الفواتير والموردين</div><div class="al2">إدارة الفواتير · الموردون · الإحصائيات</div></div></div>
         <div class="ai" onclick="openAIP(null)"><div style="font-size:24px;margin-left:10px">🤖</div><div class="ai-info"><div class="an2">تحليل أسعار AI</div><div class="al2">توقع سعر العقار بالذكاء الاصطناعي</div></div></div>
         <div class="ai" onclick="openUpload()"><div style="font-size:24px;margin-left:10px">📸</div><div class="ai-info"><div class="an2">إضافة صور + جولة 360°</div><div class="al2">أضف صور حقيقية وبانورامية 360°</div></div></div>
+        <div class="ai" onclick="openSkills()"><div style="font-size:24px;margin-left:10px">📚</div><div class="ai-info"><div class="an2">كتاب إلى مهارة (AI Skill)</div><div class="al2">حوّل كتابك أو مستندك إلى مهارة ذكية للوكيل</div></div></div>
       </div>
     </div>
   </div>
@@ -822,6 +823,26 @@
         <div class="fin-field"><label>المدينة</label><input id="seo-city" placeholder="الرياض"></div>
         <button class="fin-run" onclick="runSeo()">🔍 تحليل SEO</button>
         <div id="mktSeoResult" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SKILLS OVERLAY -->
+  <div class="leg-ov" id="skillOv">
+    <div class="leg-p">
+      <button class="cls" onclick="closeSkills()">✕</button>
+      <div style="font-size:16px;font-weight:700;color:var(--g);margin-bottom:6px">📚 كتاب إلى مهارة (AI Skill)</div>
+      <div style="font-size:11px;color:var(--m);margin-bottom:16px">حوّل كتابك أو مستندك إلى نص منظم جاهز للوكيل الذكي (Claude Code · Copilot CLI · Amp)</div>
+      <div style="padding:16px;border-radius:var(--r);background:rgba(8,9,14,.95);border:1px solid rgba(212,175,55,.2);margin-bottom:12px">
+        <div style="font-size:12px;color:var(--m);margin-bottom:8px">الصيغ المدعومة: PDF · EPUB · DOCX · RTF · TXT · MD · HTML · MOBI</div>
+        <div id="skillDropZone" onclick="document.getElementById('skillFile').click()" style="border:2px dashed rgba(212,175,55,.3);border-radius:var(--r);padding:30px 16px;text-align:center;cursor:pointer;background:rgba(212,175,55,.03)">
+          <div style="font-size:36px;margin-bottom:8px">📕</div>
+          <div style="font-size:13px;color:var(--m)">اضغط لاختيار ملف الكتاب</div>
+          <div id="skillFileName" style="font-size:11px;color:var(--g);margin-top:6px"></div>
+        </div>
+        <input type="file" id="skillFile" accept=".pdf,.epub,.docx,.rtf,.txt,.md,.html,.mobi" style="display:none" onchange="skillFileSelected(this)">
+        <button class="fin-run" onclick="runSkill()" id="skillRunBtn" disabled style="opacity:.5">🚀 تحويل الكتاب</button>
+        <div id="skillResult" style="display:none"></div>
       </div>
     </div>
   </div>
@@ -2648,6 +2669,43 @@ function closeAbout(){document.getElementById('aboutOv').style.display='none'}
 /* LEGAL */
 function openLeg(){document.getElementById('legOv').classList.add('on')}
 function closeLeg(){document.getElementById('legOv').classList.remove('on')}
+function openSkills(){document.getElementById('skillOv').classList.add('on')}
+function closeSkills(){document.getElementById('skillOv').classList.remove('on')}
+function skillFileSelected(input){
+  var el=document.getElementById('skillFileName');
+  if(input.files&&input.files[0]){el.textContent=input.files[0].name;var b=document.getElementById('skillRunBtn');b.disabled=false;b.style.opacity='1'}
+  else{el.textContent='';document.getElementById('skillRunBtn').disabled=true;document.getElementById('skillRunBtn').style.opacity='.5'}
+}
+async function runSkill(){
+  var input=document.getElementById('skillFile');
+  if(!input.files||!input.files[0]){toast('اختر ملف أولاً');return}
+  var btn=document.getElementById('skillRunBtn');btn.disabled=true;btn.textContent='⏳ جاري التحويل...';
+  var fd=new FormData();fd.append('file',input.files[0]);
+  var res=document.getElementById('skillResult');res.style.display='block';res.innerHTML='<div class="load">جاري استخراج النص وتحليل البنية...<br><small>قد يستغرق ذلك دقيقة أو أكثر حسب حجم الملف</small></div>';
+  try{
+    var r=await fetch('/api/skills/convert',{method:'POST',body:fd});
+    var d=await r.json();
+    if(d&&d.success){
+      var m=d.metadata||{};
+      res.innerHTML='<div style="padding:14px;border-radius:var(--r);background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.3);margin-top:12px">'+
+        '<div style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:8px">✅ تم التحويل بنجاح!</div>'+
+        '<div style="font-size:12px;color:var(--m);line-height:1.8">'+
+        '<div>📄 الملف: <b style="color:var(--g)">'+m.filename+'</b></div>'+
+        '<div>📖 الصفحات: <b style="color:var(--g)">'+m.pages+'</b></div>'+
+        '<div>📝 الكلمات: <b style="color:var(--g)">'+m.words.toLocaleString('ar-SA')+'</b></div>'+
+        '<div>📊 التوكينز: <b style="color:var(--g)">'+m.estimated_tokens_human+'</b></div>'+
+        '<div>📑 الفصول المكتشفة: <b style="color:var(--g)">'+m.chapters_detected+'</b></div>'+
+        '</div></div>'+
+        '<div style="margin-top:10px"><a href="'+d.downloadUrl+'" download style="display:block;text-align:center;padding:12px;border-radius:999px;background:linear-gradient(135deg,#d4af37,#c9a430);color:#05060a;font-size:13px;font-weight:700">⬇️ تحميل النص الكامل</a></div>'+
+        '<div style="margin-top:8px;padding:10px;border-radius:10px;background:rgba(8,9,14,.9);border:1px solid var(--b);font-size:10px;color:var(--m);line-height:1.6">💡 استخدم النص مع وكيلك الذكي لإنشاء مهارة كاملة (SKILL.md + فصول)</div>';
+    }else{
+      res.innerHTML='<div style="padding:14px;border-radius:var(--r);background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.3);margin-top:12px;font-size:12px;color:var(--red)">⚠️ '+((d&&d.error)||'فشل التحويل')+'</div>';
+    }
+  }catch(e){
+    res.innerHTML='<div style="padding:14px;border-radius:var(--r);background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.3);margin-top:12px;font-size:12px;color:var(--red)">⚠️ خطأ في الاتصال بالخادم</div>';
+  }
+  btn.disabled=false;btn.textContent='🚀 تحويل الكتاب';
+}
 function showLegTab(el,id){document.querySelectorAll('#legOv .mkt-tab').forEach(function(t){t.classList.remove('on')});el.classList.add('on');document.getElementById('leg-contract').style.display=id==='leg-contract'?'block':'none';document.getElementById('leg-compliance').style.display=id==='leg-compliance'?'block':'none'}
 async function runContract(){
   toast('جاري مراجعة العقد بالذكاء الاصطناعي...');

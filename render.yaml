@@ -4,7 +4,9 @@ services:
     env: node
     region: ohio
     plan: free
-    buildCommand: npm install
+    buildCommand: |
+      pip3 install --no-cache-dir -r requirements.txt --break-system-packages || pip3 install --no-cache-dir -r requirements.txt
+      npm install
     startCommand: node scripts/seed.js && node src/server.js
     healthCheckPath: /api/health
     autoDeploy: true
@@ -14,8 +16,8 @@ services:
       - key: PORT
         value: "5000"
       - key: JWT_SECRET
-        generateValue: true
+        sync: false
       - key: MAPBOX_TOKEN
         value: pk.eyJ1IjoidnBwLTY2IiwiYSI6ImNtcndoZW5hdzA2MGYzM3IzbTA4cW1yNnAifQ.bP-Z7H9Wn6WkgF2fXYITQw
       - key: DATABASE_URL
-        value: postgresql://postgres:lRduReiPwvPvfHrSoKrWDPFcsvPweKUd@sakura.proxy.rlwy.net:38495/railway
+        sync: false

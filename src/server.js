@@ -33,6 +33,7 @@ import legalRoutes from './routes/legal.js';
 import businessRoutes from './routes/business.js';
 import marketRoutes from './routes/market.js';
 import placeholderRoutes from './routes/placeholder.js';
+import skillRoutes from './routes/skills.js';
 import tileRoutes from './routes/tiles.js';
 import chatRoutes from './routes/chat.js';
 import adRoutes from './routes/ads.js';
@@ -113,6 +114,7 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/ratings', ratingRoutes);
+app.use('/api/skills', skillRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '1.0.0' });
