@@ -8,11 +8,11 @@ const properties = [{"title":"فيلا فاخرة في حي النرجس","type"
 
 for (const p of properties) {
   await sql.unsafe(`
-    INSERT INTO properties (title, type, purpose, price, area, rooms, baths, cars, facing, year, age, description, city, district, street, "streetWidth", lat, lng, images, "panoramicImage", features, trust, status, "isFeatured", "agentName", "agentPhone", "agentOffice")
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27)
+    INSERT INTO properties (title, type, purpose, price, area, rooms, baths, cars, apartments, facing, year, age, description, city, district, street, "streetWidth", lat, lng, images, "panoramicImage", features, trust, status, "isFeatured", "agentName", "agentPhone", "agentOffice")
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28)
     ON CONFLICT DO NOTHING
   `, [
-    p.title, p.type, p.purpose, p.price, p.area, p.rooms, p.baths, p.cars, p.facing,
+    p.title, p.type, p.purpose, p.price, p.area, p.rooms, p.baths, p.cars, p.apartments ?? (p.type === 'فيلا' ? 3 : 0), p.facing,
     p.year, p.age, p.description, p.city, p.district, p.street, p.streetWidth,
     p.lat, p.lng, p.images, p.panoramicImage, p.features, p.trust, p.status,
     p.isFeatured, p.agentName, p.agentPhone, p.agentOffice

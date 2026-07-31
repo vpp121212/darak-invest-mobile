@@ -12,7 +12,7 @@ async function handleSearch(req, res) {
     console.log('SEARCH HIT:', req.originalUrl, req.path);
     const start = Date.now();
     const { q, city, type, purpose, minPrice, maxPrice, minArea, maxArea,
-      rooms, baths, facing, trust, sort, age, minStreetWidth, minCars,
+      rooms, baths, apartments, facing, trust, sort, age, minStreetWidth, minCars,
       features, page = 1, limit = 50 } = req.query;
 
     let conditions = [];
@@ -36,6 +36,7 @@ async function handleSearch(req, res) {
     add('trust = ?', trust);
     add('rooms >= ?', rooms && Number(rooms));
     add('baths >= ?', baths && Number(baths));
+    add('apartments = ?', apartments && Number(apartments));
     add('price >= ?', minPrice && Number(minPrice));
     add('price <= ?', maxPrice && Number(maxPrice));
     add('area >= ?', minArea && Number(minArea));

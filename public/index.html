@@ -245,7 +245,7 @@
     </div>
     <div class="srch">
       <input type="text" id="hq" placeholder="ابحث بالاسم أو المنطقة...">
-      <div class="srch-row"><select id="hc"><option value="">المدينة</option></select><select id="ht"><option value="">النوع</option><option>فيلا</option><option>شقة</option><option>أرض</option><option>مكتب</option><option>محل</option><option>بنتهاوس</option><option>قصر</option><option>شاليه</option><option>دوبلكس</option><option>مزرعة</option></select><select id="hp"><option value="">السعر الأقصى</option><option value="500000">أقل من 500,000</option><option value="1000000">أقل من 1,000,000</option><option value="2000000">أقل من 2,000,000</option><option value="5000000">أقل من 5,000,000</option></select></div>
+      <div class="srch-row"><select id="hc"><option value="">المدينة</option></select><select id="ht" onchange="toggleApartmentsFilter()"><option value="">النوع</option><option>فيلا</option><option>شقة</option><option>أرض</option><option>مكتب</option><option>محل</option><option>بنتهاوس</option><option>قصر</option><option>شاليه</option><option>دوبلكس</option><option>مزرعة</option></select><select id="hp"><option value="">السعر الأقصى</option><option value="500000">أقل من 500,000</option><option value="1000000">أقل من 1,000,000</option><option value="2000000">أقل من 2,000,000</option><option value="5000000">أقل من 5,000,000</option></select></div>
       <button class="srch-adv-btn" onclick="toggleAdvFilters()">⚙️ فلاتر متقدمة</button>
       <button class="srch-btn" onclick="doSearch()">🔍 بحث</button>
     </div>
@@ -288,6 +288,10 @@
           <div class="af-chip-group">
             <div class="af-chip-l">دورات المياه</div>
             <div class="af-chips" id="af-baths"><span class="af-chip" data-v="0">الكل</span><span class="af-chip" data-v="1">1</span><span class="af-chip" data-v="2">2</span><span class="af-chip" data-v="3">3</span><span class="af-chip" data-v="4">4+</span></div>
+          </div>
+          <div class="af-chip-group" id="af-apartments-group" style="display:none">
+            <div class="af-chip-l">عدد الشقق في الفيلا</div>
+            <div class="af-chips" id="af-apartments"><span class="af-chip" data-v="0">الكل</span><span class="af-chip" data-v="1">شقة واحدة</span><span class="af-chip" data-v="2">شقتان</span><span class="af-chip" data-v="3">ثلاث شقق</span></div>
           </div>
           <div class="af-chip-group">
             <div class="af-chip-l">غرف الصالات</div>
@@ -506,7 +510,8 @@
       <div class="ap-title">🏠 أضف عقارك</div>
       <div class="ap-sub">أضف عقارك للبيع أو الإيجار وصل لآلاف المشترين</div>
       <div class="ap-field"><label>عنوان الإعلان *</label><input id="ap-title" placeholder="مثال: فيلا فاخرة في حي النرجس"></div>
-      <div class="ap-row"><div class="ap-field"><label>نوع العقار *</label><select id="ap-type"><option>فيلا</option><option>شقة</option><option>بنتهاوس</option><option>قصر</option><option>دوبلكس</option><option>مكتب</option><option>شاليه</option><option>مزرعة</option><option>محل</option></select></div><div class="ap-field"><label>الغرض *</label><select id="ap-purpose"><option>بيع</option><option>إيجار</option></select></div></div>
+      <div class="ap-row"><div class="ap-field"><label>نوع العقار *</label><select id="ap-type" onchange="toggleApApartments()"><option>فيلا</option><option>شقة</option><option>بنتهاوس</option><option>قصر</option><option>دوبلكس</option><option>مكتب</option><option>شاليه</option><option>مزرعة</option><option>محل</option></select></div><div class="ap-field"><label>الغرض *</label><select id="ap-purpose"><option>بيع</option><option>إيجار</option></select></div></div>
+      <div class="ap-row" id="ap-apartments-row" style="display:none"><div class="ap-field"><label>عدد الشقق في الفيلا</label><select id="ap-apartments"><option value="1">شقة واحدة</option><option value="2">شقتان</option><option value="3">ثلاث شقق</option></select></div><div class="ap-field"><label>&nbsp;</label><div style="font-size:10px;color:var(--m);padding:8px 0">حدد عدد الشقق (الأدوار) داخل الفيلا</div></div></div>
       <div class="ap-row"><div class="ap-field"><label>المساحة (م²) *</label><input type="number" id="ap-area" placeholder="450"></div><div class="ap-field"><label>السعر (ر.س) *</label><input type="number" id="ap-price" placeholder="2,500,000"></div></div>
       <div class="ap-row"><div class="ap-field"><label>الغرف</label><input type="number" id="ap-rooms" placeholder="5"></div><div class="ap-field"><label>دورات المياه</label><input type="number" id="ap-baths" placeholder="4"></div></div>
       <div class="ap-field"><label>المدينة *</label><select id="ap-city" onchange="fetchDistricts()"><option>الرياض</option><option>جدة</option><option>مكة</option><option>الدمام</option><option>الخبر</option><option>الباحة</option></select></div>
@@ -1287,7 +1292,7 @@ function render(f){
   if(!list.length){g.innerHTML='<div class="load">لا توجد عقارات</div>';return}
   g.innerHTML=list.map(function(p){
     var im=pImg(p),fav=F.indexOf(p.id)>-1;
-    return'<div class="card" onclick="showDetail('+p.id+')"><div class="card-img"><img src="'+im+'" alt="'+p.title+'" loading="lazy" onerror="this.onerror=null;this.src=\''+pFallback(p)+'\'"><div class="badges"><span class="badge '+(p.purpose==='إيجار'?'badge-r':'badge-s')+'">'+p.purpose+'</span>'+(p.status==='حصري'?'<span class="badge badge-x">⭐ حصري</span>':'')+'</div><button class="fav '+(fav?'on':'')+'" onclick="toggleFav('+p.id+',event)">'+(fav?'❤':'🤍')+'</button><span class="trust trust-'+tCls(p.trust)+'">'+tLbl(p.trust)+'</span>'+(p.panoramicImage?'<span class="card-360">🌐 360°</span>':'')+'</div><div class="card-b"><div class="card-t">'+p.title+'</div><div class="card-l">📍 '+pLoc(p)+'</div><div class="card-p">'+pPrice(p)+'</div><div class="card-m"><span>🛏 '+p.rooms+'</span><span>📐 '+fmt(p.area)+' م²</span><span>🚿 '+p.baths+'</span></div></div></div>'
+    return'<div class="card" onclick="showDetail('+p.id+')"><div class="card-img"><img src="'+im+'" alt="'+p.title+'" loading="lazy" onerror="this.onerror=null;this.src=\''+pFallback(p)+'\'"><div class="badges"><span class="badge '+(p.purpose==='إيجار'?'badge-r':'badge-s')+'">'+p.purpose+'</span>'+(p.status==='حصري'?'<span class="badge badge-x">⭐ حصري</span>':'')+'</div><button class="fav '+(fav?'on':'')+'" onclick="toggleFav('+p.id+',event)">'+(fav?'❤':'🤍')+'</button><span class="trust trust-'+tCls(p.trust)+'">'+tLbl(p.trust)+'</span>'+(p.panoramicImage?'<span class="card-360">🌐 360°</span>':'')+'</div><div class="card-b"><div class="card-t">'+p.title+'</div><div class="card-l">📍 '+pLoc(p)+'</div><div class="card-p">'+pPrice(p)+'</div><div class="card-m"><span>🛏 '+p.rooms+'</span><span>📐 '+fmt(p.area)+' م²</span><span>🚿 '+p.baths+'</span>'+(p.type==='فيلا'&&p.apartments?'<span>🏢 '+p.apartments+' شقق</span>':'')+'</div></div></div>'
   }).join('');
 }
 
@@ -1512,6 +1517,7 @@ async function doSearch(){
   var purpose=document.getElementById('af-purpose').value||cur;
   var rooms=Number(getChipVal('af-rooms'))||0;
   var baths=Number(getChipVal('af-baths'))||0;
+  var apartments=Number(getChipVal('af-apartments'))||0;
   var facing=getChipVal('af-facing');
   var age=getChipVal('af-age');
   var sort=document.getElementById('af-sort').value;
@@ -1521,7 +1527,7 @@ async function doSearch(){
   ['af-f-pool','af-f-elev','af-f-garage','af-f-ac','af-f-kitchen','af-f-furnished','af-f-entrance','af-f-roof'].forEach(function(id){
     var el=document.getElementById(id);if(el&&el.checked)features.push(el.value);
   });
-  var hasFilters=q||c||t||minP||maxP||minA||maxA||purpose||rooms||baths||facing||age||sort||streetW||cars||features.length;
+  var hasFilters=q||c||t||minP||maxP||minA||maxA||purpose||rooms||baths||apartments||facing||age||sort||streetW||cars||features.length;
   if(!hasFilters){render();return}
   var params=new URLSearchParams();
   if(q)params.set('q',q);
@@ -1534,6 +1540,7 @@ async function doSearch(){
   if(maxA)params.set('maxArea',maxA);
   if(rooms)params.set('rooms',rooms);
   if(baths)params.set('baths',baths);
+  if(apartments)params.set('apartments',apartments);
   if(facing)params.set('facing',facing);
   if(age)params.set('age',age);
   if(sort)params.set('sort',sort);
@@ -1626,7 +1633,7 @@ function showDetail(id){
   currentDetailImages=imgs;
   html+='<span class="db db-'+tCls(p.trust)+'">'+tLbl(p.trust)+'</span>';
   html+='<div class="dt">'+p.title+'</div><div class="dl">📍 '+pLoc(p)+'</div><div class="dp">'+pPrice(p)+'</div>';
-  html+='<div class="sp"><div class="si"><div class="si-v">'+fmt(p.area)+' م²</div><div class="si-l">المساحة</div></div><div class="si"><div class="si-v">'+(p.rooms||'—')+'</div><div class="si-l">الغرف</div></div><div class="si"><div class="si-v">'+(p.baths||'—')+'</div><div class="si-l">الحمامات</div></div><div class="si"><div class="si-v">'+(p.cars||'—')+'</div><div class="si-l">مواقف</div></div><div class="si"><div class="si-v">'+(p.facing||'—')+'</div><div class="si-l">الواجهة</div></div><div class="si"><div class="si-v">'+(p.year||'—')+'</div><div class="si-l">البناء</div></div></div>';
+  html+='<div class="sp"><div class="si"><div class="si-v">'+fmt(p.area)+' م²</div><div class="si-l">المساحة</div></div><div class="si"><div class="si-v">'+(p.rooms||'—')+'</div><div class="si-l">الغرف</div></div><div class="si"><div class="si-v">'+(p.baths||'—')+'</div><div class="si-l">الحمامات</div></div><div class="si"><div class="si-v">'+(p.cars||'—')+'</div><div class="si-l">مواقف</div></div>'+(p.type==='فيلا'&&p.apartments?'<div class="si"><div class="si-v">'+p.apartments+'</div><div class="si-l">الشقق</div></div>':'')+'<div class="si"><div class="si-v">'+(p.facing||'—')+'</div><div class="si-l">الواجهة</div></div><div class="si"><div class="si-v">'+(p.year||'—')+'</div><div class="si-l">البناء</div></div></div>';
   if(p.features&&p.features.length){html+='<div class="fd"><h3>المميزات</h3><div class="fch">'+p.features.map(function(f){return'<span style="padding:6px 12px;border-radius:999px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.15);font-size:11px;color:var(--m)">'+f+'</span>'}).join('')+'</div></div>'}
   if(p.desc){html+='<div class="desc"><h3>الوصف</h3><p>'+p.desc+'</p></div>'}
   html+='<div id="pulse-card-'+p.id+'"><div class="load" style="padding:16px">جاري تحميل مؤشر نبض الحي...</div></div>'
@@ -1788,7 +1795,7 @@ function createPropertyPopup(p){
     '<div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px">'+p.title+'</div>'+
     '<div style="font-size:11px;color:#999;margin-bottom:6px">📍 '+pLoc(p)+'</div>'+
     '<div style="font-size:22px;font-weight:800;color:#d4af37;margin-bottom:6px">'+fmt(p.price)+' ر.س</div>'+
-    '<div style="display:flex;gap:10px;margin-bottom:8px;font-size:11px;color:#aaa"><span>🛏 '+p.rooms+'</span><span>📐 '+fmt(p.area)+' م²</span><span>🚿 '+p.baths+'</span></div>'+
+    '<div style="display:flex;gap:10px;margin-bottom:8px;font-size:11px;color:#aaa"><span>🛏 '+p.rooms+'</span><span>📐 '+fmt(p.area)+' م²</span><span>🚿 '+p.baths+'</span>'+(p.type==='فيلا'&&p.apartments?'<span>🏢 '+p.apartments+' شقق</span>':'')+'</div>'+
     feat+
     '<button onclick="closeMap();showDetail('+p.id+')" style="width:100%;padding:10px;border-radius:10px;background:linear-gradient(135deg,#d4af37,#b8941f);color:#05060a;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:\'Cairo\',sans-serif;transition:opacity .2s" onmouseover="this.style.opacity=\'.85\'" onmouseout="this.style.opacity=\'1\'">عرض التفاصيل</button></div>'
   );
@@ -3104,6 +3111,16 @@ async function fetchMktDistricts(){
     }
   }catch(e){}
 }
+function toggleApartmentsFilter(){
+  var g=document.getElementById('af-apartments-group');
+  var t=document.getElementById('ht')?document.getElementById('ht').value:'';
+  if(g)g.style.display=(t==='فيلا')?'block':'none';
+}
+function toggleApApartments(){
+  var row=document.getElementById('ap-apartments-row');
+  var tp=document.getElementById('ap-type')?document.getElementById('ap-type').value:'';
+  if(row)row.style.display=(tp==='فيلا')?'flex':'none';
+}
 async function submitAddProp(){
   var t=document.getElementById('ap-title')?document.getElementById('ap-title').value:'';
   var tp=document.getElementById('ap-type')?document.getElementById('ap-type').value:'شقة';
@@ -3112,6 +3129,7 @@ async function submitAddProp(){
   var ar=Number(document.getElementById('ap-area')?document.getElementById('ap-area').value:100);
   var rm=Number(document.getElementById('ap-rooms')?document.getElementById('ap-rooms').value:3);
   var bt=Number(document.getElementById('ap-baths')?document.getElementById('ap-baths').value:2);
+  var ap=Number(document.getElementById('ap-apartments')?document.getElementById('ap-apartments').value:0);
   var ct=document.getElementById('ap-city')?document.getElementById('ap-city').value:'الرياض';
   var di=document.getElementById('ap-district')?document.getElementById('ap-district').value:'';
   var ds=document.getElementById('ap-desc')?document.getElementById('ap-desc').value:'';
@@ -3132,7 +3150,7 @@ async function submitAddProp(){
     if(up2&&up2.success)panoUrl=up2.url;
   }
   var d=await api('/properties',{method:'POST',body:JSON.stringify({
-    title:t,type:tp,purpose:pr,price:prc,area:ar,rooms:rm,baths:bt,
+    title:t,type:tp,purpose:pr,price:prc,area:ar,rooms:rm,baths:bt,apartments:ap,
     city:ct,district:di||ct,description:ds,year:new Date().getFullYear(),age:0,
     facing:'شمالي',features:[],images:images,panoramicImage:panoUrl,
     lat:Number(document.getElementById('ap-lat').value)||null,
@@ -3159,7 +3177,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').then
 
 /* LOAD DATA */
 var FALLBACK=[
-{id:1,title:"فيلا فاخرة في حي النرجس",type:"فيلا",loc:"حي النرجس، الرياض",district:"حي النرجس",city:"الرياض",price:2500000,rooms:6,baths:5,cars:3,area:450,year:2023,age:1,status:"حصري",lat:24.7935,lng:46.6898,street:"طريق الأمير تركي",streetW:20,facing:"شرقي",purpose:"بيع",desc:"فيلا فاخرة بتصميم عصري مع حديقة خاصة ومسبح خارجي ونادي صحي",images:[],pano:null,features:["حديقة خاصة","مسبح خارجي","موقف سيارات","نادي صحي","غرفة خادمة","مطبخ مفروش"],trust:"verified",agent:{name:"مكتب الديار العقارية",role:"وسيط مرخص",phone:"+966501234567"}},
+{id:1,title:"فيلا فاخرة في حي النرجس",type:"فيلا",loc:"حي النرجس، الرياض",district:"حي النرجس",city:"الرياض",price:2500000,rooms:6,baths:5,cars:3,apartments:3,area:450,year:2023,age:1,status:"حصري",lat:24.7935,lng:46.6898,street:"طريق الأمير تركي",streetW:20,facing:"شرقي",purpose:"بيع",desc:"فيلا فاخرة بتصميم عصري مع حديقة خاصة ومسبح خارجي ونادي صحي",images:[],pano:null,features:["حديقة خاصة","مسبح خارجي","موقف سيارات","نادي صحي","غرفة خادمة","مطبخ مفروش"],trust:"verified",agent:{name:"مكتب الديار العقارية",role:"وسيط مرخص",phone:"+966501234567"}},
 {id:2,title:"شقة مفروشة في حي الملقا",type:"شقة",loc:"حي الملقا، الرياض",district:"حي الملقا",city:"الرياض",price:2500,rooms:3,baths:2,cars:1,area:180,year:2022,age:2,status:"حصري",lat:24.7115,lng:46.6748,street:"طريق الملك فهد",streetW:15,facing:"شمالي",purpose:"إيجار",desc:"شقة مفروشة بالكامل بإطلالة رائعة على برج المملكة",images:[],pano:null,features:["مفروشة بالكامل","إطلالة بانورامية","أمن 24/7","موقف سيارات"],trust:"office",agent:{name:"مكتب الديار العقارية",role:"وسيط مرخص",phone:"+966501234567"}},
 {id:3,title:"بنتهاوس فاخر في حي الشفا",type:"بنتهاوس",loc:"حي الشفا، الرياض",district:"حي الشفا",city:"الرياض",price:3800000,rooms:5,baths:4,cars:2,area:350,year:2023,age:1,status:"حصري",lat:24.8155,lng:46.6545,street:"طريق الثمامة",streetW:25,facing:"غربي",purpose:"بيع",desc:"بنتهاوس فاخر بإطلالة بانورامية على برج المملكة",images:[],pano:null,features:["إطلالة بانورامية","مسبح داخلي","نادي صحي","خدمة كونسيرج"],trust:"verified",agent:{name:"مكتب الدار العقارية",role:"وسيط مرخص",phone:"+966555123456"}},
 {id:4,title:"شقة عائلية في حي الراكة",type:"شقة",loc:"حي الراكة، جدة",district:"حي الراكة",city:"جدة",price:3500,rooms:4,baths:3,cars:1,area:220,year:2021,age:3,status:"متاح",lat:21.6553,lng:39.1553,street:"شارع الأمير سلطان",streetW:20,facing:"شرقي",purpose:"إيجار",desc:"شقة عائلية واسعة في حي هادئ قريب من جميع الخدمات",images:[],pano:null,features:["مدخل خاص","موقف سيارة","قريب من المدارس"],trust:"office",agent:{name:"مكتب جدة العقاري",role:"وسيط مرخص",phone:"+966555987654"}},

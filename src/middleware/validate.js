@@ -11,9 +11,11 @@ function parseErrors(result) {
 }
 
 function validateSchema(schema, data) {
-  return schema.safeParse
-    ? schema.safeParse(data)
-    : { success: true, data: schema.validate(data, { abortEarly: false, stripUnknown: true }) };
+  if (schema.safeParse) {
+    return schema.safeParse(data);
+  }
+  const result = schema.validate(data, { abortEarly: false, stripUnknown: true });
+  return { success: !result.error, data: result.value, error: result.error };
 }
 
 export const validate = {
@@ -33,7 +35,7 @@ export const validate = {
       if (!result.success) {
         return res.status(400).json(Errors.validation(parseErrors(result)).toJSON());
       }
-      req.query = result.data;
+      Object.defineProperty(req, 'query', { value: result.data, configurable: true, writable: true, enumerable: true });
       next();
     };
   },

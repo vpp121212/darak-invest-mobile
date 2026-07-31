@@ -79,13 +79,13 @@ router.post('/', protect, validate.body(createPropertySchema), async (req, res) 
   try {
     const p = req.body;
     const [result] = await sql.unsafe(`
-      INSERT INTO properties (title, type, purpose, price, area, rooms, baths, cars, facing, year, age, description,
+      INSERT INTO properties (title, type, purpose, price, area, rooms, baths, cars, apartments, facing, year, age, description,
         city, district, area_name, street, "streetWidth", lat, lng, features, trust, status, images, "panoramicImage",
         "agentName", "agentPhone", "agentOffice", "agentUserId")
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29)
       RETURNING id
     `, [
-      p.title, p.type, p.purpose, p.price, p.area, p.rooms, p.baths, p.cars || 0, p.facing || 'شمالي',
+      p.title, p.type, p.purpose, p.price, p.area, p.rooms, p.baths, p.cars || 0, p.apartments || 0, p.facing || 'شمالي',
       p.year, p.age || 0, p.description, p.city, p.district, p.area_name, p.street, p.streetWidth,
       p.lat, p.lng, JSON.stringify(p.features || []), p.trust || 'direct', 'active',
       JSON.stringify(p.images || []), p.panoramicImage || null,
@@ -105,14 +105,14 @@ router.put('/:id', protect, validate.body(updatePropertySchema), async (req, res
     }
     const p = req.body;
     await sql.unsafe(`
-      UPDATE properties SET title=$1, type=$2, purpose=$3, price=$4, area=$5, rooms=$6, baths=$7, cars=$8, facing=$9, year=$10, age=$11, description=$12,
-        city=$13, district=$14, area_name=$15, street=$16, "streetWidth"=$17, lat=$18, lng=$19, features=$20, trust=$21,
+      UPDATE properties SET title=$1, type=$2, purpose=$3, price=$4, area=$5, rooms=$6, baths=$7, cars=$8, apartments=$9, facing=$10, year=$11, age=$12, description=$13,
+        city=$14, district=$15, area_name=$16, street=$17, "streetWidth"=$18, lat=$19, lng=$20, features=$21, trust=$22,
         "updatedAt"=NOW()
-      WHERE id=$22
+      WHERE id=$23
     `, [
       p.title || existing.title, p.type || existing.purpose, p.purpose || existing.purpose, p.price || existing.price,
       p.area || existing.area, p.rooms ?? existing.rooms, p.baths ?? existing.baths, p.cars ?? existing.cars,
-      p.facing || existing.facing, p.year || existing.year, p.age ?? existing.age, p.description || existing.description,
+      p.apartments ?? existing.apartments, p.facing || existing.facing, p.year || existing.year, p.age ?? existing.age, p.description || existing.description,
       p.city || existing.city, p.district || existing.district, p.area_name || existing.area_name,
       p.street || existing.street, p.streetWidth || existing.streetWidth, p.lat || existing.lat, p.lng || existing.lng,
       JSON.stringify(p.features || JSON.parse(existing.features || '[]')), p.trust || existing.trust, req.params.id

@@ -35,6 +35,8 @@ await sql.unsafe(`SET client_min_messages = WARNING;
   ALTER TABLE users ADD COLUMN IF NOT EXISTS "otpCode" TEXT;
   ALTER TABLE users ADD COLUMN IF NOT EXISTS "otpExpires" TEXT;
 
+  ALTER TABLE properties ADD COLUMN IF NOT EXISTS apartments INTEGER DEFAULT 0;
+
   CREATE TABLE IF NOT EXISTS properties (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
@@ -45,6 +47,7 @@ await sql.unsafe(`SET client_min_messages = WARNING;
     rooms INTEGER NOT NULL,
     baths INTEGER NOT NULL,
     cars INTEGER DEFAULT 0,
+    apartments INTEGER DEFAULT 0,
     facing TEXT DEFAULT 'شمالي',
     year INTEGER,
     age INTEGER DEFAULT 0,
