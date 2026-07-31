@@ -112,9 +112,9 @@ router.post('/send-otp', authLimiter, async (req, res) => {
 
     sendSMS(phone, `كود التحقق الخاص بك في دارك وحيك: ${otp}`);
 
-    const smsConfigured = !!process.env.UNIFONIC_APP_SID;
+    const devMode = process.env.NODE_ENV !== 'production';
     const payload = { message: 'تم إرسال كود التحقق إلى رقم الجوال' };
-    if (!smsConfigured) payload.otp = otp.toString();
+    if (devMode) payload.otp = otp.toString();
 
     res.json(payload);
   } catch (err) {
