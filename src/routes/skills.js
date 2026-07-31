@@ -45,11 +45,26 @@ router.post('/convert', upload.single('file'), async (req, res) => {
     await fs.writeFile(path.join(publicDir, 'full_text.txt'), text);
     await fs.writeFile(path.join(publicDir, 'metadata.json'), JSON.stringify(meta, null, 2));
 
+    const script = path.join(process.cwd(), 'scripts', 'generate_skill.py');
+    const skillOut = path.join(publicDir, 'skill');
+    try {
+      await run('python3', [script, workDir, '--output', skillOut], {
+        env: { ...process.env },
+        cwd: process.cwd(),
+        timeout: 60000
+      });
+    } catch (genErr) {
+      console.error('Skill generation failed (non-fatal):', genErr.message);
+    }
+
+    const hasSkill = await fs.stat(path.join(skillOut, 'SKILL.md')).then(() => true).catch(() => false);
+
     res.json({
       success: true,
       skillId: id,
       metadata: meta,
-      downloadUrl: `/skills/${id}/full_text.txt`
+      downloadUrl: `/skills/${id}/full_text.txt`,
+      skill: hasSkill ? `/skills/${id}/skill/SKILL.md` : null
     });
   } catch (err) {
     console.error('Skill conversion error:', err);
