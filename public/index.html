@@ -238,6 +238,7 @@
     <div class="qi">
       <div class="qi-i" onclick="nav('map')"><span class="qi-icon">🗺️</span><span class="qi-l">الخريطة</span></div>
       <div class="qi-i" onclick="nav('pulse')"><span class="qi-icon">📊</span><span class="qi-l">نبض الحي</span></div>
+      <div class="qi-i" onclick="nav('heat')"><span class="qi-icon">🔥</span><span class="qi-l">الحرارة</span></div>
       <div class="qi-i" onclick="nav('tools')"><span class="qi-icon">💰</span><span class="qi-l">العائد</span></div>
       <div class="qi-i" onclick="nav('add')"><span class="qi-icon">➕</span><span class="qi-l">إضافة</span></div>
       <div class="qi-i" onclick="nav('sources')"><span class="qi-icon">🔗</span><span class="qi-l">المصادر</span></div>
@@ -418,6 +419,28 @@
         <strong style="color:var(--g)">🛡️ الشفافية:</strong> المؤشرات المعروضة في نبض الحي مبنية على إعلانات منصة دارك وحيك الفعلية، وتُعرض الأرقام الرسمية الحكومية (متوسط الإيجار لكل متر) من البيانات المفتوحة للهيئة العامة للعقار مع إسناد المصدر الكامل.
       </div>
       <div style="text-align:center;margin:12px 0"><a href="#" onclick="nav('sources');return false" style="color:var(--g);font-size:12px;font-weight:600;text-decoration:none">🔗 المصادر الرسمية للبيانات ←</a></div>
+    </div>
+  </div>
+
+  <!-- HEATMAP PAGE -->
+  <div class="pg" id="pg-heat">
+    <div class="wrap" style="padding-top:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div style="font-size:16px;font-weight:700;color:var(--g)">🔥 خريطة الحرارة العقارية</div>
+        <div style="font-size:11px;color:var(--m)" id="heatCount"></div>
+      </div>
+      <div style="font-size:11px;color:var(--m);margin-bottom:12px">متوسط الأسعار · كثافة العقارات · الأحياء الأكثر طلبًا</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <button class="tab on" id="heatDensityBtn" onclick="setHeatMetric('density',this)">🔢 الكثافة</button>
+        <button class="tab" id="heatPriceBtn" onclick="setHeatMetric('price',this)">💰 الأسعار</button>
+        <button class="tab" id="heatDemandBtn" onclick="setHeatMetric('demand',this)">📈 الطلب</button>
+      </div>
+      <div id="heatMap" style="width:100%;height:340px;border-radius:16px;overflow:hidden;position:relative;background:#0a0b10"></div>
+      <div id="heatLegend" style="margin-top:8px"></div>
+      <div id="heatList" style="display:flex;flex-direction:column;gap:8px;margin-top:14px"><div class="load" id="heatLd">جاري تحميل بيانات الأحياء...</div></div>
+      <div style="margin-top:16px;padding:12px;border-radius:12px;background:rgba(212,175,55,.05);border:1px solid rgba(212,175,55,.2);font-size:11px;color:var(--m);line-height:1.8">
+        <strong style="color:var(--g)">🛡️ المصدر:</strong> متوسط الأسعار وعدد العقود من بيانات الهيئة العامة للعقار (منصة البيانات المفتوحة) ومن عقارات دارك. مؤشر "الطلب" مبني على عدد العقود الرسمية المسجلة في كل حي.
+      </div>
     </div>
   </div>
 
@@ -1305,6 +1328,7 @@ function nav(page){
   if(page==='add')setTimeout(fetchDistricts,100);
   if(page==='pulse')loadPulseData();
   if(page==='sources')loadSources();
+  if(page==='heat'){initHeatMap();loadHeatData();}
 }
 
 /* RENDER */
@@ -1995,6 +2019,147 @@ function openMap(){
   });
 }
 function closeMap(){document.getElementById('mapOverlay').classList.remove('on')}
+
+/* HEATMAP */
+var heatMapInstance=null,heatMetric='density',heatData=null,heatSorted=[];
+function initHeatMap(){
+  if(heatMapInstance)return;
+  withMap('heatMap',function(){
+    if(heatMapInstance)return;
+    heatMapInstance=createMap({container:'heatMap',_addMarkers:false,_onLoad:function(m){renderHeatLayer(m)}});
+  });
+}
+function heatDistrictMap(){
+  var map={};
+  if(heatData&&heatData.districts)heatData.districts.forEach(function(d){map[(d.district||'').replace(/^(حي\s+)/,'')]=d});
+  return map;
+}
+function heatFeatureCollection(){
+  var dmap=heatDistrictMap();
+  var maxW=1,pts=[];
+  A.forEach(function(p){
+    if(!p.lat||!p.lng)return;
+    var d=dmap[(p.district||'').replace(/^(حي\s+)/,'')];
+    var w=1;
+    if(heatMetric==='price'){w=(d&&(d.ourAvgPrice||d.avgSale))||p.price||0}
+    else if(heatMetric==='demand'){w=(d&&d.deals)||0}
+    if(w>maxW)maxW=w;
+    pts.push({type:'Feature',properties:{w:w},geometry:{type:'Point',coordinates:[p.lng,p.lat]}});
+  });
+  if(heatMetric!=='density'&&heatData&&heatData.districts){
+    heatData.districts.forEach(function(d){
+      if(!d.lat||!d.lng)return;
+      var w=heatMetric==='price'?(d.ourAvgPrice||d.avgSale||0):(d.deals||0);
+      if(w<=0)return;
+      if(w>maxW)maxW=w;
+      pts.push({type:'Feature',properties:{w:w},geometry:{type:'Point',coordinates:[d.lng,d.lat]}});
+    });
+  }
+  if(maxW>0)pts.forEach(function(f){f.properties.w=Math.min(1,f.properties.w/maxW)});
+  return {type:'FeatureCollection',features:pts};
+}
+function renderHeatLayer(m){
+  try{
+    if(m.getLayer('heat'))m.removeLayer('heat');
+    if(m.getSource('heatSrc'))m.removeSource('heatSrc');
+    m.addSource('heatSrc',{type:'geojson',data:heatFeatureCollection()});
+    m.addLayer({
+      id:'heat',type:'heatmap',source:'heatSrc',
+      paint:{
+        'heatmap-weight':['interpolate',['linear'],['get','w'],0,0,1,1],
+        'heatmap-intensity':['interpolate',['linear'],['zoom'],0,1.3,9,3.2],
+        'heatmap-color':['interpolate',['linear'],['heatmap-density'],0,'rgba(33,102,172,0)',0.15,'rgba(66,150,240,.55)',0.35,'rgba(60,220,180,.7)',0.55,'rgba(255,220,80,.8)',0.75,'rgba(255,140,40,.9)',1,'rgba(255,50,50,1)'],
+        'heatmap-radius':['interpolate',['linear'],['zoom'],0,28,9,55],
+        'heatmap-opacity':0.85
+      }
+    });
+    renderHeatLegend();
+  }catch(e){}
+}
+function renderHeatLegend(){
+  var el=document.getElementById('heatLegend');
+  if(!el)return;
+  var labels=heatMetric==='density'?['منخفض','مرتفع']:(heatMetric==='price'?['أقل سعرًا','الأعلى سعرًا']:['أقل طلبًا','الأكثر طلبًا']);
+  el.innerHTML='<div style="display:flex;align-items:center;gap:8px;direction:rtl">'+
+    '<span style="font-size:10px;color:var(--m)">'+labels[0]+'</span>'+
+    '<div style="flex:1;height:10px;border-radius:999px;background:linear-gradient(90deg,#428ff0,#3cdcb4,#ffdc50,#ff8c28,#ff3232)"></div>'+
+    '<span style="font-size:10px;color:var(--m)">'+labels[1]+'</span></div>';
+}
+function setHeatMetric(metric,btn){
+  heatMetric=metric;
+  ['density','price','demand'].forEach(function(m){
+    var b=document.getElementById('heat'+m.charAt(0).toUpperCase()+m.slice(1)+'Btn');
+    if(b)b.classList.remove('on');
+  });
+  if(btn)btn.classList.add('on');
+  if(heatMapInstance){try{renderHeatLayer(heatMapInstance)}catch(e){}}
+  renderHeatList();
+}
+function heatValue(d){
+  if(heatMetric==='density')return d.ourCount||0;
+  if(heatMetric==='price')return d.ourAvgPrice||d.avgSale||d.avgRent||0;
+  return d.deals||d.ourCount||0;
+}
+function renderHeatList(){
+  var el=document.getElementById('heatList');
+  if(!el)return;
+  if(!heatData||!heatData.districts||!heatData.districts.length){
+    el.innerHTML='<div class="load">لا توجد بيانات متاحة</div>';
+    var c=document.getElementById('heatCount');if(c)c.textContent='';
+    return;
+  }
+  var c=document.getElementById('heatCount');
+  if(c)c.textContent=heatData.districts.length+' حي';
+  heatSorted=heatData.districts.slice().sort(function(a,b){return heatValue(b)-heatValue(a)});
+  var top=heatSorted.slice(0,10),mx=Math.max(1,heatValue(heatSorted[0])||1);
+  el.innerHTML=top.map(function(d,i){
+    var price;
+    if(heatMetric==='price'){
+      price=d.ourAvgPrice?'<span style="color:var(--g);font-weight:700">'+fmt(d.ourAvgPrice)+' ر.س</span>':(d.avgSale?'<span style="color:var(--g);font-weight:700">'+fmt(d.avgSale)+' ر.س · رسمي</span>':'<span style="color:var(--m)">لا توجد بيانات</span>');
+    }else{
+      price='<span style="color:var(--g);font-weight:700">'+fmt(d.ourAvgPrice||d.avgSale||0)+' ر.س</span>';
+    }
+    var meta=[];
+    if(heatMetric==='demand'&&d.deals)meta.push('📄 '+fmt(d.deals)+' عقد');
+    if(d.ourCount)meta.push('🏠 '+d.ourCount+' عقار');
+    if(heatMetric==='price'&&d.ourAvgPriceM2)meta.push('📐 '+fmt(d.ourAvgPriceM2)+' ر.س/م²');
+    var rank=i+1;
+    var pct=Math.round(heatValue(d)/mx*100);
+    var grad=rank===1?'#ff3232,#d60000':rank<=3?'#ff8c28,#e05d00':'#d4af37,#b8941f';
+    return '<div class="card" style="cursor:pointer" onclick="heatFlyTo('+i+')">'+
+      '<div style="display:flex;align-items:center;gap:10px">'+
+      '<div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#05060a;background:linear-gradient(135deg,'+grad+')">'+rank+'</div>'+
+      '<div style="flex:1;min-width:0">'+
+      '<div style="font-size:12px;font-weight:700;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📍 '+(d.district||'حي')+'</div>'+
+      (meta.length?'<div style="font-size:10px;color:var(--m);margin-top:2px">'+meta.join(' · ')+'</div>':'')+
+      '</div>'+
+      '<div style="text-align:left">'+price+'</div></div>'+
+      '<div style="height:4px;border-radius:999px;background:rgba(255,255,255,.06);margin-top:8px"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,#428ff0,#3cdcb4,#ffdc50,#ff8c28,#ff3232)"></div></div>'+
+      '</div>';
+  }).join('');
+}
+function heatFlyTo(i){
+  var d=heatSorted[i];
+  if(!d)return;
+  if(d.lat&&d.lng&&heatMapInstance){heatMapInstance.flyTo({center:[d.lng,d.lat],zoom:13,duration:1500})}
+  var c=document.getElementById('heatMap');
+  if(c)c.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function loadHeatData(){
+  api('/heatmap').then(function(d){
+    if(d&&d.success&&d.districts){
+      heatData=d;
+      renderHeatList();
+      if(heatMapInstance){try{renderHeatLayer(heatMapInstance)}catch(e){}}
+    }else{
+      var el=document.getElementById('heatList');
+      if(el)el.innerHTML='<div class="load">تعذر تحميل بيانات الأحياء — أعد المحاولة</div>';
+    }
+  }).catch(function(){
+    var el=document.getElementById('heatList');
+    if(el)el.innerHTML='<div class="load">خطأ في تحميل بيانات الأحياء</div>';
+  });
+}
 
 /* 3D VIEW */
 function open3DBuild(p){
