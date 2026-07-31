@@ -1820,15 +1820,39 @@ function loadMapboxLib(){
   if(window.mapboxgl)return Promise.resolve(true);
   if(_mapboxLoadPromise)return _mapboxLoadPromise;
   _mapboxLoadPromise=new Promise(function(resolve){
-    var s=document.createElement('script');
-    s.src='/mapbox-gl.js';
-    s.async=true;
-    s.onload=function(){resolve(true)};
-    s.onerror=function(){resolve(false)};
-    setTimeout(function(){resolve(false)},12000);
-    document.head.appendChild(s);
+    var tries=0;
+    function attempt(){
+      if(window.mapboxgl){resolve(true);return}
+      if(++tries>5){resolve(false);return}
+      var s=document.createElement('script');
+      s.src='/mapbox-gl.js?v='+(Date.now());
+      s.async=true;
+      var done=false;
+      function finish(ok){if(done)return;done=true;clearTimeout(t);if(!ok)setTimeout(attempt,4000);else resolve(true)}
+      s.onload=function(){finish(true)};
+      s.onerror=function(){finish(false)};
+      var t=setTimeout(function(){finish(false)},30000);
+      document.head.appendChild(s);
+    }
+    attempt();
   });
   return _mapboxLoadPromise;
+}
+
+function withMap(cid,readyFn){
+  var c=document.getElementById(cid);if(!c)return;
+  c.style.background='#0a0b10';
+  c.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--m);font-size:13px;gap:10px;direction:rtl"><div style="font-size:28px">🗺️</div><div>جاري تحميل الخرائط...</div></div>';
+  var tries=0;
+  function step(){
+    ensureToken().then(function(ok){
+      if(ok){readyFn();return}
+      tries++;
+      if(tries>=12){mapFail(cid,function(){withMap(cid,readyFn)});return}
+      setTimeout(step,4000);
+    });
+  }
+  step();
 }
 
 function ensureToken(){
@@ -1937,15 +1961,14 @@ function createMap(opts){
 
 function initMapPage(){
   if(mapInstance)return;
-  ensureToken().then(function(ok){
-    if(!ok){mapFail('mapView',function(){initMapPage()});return}
+  withMap('mapView',function(){
+    if(mapInstance)return;
     if(document.getElementById('mapView'))mapInstance=createMap({container:'mapView'});
   });
 }
 function openMap(){
   document.getElementById('mapOverlay').classList.add('on');
-  ensureToken().then(function(ok){
-    if(!ok){mapFail('mapViewFull',function(){openMap()});return}
+  withMap('mapViewFull',function(){
     if(mapFullMap)return;
     mapFullMap=createMap({container:'mapViewFull'});
   });
@@ -1953,22 +1976,22 @@ function openMap(){
 function closeMap(){document.getElementById('mapOverlay').classList.remove('on')}
 
 /* 3D VIEW */
+function open3DBuild(p){
+  if(map3dInstance){map3dInstance.remove();map3dInstance=null}
+  var area=p.area||300;
+  var side=(Math.sqrt(area)/111000)*(Math.cos(p.lat*Math.PI/180)||1);
+  var s=side/2;
+  var plotGeoJSON={type:'Feature',properties:{title:p.title,type:p.type,area:p.area},geometry:{type:'Polygon',coordinates:[[[p.lng-s,p.lat-s],[p.lng+s,p.lat-s],[p.lng+s,p.lat+s],[p.lng-s,p.lat+s],[p.lng-s,p.lat-s]]]}};
+  map3dInstance=createMap({container:'map3d',center:[p.lng,p.lat],zoom:17,pitch:60,bearing:-20,_addMarkers:false,_onLoad:function(m){
+    m.addSource('plot',{type:'geojson',data:plotGeoJSON});
+    m.addLayer({id:'plot-3d',type:'fill-extrusion',source:'plot',paint:{'fill-extrusion-color':'#d4af37','fill-extrusion-height':15,'fill-extrusion-opacity':0.85}});
+    m.flyTo({center:[p.lng,p.lat],zoom:17,pitch:65,bearing:-30,duration:2000});
+  }});
+}
 function open3D(p){
   if(!p||!p.lat||!p.lng)return;
   document.getElementById('ov3d').classList.add('on');
-  ensureToken().then(function(ok){
-    if(!ok){mapFail('map3d',function(){open3D(p)});return}
-    if(map3dInstance){map3dInstance.remove();map3dInstance=null}
-    var area=p.area||300;
-    var side=(Math.sqrt(area)/111000)*(Math.cos(p.lat*Math.PI/180)||1);
-    var s=side/2;
-    var plotGeoJSON={type:'Feature',properties:{title:p.title,type:p.type,area:p.area},geometry:{type:'Polygon',coordinates:[[[p.lng-s,p.lat-s],[p.lng+s,p.lat-s],[p.lng+s,p.lat+s],[p.lng-s,p.lat+s],[p.lng-s,p.lat-s]]]}};
-    map3dInstance=createMap({container:'map3d',center:[p.lng,p.lat],zoom:17,pitch:60,bearing:-20,_addMarkers:false,_onLoad:function(m){
-      m.addSource('plot',{type:'geojson',data:plotGeoJSON});
-      m.addLayer({id:'plot-3d',type:'fill-extrusion',source:'plot',paint:{'fill-extrusion-color':'#d4af37','fill-extrusion-height':15,'fill-extrusion-opacity':0.85}});
-      m.flyTo({center:[p.lng,p.lat],zoom:17,pitch:65,bearing:-30,duration:2000});
-    }});
-  });
+  withMap('map3d',function(){open3DBuild(p)});
 }
 function close3D(){document.getElementById('ov3d').classList.remove('on');if(map3dInstance){map3dInstance.remove();map3dInstance=null}}
 
@@ -1976,8 +1999,7 @@ function close3D(){document.getElementById('ov3d').classList.remove('on');if(map
 var mapPickerInstance=null,mapPickerMarker=null;
 function openMapPicker(){
   document.getElementById('mapPickerOv').classList.add('on');
-  ensureToken().then(function(ok){
-    if(!ok){mapFail('mapPicker',function(){openMapPicker()});return}
+  withMap('mapPicker',function(){
     if(mapPickerInstance){mapPickerInstance.remove();mapPickerInstance=null}
     var lat=parseFloat(document.getElementById('ap-lat').value)||24.7136;
     var lng=parseFloat(document.getElementById('ap-lng').value)||46.6753;
@@ -2232,8 +2254,8 @@ var map3dNeighborhoods={
 
 function initMap3d(){
   if(map3dInstance2)return;
-  ensureToken().then(function(ok){
-    if(!ok){mapFail('map3dView',function(){initMap3d()});return}
+  withMap('map3dView',function(){
+    if(map3dInstance2)return;
     var loaded=false;
     try{
       map3dInstance2=new mapboxgl.Map({
