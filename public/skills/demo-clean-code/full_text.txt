@@ -1,0 +1,56 @@
+================================================================================
+SOURCE: clean-code.md (Path: /private/tmp/skill-test/clean-code.md)
+================================================================================
+
+# Clean Code – A Handbook of Agile Software Craftsmanship
+
+Chapter 1: Clean Code
+The purpose of clean code. Code matters because code is the language of the system. Bad code demoralizes teams. The Boy Scout rule: leave the campground cleaner than you found it. Quality is not an accident.
+
+Chapter 2: Meaningful Names
+Names should reveal intent. Avoid disinformation and meaningless distinctions. Use pronounceable, searchable names. Class names are nouns, method names are verbs. Avoid mental mapping and context prefixes.
+
+Chapter 3: Functions
+Functions should be small, doing one thing. One level of abstraction per function. Use descriptive names. Fewer arguments is better; prefer no side effects. Command-query separation. Prefer exceptions over error codes.
+
+Chapter 4: Comments
+Comments are a failure to express ourselves in code. Do not add noise or misleading comments. Use comments for legal, informational, clarification, warning, and TODO with a justification. Prefer self-explanatory code.
+
+Chapter 5: Formatting
+Code formatting is about communication. Vertical openness between concepts, vertical density for related lines. Use horizontal alignment and indentation consistently. Team rules beat personal preference.
+
+Chapter 6: Objects and Data Structures
+Objects hide data behind abstractions and expose functions. Data structures expose data and have no meaningful functions. The Law of Demeter. Hybrids are bad. Keep data and behavior together.
+
+Chapter 7: Error Handling
+Error handling is important but should not obscure logic. Use exceptions rather than return codes. Write try-catch-finally first. Provide context with exceptions. Do not return null or pass null.
+
+Chapter 8: Boundaries
+We control software boundaries. Learn from third-party code via learning tests. Write code at the boundary, cleanly. Adapters convert our world to the third-party interface.
+
+Chapter 9: Unit Tests
+The three laws of TDD. Keep tests clean; tests are as important as production code. One assert per test, one concept per test. F.I.R.S.T.: Fast, Independent, Repeatable, Self-validating, Timely.
+
+Chapter 10: Classes
+Classes should be small. Single Responsibility Principle. Cohesion keeps methods and variables together. Prefer composition over inheritance. Organize code by change, not by function.
+
+Chapter 11: Systems
+Separate construction from use. Dependency Injection. Build systems with factories and modules. Use the simplest thing that works. Keep the system simple as it evolves.
+
+Chapter 12: Emergence
+Four rules of simple design: run all tests, no duplication, express intent, minimize classes and methods. Design emerges from these rules.
+
+Chapter 13: Concurrency
+Concurrency decouples what from when. It is a design concern. Correctness: mutual exclusion, critical sections. Beware of shared state. Test concurrency: run more threads than processors, on different platforms, under load.
+
+Chapter 14: Successive Refinement
+A case study of refactoring. First make it work, then make it right. The iterative process of cleaning code. Each pass removes duplication and improves names and structure.
+
+Chapter 15: JUnit Internals
+A look at JUnit's internal design. Clean code in a real codebase. The value of careful naming and small functions inside a widely used framework.
+
+Chapter 16: Refactoring SerialDate
+Refactoring a real date-handling class. Removing duplication, improving names, clarifying intent. A worked example of disciplined cleanup.
+
+Chapter 17: Smells and Heuristics
+A catalog of code smells: comments, environment, functions, general, Java, names, and tests. The final checklist used to evaluate code cleanliness.
