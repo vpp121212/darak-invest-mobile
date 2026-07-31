@@ -1,6 +1,10 @@
 import postgres from 'postgres';
 
-const sql = postgres(process.env.DATABASE_URL || 'postgresql://postgres:lRduReiPwvPvfHrSoKrWDPFcsvPweKUd@sakura.proxy.rlwy.net:38495/railway', {
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is required');
+}
+
+const sql = postgres(process.env.DATABASE_URL, {
   ssl: 'require',
   max: 10,
   idle_timeout: 30,
@@ -440,6 +444,29 @@ await sql.unsafe(`SET client_min_messages = WARNING;
     "createdAt" TEXT DEFAULT (NOW()),
     UNIQUE("advertiserId", "userId")
   );
+
+  CREATE TABLE IF NOT EXISTS official_indicators (
+    id SERIAL PRIMARY KEY,
+    indicator_type TEXT NOT NULL CHECK(indicator_type IN ('rent','sales')),
+    year INTEGER NOT NULL,
+    quarter INTEGER NOT NULL,
+    region TEXT NOT NULL,
+    city TEXT,
+    district TEXT,
+    property_type TEXT,
+    category TEXT,
+    deals INTEGER DEFAULT 0,
+    avg_value REAL,
+    avg_per_m2 REAL,
+    source TEXT DEFAULT 'الهيئة العامة للعقار',
+    source_url TEXT,
+    notes TEXT,
+    "createdAt" TEXT DEFAULT (NOW()),
+    UNIQUE(indicator_type, year, quarter, region, city, district, property_type)
+  );
+  CREATE INDEX IF NOT EXISTS idx_official_indicators_city ON official_indicators(city);
+  CREATE INDEX IF NOT EXISTS idx_official_indicators_district ON official_indicators(district);
+  CREATE INDEX IF NOT EXISTS idx_official_indicators_type ON official_indicators(indicator_type);
 
   CREATE TABLE IF NOT EXISTS realestate_deeds (
     id SERIAL PRIMARY KEY,

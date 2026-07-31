@@ -1,0 +1,98 @@
+[
+  {
+    "dataset_id": "06939867-7a5c-436d-815d-c19cb878430a",
+    "slug": "riyadh_rent_city",
+    "title": "مؤشرات الايجار لمنطقة الرياض على مستوى المدن ",
+    "period": {
+      "fromDate": "2024-01-01",
+      "toDate": "2024-12-31"
+    },
+    "file": "riyadh_rent_city.csv",
+    "size": 311080,
+    "source_url": "https://open.data.gov.sa/ar/datasets/view/06939867-7a5c-436d-815d-c19cb878430a"
+  },
+  {
+    "dataset_id": "a108f1ed-0091-4264-bb82-71a4ad0989f8",
+    "slug": "eastern_rent_city",
+    "title": "مؤشرات الايجار للمنطقة الشرقية على مستوى المدن",
+    "period": {
+      "fromDate": "2024-01-01",
+      "toDate": "2024-12-31"
+    },
+    "file": "eastern_rent_city.csv",
+    "size": 8438543,
+    "source_url": "https://open.data.gov.sa/ar/datasets/view/a108f1ed-0091-4264-bb82-71a4ad0989f8"
+  },
+  {
+    "dataset_id": "a3096049-0662-4ecb-96b1-d86628dbde1e",
+    "slug": "makkah_rent_city",
+    "title": "مؤشرات الايجار لمنطقة مكة المكرمة على مستوى المدن",
+    "period": {
+      "fromDate": "2024-01-01",
+      "toDate": "2024-12-31"
+    },
+    "file": "makkah_rent_city.csv",
+    "size": 161826,
+    "source_url": "https://open.data.gov.sa/ar/datasets/view/a3096049-0662-4ecb-96b1-d86628dbde1e"
+  },
+  {
+    "dataset_id": "86415b9b-dd94-4bd2-a2a9-496ba0bcc250",
+    "slug": "madinah_rent_city",
+    "title": "مؤشرات الايجار لمنطقة المدينة المنورة على مستوى المدن",
+    "period": {
+      "fromDate": "2024-01-01",
+      "toDate": "2024-12-31"
+    },
+    "file": "madinah_rent_city.csv",
+    "size": 74589,
+    "source_url": "https://open.data.gov.sa/ar/datasets/view/86415b9b-dd94-4bd2-a2a9-496ba0bcc250"
+  },
+  {
+    "dataset_id": "75d8dd7a-88fe-4d48-b69b-485a7afb0cc4",
+    "slug": "qassim_rent_city",
+    "title": "مؤشرات الايجار لمنطقة القصيم على مستوى المدن",
+    "period": {
+      "fromDate": "2024-01-01",
+      "toDate": "2024-12-31"
+    },
+    "file": "qassim_rent_city.csv",
+    "size": 156769,
+    "source_url": "https://open.data.gov.sa/ar/datasets/view/75d8dd7a-88fe-4d48-b69b-485a7afb0cc4"
+  },
+  {
+    "dataset_id": "5841795c-c6a7-45ad-97b8-49b4533f36f6",
+    "slug": "baha_rent_city",
+    "title": "مؤشرات الايجار لمنطقة الباحة على مستوى المدن",
+    "period": {
+      "fromDate": "2024-01-01",
+      "toDate": "2024-12-31"
+    },
+    "file": "baha_rent_city.csv",
+    "size": 59720,
+    "source_url": "https://open.data.gov.sa/ar/datasets/view/5841795c-c6a7-45ad-97b8-49b4533f36f6"
+  },
+  {
+    "dataset_id": "2dde7e8c-db79-4aec-be4e-37cef64c1d4d",
+    "slug": "riyadh_rent_q1_2026",
+    "title": "مؤشر الايجار لمنطقة الرياض الربع الاول من عام 2026",
+    "period": {
+      "fromDate": "2026-01-01",
+      "toDate": "2026-03-31"
+    },
+    "file": "riyadh_rent_q1_2026.csv",
+    "size": 296033,
+    "source_url": "https://open.data.gov.sa/ar/datasets/view/2dde7e8c-db79-4aec-be4e-37cef64c1d4d"
+  },
+  {
+    "dataset_id": "05cc087e-7151-42b2-8fbe-6e41e5813201",
+    "slug": "riyadh_sales_q1_2026",
+    "title": "مؤشرات صفقات البيع لمنطقة الرياض الربع الاول من عام 2026",
+    "period": {
+      "fromDate": "2026-01-01",
+      "toDate": "2026-03-31"
+    },
+    "file": "riyadh_sales_q1_2026.csv",
+    "size": 7012,
+    "source_url": "https://open.data.gov.sa/ar/datasets/view/05cc087e-7151-42b2-8fbe-6e41e5813201"
+  }
+]

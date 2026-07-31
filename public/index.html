@@ -241,6 +241,7 @@
       <div class="qi-i" onclick="nav('pulse')"><span class="qi-icon">📊</span><span class="qi-l">نبض الحي</span></div>
       <div class="qi-i" onclick="nav('tools')"><span class="qi-icon">💰</span><span class="qi-l">العائد</span></div>
       <div class="qi-i" onclick="nav('add')"><span class="qi-icon">➕</span><span class="qi-l">إضافة</span></div>
+      <div class="qi-i" onclick="nav('sources')"><span class="qi-icon">🔗</span><span class="qi-l">المصادر</span></div>
     </div>
     <div class="srch">
       <input type="text" id="hq" placeholder="ابحث بالاسم أو المنطقة...">
@@ -410,6 +411,24 @@
         </select>
       </div>
       <div id="pulseGrid" style="display:flex;flex-direction:column;gap:8px"><div class="load" id="pulseLd">جاري تحميل بيانات الأحياء...</div></div>
+      <div style="margin-top:16px;padding:12px;border-radius:12px;background:rgba(212,175,55,.05);border:1px solid rgba(212,175,55,.2);font-size:11px;color:var(--m);line-height:1.8">
+        <strong style="color:var(--g)">🛡️ الشفافية:</strong> المؤشرات المعروضة في نبض الحي مبنية على إعلانات منصة دارك وحيك الفعلية، وتُعرض الأرقام الرسمية الحكومية (متوسط الإيجار لكل متر) من البيانات المفتوحة للهيئة العامة للعقار مع إسناد المصدر الكامل.
+      </div>
+      <div style="text-align:center;margin:12px 0"><a href="#" onclick="nav('sources');return false" style="color:var(--g);font-size:12px;font-weight:600;text-decoration:none">🔗 المصادر الرسمية للبيانات ←</a></div>
+    </div>
+  </div>
+
+  <!-- SOURCES PAGE -->
+  <div class="pg" id="pg-sources">
+    <div class="wrap" style="padding-top:16px">
+      <div style="font-size:16px;font-weight:700;color:var(--g);margin-bottom:4px">🔗 المصادر الرسمية للبيانات</div>
+      <div style="font-size:11px;color:var(--m);margin-bottom:14px;line-height:1.8">كل رقم في دارك وحيك إما من إعلانات المنصة الفعلية، أو من بيانات حكومية رسمية مفتوحة — مع إسناد المصدر والفترة. لا نعرض أي أرقام مخترعة.</div>
+      <div id="sourcesList" style="display:flex;flex-direction:column;gap:10px"><div class="load">جاري تحميل المصادر...</div></div>
+      <div style="margin-top:16px;padding:12px;border-radius:12px;background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.2);font-size:11px;color:var(--m);line-height:1.9">
+        <strong style="color:var(--green)">كيف نعمل:</strong><br>
+        📐 <strong>سعر المتر</strong> — يُحسب من إعلانات المنصة الفعلية مع إظهار عدد العينة وتاريخها (مؤشر مبدئي قابل للتحقق من كل إعلان).<br>
+        🏛️ <strong>المؤشرات الرسمية</strong> — متوسط الإيجار وعدد العقود لكل حي/مدينة، من البيانات المفتوحة المنشورة من الجهات الحكومية، مع اسم المصدر ورابط المراجعة والفترة الزمنية.
+      </div>
     </div>
   </div>
 
@@ -476,6 +495,7 @@
             <div id="mapPulseDetails" style="font-size:10px;color:var(--m);margin-top:2px;line-height:1.6"></div>
           </div>
         </div>
+        <div id="mapPulseOfficial" style="margin-top:10px"></div>
       </div>
     </div>
   </div>
@@ -1258,6 +1278,7 @@ function nav(page){
   if(page==='map'){initMapPage();setTimeout(initMap3d,300)}
   if(page==='add')setTimeout(fetchDistricts,100);
   if(page==='pulse')loadPulseData();
+  if(page==='sources')loadSources();
 }
 
 /* RENDER */
@@ -1333,8 +1354,13 @@ function openPulseDetail(px){
     (px.avg_rent?'<div style="padding:10px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">متوسط الإيجار/سنوياً</div><div style="font-size:13px;font-weight:700;color:var(--g)">'+fmt(px.avg_rent)+' ر.س</div></div>':'')+
     (px.avg_sale?'<div style="padding:10px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">متوسط البيع</div><div style="font-size:13px;font-weight:700;color:var(--g)">'+fmt(px.avg_sale)+' ر.س</div></div>':'')+
     (px.walk_score?'<div style="padding:10px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">مؤشر المشي</div><div style="font-size:16px;font-weight:700;color:var(--blue)">'+px.walk_score+'</div></div>':'')+
-    '</div>'+metro+projects+'<div style="font-size:9px;color:var(--m);text-align:left;padding-top:4px;border-top:1px solid rgba(255,255,255,.04)">📊 '+px.data_source+'</div></div>';
+    '</div>'+metro+projects+'<div style="font-size:9px;color:var(--m);text-align:left;padding-top:4px;border-top:1px solid rgba(255,255,255,.04)">📊 '+px.data_source+'</div><div id="officialBlock"></div></div>';
   document.getElementById('ovp').innerHTML=html;
+  loadOfficialForDistrict(px.district).then(function(d){
+    var b=renderOfficialBlock(d);
+    var el=document.getElementById('officialBlock');
+    if(el&&b)el.innerHTML=b;
+  });
   document.getElementById('ov').classList.add('open');
   document.body.style.overflow='hidden';
 }
@@ -1395,6 +1421,51 @@ function pulseCity(el){
   document.querySelectorAll('#pulseCityFilter .hc').forEach(function(c){c.classList.remove('on')});
   el.classList.add('on');
   renderPulse();
+}
+
+var officialCache={};
+async function loadOfficialForDistrict(district){
+  if(officialCache[district])return officialCache[district];
+  var d=await api('/indicators/district/'+encodeURIComponent(district));
+  officialCache[district]=d&&d.success?d:{success:false,indicators:[]};
+  return officialCache[district];
+}
+function renderOfficialBlock(d){
+  if(!d||!d.success||!d.indicators||!d.indicators.length)return'';
+  var rows=d.indicators.slice(0,4);
+  var items=rows.map(function(o){
+    var label=o.property_type||'—';
+    var perM2=o.avg_per_m2?'<div style="font-size:11px;font-weight:700;color:var(--green)">'+fmt(o.avg_per_m2)+' ر.س/م²</div>':'';
+    return'<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--m);padding:6px 8px;border-radius:8px;background:rgba(255,255,255,.02);margin-bottom:4px">'+
+      '<span style="flex:1;font-weight:600;color:var(--t)">'+label+'</span>'+
+      '<span>'+fmt(o.deals)+' عقد</span>'+
+      perM2+
+      '</div>';
+  }).join('');
+  var src=d.indicators[0];
+  return'<div style="margin-top:10px;padding:10px;border-radius:10px;background:rgba(212,175,55,.05);border:1px solid rgba(212,175,55,.18)">'+
+    '<div style="font-size:11px;color:var(--g);font-weight:700;margin-bottom:6px">🏛️ متوسط الإيجار الرسمي — '+((src.year||'')+' '+qName(src.quarter))+'</div>'+
+    items+
+    '<div style="font-size:9px;color:var(--m);padding-top:6px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap">'+
+    '<span>المصدر: '+src.source+'</span>'+
+    '<a href="'+src.source_url+'" target="_blank" style="color:var(--g);text-decoration:none">المراجعة ←</a>'+
+    '</div></div>';
+}
+function qName(q){return q===1?'الربع الأول':q===2?'الربع الثاني':q===3?'الربع الثالث':'الربع الرابع'}
+
+function loadSources(){
+  api('/indicators/sources').then(function(d){
+    var el=document.getElementById('sourcesList');
+    if(!d||!d.success||!d.sources||!d.sources.length){el.innerHTML='<div class="load">لا توجد مصادر</div>';return}
+    el.innerHTML=d.sources.map(function(s){
+      return'<div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)">'+
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">'+
+        '<div style="font-size:13px;font-weight:700;color:var(--t)">'+s.name+'</div>'+
+        '<span style="font-size:9px;padding:2px 8px;border-radius:999px;background:rgba(212,175,55,.12);color:var(--g);font-weight:600;white-space:nowrap">'+s.update+'</span></div>'+
+        '<div style="font-size:11px;color:var(--m);line-height:1.7;margin-bottom:8px">'+s.description+'</div>'+
+        '<a href="'+s.url+'" target="_blank" style="display:inline-block;padding:6px 14px;border-radius:8px;background:linear-gradient(135deg,#d4af37,#b8941f);color:#05060a;font-size:11px;font-weight:700;text-decoration:none">زيارة المصدر 🔗</a></div>';
+    }).join('');
+  });
 }
 
 /* ADVANCED FILTERS */
@@ -2115,6 +2186,14 @@ function showPulseOnUI(px){
     'المشي: '+(px.walk_score||'—')+' · '+
     'الإيجار: '+fmt(px.avg_rent||0)+' ر.س';
   document.getElementById('mapPulseCard').style.display='block';
+  document.getElementById('mapPulseOfficial').innerHTML='';
+  if(px.district){
+    loadOfficialForDistrict(px.district).then(function(d){
+      var b=renderOfficialBlock(d);
+      var el=document.getElementById('mapPulseOfficial');
+      if(el&&b)el.innerHTML=b;
+    });
+  }
 }
 async function loadMapAds(){
   var type=document.getElementById('mapTypeFilter').value;

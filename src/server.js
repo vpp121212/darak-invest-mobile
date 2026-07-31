@@ -44,6 +44,7 @@ import paymentRoutes from './routes/payments.js';
 import dashboardRoutes from './routes/dashboard.js';
 import reportRoutes from './routes/reports.js';
 import ratingRoutes from './routes/ratings.js';
+import indicatorRoutes from './routes/indicators.js';
 
 dotenv.config();
 
@@ -114,6 +115,7 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/ratings', ratingRoutes);
+app.use('/api/indicators', indicatorRoutes);
 app.use('/api/skills', skillRoutes);
 
 app.get('/api/health', (req, res) => {
