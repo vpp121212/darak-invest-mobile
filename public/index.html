@@ -1274,7 +1274,7 @@ async function api(path,opts){
   var headers={'Content-Type':'application/json'};
   if(authToken)headers['Authorization']='Bearer '+authToken;
   try{
-    var r=await fetch(API+path,{...opts,headers:{...headers,...(opts&&opts.headers||{})},signal:AbortSignal.timeout?AbortSignal.timeout(10000):undefined});
+    var r=await fetch(API+path,{...opts,headers:{...headers,...(opts&&opts.headers||{})},signal:AbortSignal.timeout?AbortSignal.timeout(30000):undefined});
     var d=await r.json().catch(function(){return{}});
     if(!r.ok){return {error:fmtErr(d),code:d.code||'UNKNOWN',status:r.status}}
     return d;
@@ -1821,22 +1821,26 @@ function loadMapboxLib(){
   if(window.mapboxgl)return Promise.resolve(true);
   if(_mapboxLoadPromise)return _mapboxLoadPromise;
   _mapboxLoadPromise=new Promise(function(resolve){
-    var tries=0;
+    var i=0;
     function attempt(){
       if(window.mapboxgl){resolve(true);return}
-      if(++tries>8){resolve(false);return}
       var s=document.createElement('script');
-      s.src=_mapboxLibSources[tries%2]+'?v='+Date.now();
+      s.src=_mapboxLibSources[i%_mapboxLibSources.length]+'?v='+Date.now();
       s.async=true;
-      var done=false;
-      function finish(ok){if(done)return;done=true;clearTimeout(t);if(!ok)setTimeout(attempt,3000);else resolve(true)}
+      var done=false,t;
+      function finish(ok){
+        if(done)return;done=true;clearTimeout(t);
+        if(!ok&&i<(_mapboxLibSources.length*2-1)){i++;setTimeout(attempt,400)}
+        else resolve(!!window.mapboxgl);
+      }
       s.onload=function(){finish(!!window.mapboxgl)};
       s.onerror=function(){finish(false)};
-      var t=setTimeout(function(){finish(false)},25000);
+      t=setTimeout(function(){finish(false)},12000);
       document.head.appendChild(s);
     }
     attempt();
   });
+  _mapboxLoadPromise.catch(function(){});
   return _mapboxLoadPromise;
 }
 
@@ -1861,7 +1865,7 @@ function withMap(cid,readyFn){
   function step(){
     if(navigator.onLine===false){mapFail(cid,function(){withMap(cid,readyFn)});return}
     ensureToken().then(function(ok){
-      if(ok){readyFn();return}
+      if(ok){c.innerHTML='';readyFn();return}
       tries++;
       if(tries>=60){mapFail(cid,function(){withMap(cid,readyFn)});return}
       setTimeout(step,5000);
@@ -1872,17 +1876,19 @@ function withMap(cid,readyFn){
 
 function ensureToken(){
   if(_tokenReady&&MB_TOKEN&&window.mapboxgl)return Promise.resolve(true);
-  if(_tokenPromise)return _tokenPromise;
+  if(_tokenPromise)return _tokenPromise.then(function(ok){
+    if(!ok&&!window.mapboxgl){_tokenPromise=null}
+    return ok||(!!window.mapboxgl&&window._mbBlocked);
+  });
   _tokenPromise=Promise.all([
     loadMapboxLib(),
     fetch('/api/config/mapbox').then(function(r){return r.json()}).then(function(d){
-      if(d&&d.token&&window.mapboxgl){MB_TOKEN=d.token;mapboxgl.accessToken=d.token}
+      if(d&&d.token){MB_TOKEN=d.token;if(window.mapboxgl){mapboxgl.accessToken=d.token;try{mapboxgl.setRTLTextPlugin('/mapbox-gl-rtl-text.js',null,false);}catch(e){}}}
       _tokenReady=true;
-      if(window.mapboxgl){try{mapboxgl.setRTLTextPlugin('/mapbox-gl-rtl-text.js',null,false);}catch(e){}}
-      return !!(MB_TOKEN&&window.mapboxgl);
-    }).catch(function(){_tokenReady=true;return false}),
+      return true;
+    }).catch(function(){_tokenReady=true;return true}),
     probeMapbox()
-  ]).then(function(res){return res[0]&&res[1]});
+  ]).then(function(res){return !!(res[0]&&(MB_TOKEN||window._mbBlocked))});
   _tokenPromise.catch(function(){_tokenReady=true;return false});
   return _tokenPromise;
 }
