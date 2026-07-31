@@ -57,6 +57,7 @@ router.get('/all', async (req, res) => {
         ? JSON.parse(p.images || '[]')
         : [],
       pano: p.panoramicImage || null,
+      panoramicImage: p.panoramicImage || null,
       features: JSON.parse(p.features || '[]'),
       guarantees: [],
       trust: p.trust || 'direct',
