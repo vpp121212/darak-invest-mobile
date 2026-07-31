@@ -34,7 +34,7 @@ function roundNice(v) {
 
 async function fetchComparables({ city, district, type, purpose, area }) {
   const cleanDistrict = district ? district.replace(/^(حي\s+)/, '') : '';
-  const variants = [district, 'حي ' + cleanDistrict].filter(Boolean);
+  const variants = [cleanDistrict, district].filter(Boolean);
 
   const query = (extra) => `
     SELECT price, area, rooms, baths, age, district FROM properties
@@ -120,7 +120,7 @@ async function fetchOfficial({ city, district, type, purpose }) {
 
 async function fetchPulse({ city, district }) {
   const cleanDistrict = district ? district.replace(/^(حي\s+)/, '') : '';
-  const variants = [district, 'حي ' + cleanDistrict].filter(Boolean);
+  const variants = [cleanDistrict, district].filter(Boolean);
   const [pulse] = await sql`
     SELECT avg_sale, avg_rent, roi FROM neighbourhood_pulse
     WHERE city = ${city} AND district = ANY(${variants}) LIMIT 1
@@ -153,6 +153,25 @@ export async function evaluateAVM(input) {
     basePerM2 = signals.reduce((s, x) => s + x.perM2 * x.weight, 0) / wSum;
   }
 
+  let pulsePerM2 = null;
+  if (pulse && area) {
+    const total = purpose === 'بيع' ? pulse.avg_sale : (pulse.avg_rent ? pulse.avg_rent / 12 : null);
+    if (total > 0) {
+      const p = total / area;
+      const sane = purpose === 'إيجار' ? (p >= 5 && p <= 200) : (p >= 50 && p <= 150000);
+      if (sane && (!basePerM2 || (p >= basePerM2 * 0.25 && p <= basePerM2 * 4))) {
+        pulsePerM2 = p;
+        signals.push({ perM2: p, weight: 1.5 });
+        if (basePerM2) {
+          const wSum = signals.reduce((s, x) => s + x.weight, 0);
+          basePerM2 = signals.reduce((s, x) => s + x.perM2 * x.weight, 0) / wSum;
+        } else {
+          basePerM2 = p;
+        }
+      }
+    }
+  }
+
   let adjustments = [];
   if (comparables.medianRooms != null && rooms != null) {
     const roomsAdj = clamp((rooms - comparables.medianRooms) * 0.035, -0.15, 0.15);
@@ -183,6 +202,10 @@ export async function evaluateAVM(input) {
     const diff = Math.abs(comparables.medianPerM2 - official.perM2) / Math.max(comparables.medianPerM2, official.perM2);
     if (diff < 0.2) confidence += 10;
     else if (diff < 0.4) confidence += 5;
+  }
+  if (pulsePerM2 && basePerM2) {
+    const diff = Math.abs(pulsePerM2 - basePerM2) / Math.max(pulsePerM2, basePerM2);
+    if (diff < 0.25) confidence += 5;
   }
   if (area >= 40) confidence += 5;
   confidence = clamp(confidence, 15, 90);
@@ -228,8 +251,12 @@ export async function evaluateAVM(input) {
     const pulseVal = purpose === 'بيع' ? pulse.avg_sale : pulse.avg_rent;
     if (pulseVal) factors.push({
       label: 'متوسط الحي (نبض الأحياء)',
-      detail: purpose === 'بيع' ? 'متوسط صفقة البيع' : 'متوسط الإيجار',
-      value: `${Math.round(pulseVal)} ر.س`
+      detail: pulsePerM2
+        ? (purpose === 'بيع' ? 'متوسط البيع بالحي' : 'متوسط الإيجار بالحي')
+        : (purpose === 'بيع' ? 'متوسط صفقة البيع' : 'متوسط الإيجار'),
+      value: pulsePerM2
+        ? `${Math.round(pulsePerM2)} ر.س/م²`
+        : `${Math.round(pulseVal)} ر.س`
     });
   }
   adjustments.forEach(a => factors.push({ label: a.label, detail: a.detail, effect: a.effect, value: a.value }));

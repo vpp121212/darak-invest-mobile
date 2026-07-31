@@ -99,9 +99,9 @@ router.post('/test-complete', protect, async (req, res) => {
   }
 });
 
-router.post('/callback', async (req, res) => {
+router.all('/callback', async (req, res) => {
   try {
-    const { id } = req.body;
+    const id = req.body && req.body.id ? req.body.id : req.query && req.query.id;
     if (!id) return res.status(400).json({ error: 'Missing id' });
 
     if (!process.env.MOYASAR_SECRET_KEY) return res.json({ success: true, ignored: true });
@@ -114,16 +114,24 @@ router.post('/callback', async (req, res) => {
     if (!moyasarRes.ok) return res.status(502).json({ error: 'Verification failed' });
     const invoice = await moyasarRes.json();
 
-    if (invoice.status === 'paid') {
+    let paid = invoice.status === 'paid';
+    if (paid) {
       const [payment] = await sql`SELECT * FROM payments WHERE "moyasarId" = ${id} AND status = 'pending'`;
       if (payment) {
         await sql`UPDATE payments SET status = 'paid', "paidAt" = NOW() WHERE id = ${payment.id}`;
         await sql`UPDATE users SET package = ${payment.packageId}, "packageExpiry" = ${new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]} WHERE id = ${payment.userId}`;
+      } else {
+        paid = false;
       }
     }
-    res.json({ success: true });
+
+    if (req.accepts('html')) {
+      return res.redirect(`/?payment=${paid ? 'success' : 'failed'}`);
+    }
+    res.json({ success: true, paid });
   } catch (err) {
     console.error('Callback error:', err);
+    if (req.accepts('html')) return res.redirect('/?payment=failed');
     res.status(500).json({ error: 'Internal error' });
   }
 });
