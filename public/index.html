@@ -16,7 +16,6 @@
   <link rel="icon" type="image/svg+xml" href="/icons/icon-192.svg">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet"/>
-  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
   <link rel="preload" href="/mapbox-gl-rtl-text.js" as="script">
   <style>
 *{box-sizing:border-box;margin:0;padding:0}:root{--bg:#05060a;--c:#0d0f17;--g:#d4af37;--t:#f5f5f7;--m:#9fa3b7;--b:rgba(255,255,255,.08);--r:16px;--green:#4ade80;--red:#f87171;--blue:#60a5fa}html{background:var(--bg)}body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;-webkit-font-smoothing:antialiased}a{text-decoration:none;color:inherit}button{font-family:inherit;cursor:pointer}img{max-width:100%;display:block}.wrap{width:100%;max-width:480px;margin:0 auto;padding:0 14px}
@@ -1790,21 +1789,51 @@ document.getElementById('ov').addEventListener('click',function(e){if(e.target==
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeD();closeLogin();closeAIP();closeVR();closeMap();close3D();closeMapPicker();closeUpload();closeFin();closeMkt();closeLeg();closeBiz();closeAddInvoice();closeAddVendor();closeMarket();closePayOv();closeDash()}});
 
 /* MAP */
-var mapPropertyId=null,mapFullMap=null,map3dInstance=null,MB_TOKEN='',_tokenPromise=null,_tokenReady=false;
+var mapPropertyId=null,mapFullMap=null,map3dInstance=null,MB_TOKEN='',_tokenPromise=null,_tokenReady=false,_mapboxLoadPromise=null;
 
 function isNight(){var h=new Date().getHours();return h<6||h>=18}
 function mapStyle(){return isNight()?'mapbox://styles/mapbox/dark-v11':'mapbox://styles/mapbox/streets-v12'}
 
+function loadMapboxLib(){
+  if(window.mapboxgl)return Promise.resolve(true);
+  if(_mapboxLoadPromise)return _mapboxLoadPromise;
+  _mapboxLoadPromise=new Promise(function(resolve){
+    var s=document.createElement('script');
+    s.src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js';
+    s.async=true;
+    s.onload=function(){resolve(true)};
+    s.onerror=function(){resolve(false)};
+    setTimeout(function(){resolve(false)},12000);
+    document.head.appendChild(s);
+  });
+  return _mapboxLoadPromise;
+}
+
 function ensureToken(){
-  if(_tokenReady&&MB_TOKEN)return Promise.resolve(true);
+  if(_tokenReady&&MB_TOKEN&&window.mapboxgl)return Promise.resolve(true);
   if(_tokenPromise)return _tokenPromise;
-  _tokenPromise=fetch('/api/config/mapbox').then(function(r){return r.json()}).then(function(d){
-    if(d&&d.token){MB_TOKEN=d.token;mapboxgl.accessToken=d.token}
-    _tokenReady=true;
-    try{mapboxgl.setRTLTextPlugin('/mapbox-gl-rtl-text.js',null,false);}catch(e){}
-    return!!MB_TOKEN;
-  }).catch(function(){_tokenReady=true;return false});
+  _tokenPromise=Promise.all([
+    loadMapboxLib(),
+    fetch('/api/config/mapbox').then(function(r){return r.json()}).then(function(d){
+      if(d&&d.token&&window.mapboxgl){MB_TOKEN=d.token;mapboxgl.accessToken=d.token}
+      _tokenReady=true;
+      if(window.mapboxgl){try{mapboxgl.setRTLTextPlugin('/mapbox-gl-rtl-text.js',null,false);}catch(e){}}
+      return !!(MB_TOKEN&&window.mapboxgl);
+    }).catch(function(){_tokenReady=true;return false})
+  ]).then(function(res){return res[0]&&res[1]});
+  _tokenPromise.catch(function(){_tokenReady=true;return false});
   return _tokenPromise;
+}
+
+function mapFail(cid,retryFn){
+  var c=document.getElementById(cid);if(!c)return;
+  c.style.background='#0a0b10';
+  c.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--m);font-size:13px;text-align:center;padding:24px;direction:rtl;gap:10px">'+
+    '<div style="font-size:32px">🗺️</div>'+
+    '<div>الخرائط غير متاحة حالياً — تعذر الاتصال بخدمة الخرائط.<br>تحقق من اتصالك ثم حاول مرة أخرى.</div>'+
+    (retryFn?'<button id="map-retry" style="padding:10px 22px;border-radius:999px;background:linear-gradient(135deg,#d4af37,#c9a430);color:#05060a;border:none;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit">🔄 إعادة المحاولة</button>':'')+'</div>';
+  var b=c.querySelector('#map-retry');
+  if(b)b.addEventListener('click',function(){retryFn()});
 }
 
 function createMarkerEl(p){
@@ -1861,28 +1890,40 @@ function addLegend(map){
 function createMap(opts){
   var o={style:mapStyle(),center:[46.6753,24.7136],zoom:11};
   Object.keys(opts||{}).forEach(function(k){o[k]=opts[k]});
-  var m=new mapboxgl.Map(o);
+  var loaded=false;
+  var m;
+  try{
+    m=new mapboxgl.Map(o);
+  }catch(e){
+    mapFail(o.container);
+    return null;
+  }
   m.addControl(new mapboxgl.NavigationControl(),'top-left');
   m.on('load',function(){
+    loaded=true;
     try{m.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512});m.setTerrain({source:'mapbox-dem',exaggeration:1})}catch(e){}
     try{m.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',type:'fill-extrusion',minzoom:15,paint:{'fill-extrusion-color':isNight()?'#2a2d35':'#c8ccd4','fill-extrusion-height':['get','height'],'fill-extrusion-base':['get','min_height'],'fill-extrusion-opacity':isNight()?0.6:0.4}})}catch(e){}
     if(opts._addMarkers!==false){addMarkersToMap(m);addLegend(m)}
     if(opts._onLoad)opts._onLoad(m);
   });
+  setTimeout(function(){
+    if(!loaded&&m){try{m.remove()}catch(e){};mapFail(o.container)}
+  },20000);
   return m;
 }
 
 function initMapPage(){
   if(mapInstance)return;
   ensureToken().then(function(ok){
-    if(!ok)return;
+    if(!ok){mapFail('mapView',function(){initMapPage()});return}
     if(document.getElementById('mapView'))mapInstance=createMap({container:'mapView'});
   });
 }
 function openMap(){
   document.getElementById('mapOverlay').classList.add('on');
   ensureToken().then(function(ok){
-    if(!ok||mapFullMap)return;
+    if(!ok){mapFail('mapViewFull',function(){openMap()});return}
+    if(mapFullMap)return;
     mapFullMap=createMap({container:'mapViewFull'});
   });
 }
@@ -1893,7 +1934,7 @@ function open3D(p){
   if(!p||!p.lat||!p.lng)return;
   document.getElementById('ov3d').classList.add('on');
   ensureToken().then(function(ok){
-    if(!ok)return;
+    if(!ok){mapFail('map3d',function(){open3D(p)});return}
     if(map3dInstance){map3dInstance.remove();map3dInstance=null}
     var area=p.area||300;
     var side=(Math.sqrt(area)/111000)*(Math.cos(p.lat*Math.PI/180)||1);
@@ -1913,7 +1954,7 @@ var mapPickerInstance=null,mapPickerMarker=null;
 function openMapPicker(){
   document.getElementById('mapPickerOv').classList.add('on');
   ensureToken().then(function(ok){
-    if(!ok)return;
+    if(!ok){mapFail('mapPicker',function(){openMapPicker()});return}
     if(mapPickerInstance){mapPickerInstance.remove();mapPickerInstance=null}
     var lat=parseFloat(document.getElementById('ap-lat').value)||24.7136;
     var lng=parseFloat(document.getElementById('ap-lng').value)||46.6753;
@@ -2169,24 +2210,34 @@ var map3dNeighborhoods={
 function initMap3d(){
   if(map3dInstance2)return;
   ensureToken().then(function(ok){
-    if(!ok)return;
-    map3dInstance2=new mapboxgl.Map({
-      container:'map3dView',
-      style:'mapbox://styles/mapbox/streets-v12',
-      center:[46.738586,24.774265],
-      zoom:11,
-      pitch:60,
-      bearing:-17.6
-    });
+    if(!ok){mapFail('map3dView',function(){initMap3d()});return}
+    var loaded=false;
+    try{
+      map3dInstance2=new mapboxgl.Map({
+        container:'map3dView',
+        style:'mapbox://styles/mapbox/streets-v12',
+        center:[46.738586,24.774265],
+        zoom:11,
+        pitch:60,
+        bearing:-17.6
+      });
+    }catch(e){
+      mapFail('map3dView',function(){initMap3d()});
+      return;
+    }
     map3dInstance2.addControl(new mapboxgl.NavigationControl(),'top-left');
     map3dInstance2.on('load',function(){
+      loaded=true;
       try{map3dInstance2.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512});map3dInstance2.setTerrain({source:'mapbox-dem',exaggeration:1})}catch(e){}
       try{map3dInstance2.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',type:'fill-extrusion',minzoom:15,paint:{'fill-extrusion-color':isNight()?'#2a2d35':'#c8ccd4','fill-extrusion-height':['get','height'],'fill-extrusion-base':['get','min_height'],'fill-extrusion-opacity':isNight()?0.6:0.4}})}catch(e){}
       addNeighborhoodsLayer();
     });
     map3dInstance2.on('moveend',loadMapAdsByBounds);
     map3dInstance2.on('zoom',function(){var z=map3dInstance2.getZoom();map3dInstance2.setLayoutProperty('neighborhoods-fill','visibility',z>=11?'visible':'none');map3dInstance2.setLayoutProperty('neighborhoods-outline','visibility',z>=11?'visible':'none');map3dInstance2.setLayoutProperty('neighborhoods-labels','visibility',z>=11?'visible':'none')});
-    setTimeout(loadMapAdsByBounds,1000)
+    setTimeout(loadMapAdsByBounds,1000);
+    setTimeout(function(){
+      if(!loaded&&map3dInstance2){try{map3dInstance2.remove()}catch(e){};map3dInstance2=null;mapFail('map3dView',function(){initMap3d()})}
+    },20000)
   })
 }
 function addNeighborhoodsLayer(){
