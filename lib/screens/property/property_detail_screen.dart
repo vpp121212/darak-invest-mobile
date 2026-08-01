@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'ar_preview_screen.dart';
 
 const Color bgDark = Color(0xFF020617);
 const Color gold = Color(0xFFD4AF37);
@@ -42,6 +43,8 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildTitleAndPrice(property),
+                    const SizedBox(height: 16),
+                    _buildArButton(property),
                     const SizedBox(height: 20),
                     _buildDetailsGrid(property),
                     const SizedBox(height: 20),
@@ -212,6 +215,41 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
           style: GoogleFonts.cairo(color: gold, fontSize: 28, fontWeight: FontWeight.bold),
         ),
       ],
+    );
+  }
+
+  Widget _buildArButton(Map<String, dynamic> property) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ArPreviewScreen(title: property['title'] ?? ''),
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(colors: [gold, Color(0xFFB8941F)]),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.view_in_ar, color: bgDark, size: 24),
+            const SizedBox(width: 10),
+            Text(
+              'معاينة الغرفة بتقنية AR',
+              style: GoogleFonts.cairo(
+                color: bgDark,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

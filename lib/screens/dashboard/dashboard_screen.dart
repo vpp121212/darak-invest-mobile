@@ -636,7 +636,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             decoration: BoxDecoration(
               color: bgDark,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: textMuted.withOpacity(0.2), style: BorderStyle.dashed),
+              border: Border.all(color: textMuted.withOpacity(0.2), style: BorderStyle.solid),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
