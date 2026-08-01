@@ -1337,7 +1337,7 @@ function render(f){
   if(!list.length){g.innerHTML='<div class="load">لا توجد عقارات</div>';return}
   g.innerHTML=list.map(function(p){
     var im=pImg(p),fav=F.indexOf(p.id)>-1;
-    return'<div class="card" onclick="showDetail('+p.id+')"><div class="card-img"><img src="'+im+'" alt="'+p.title+'" loading="lazy" onerror="this.onerror=null;this.src=\''+pFallback(p)+'\'"><div class="badges"><span class="badge '+(p.purpose==='إيجار'?'badge-r':'badge-s')+'">'+p.purpose+'</span>'+(p.status==='حصري'?'<span class="badge badge-x">⭐ حصري</span>':'')+'</div><button class="fav '+(fav?'on':'')+'" onclick="toggleFav('+p.id+',event)">'+(fav?'❤':'🤍')+'</button><button class="card-ar" onclick="event.stopPropagation();openAR()">🥽 AR</button><span class="trust trust-'+tCls(p.trust)+'">'+tLbl(p.trust)+'</span>'+(p.panoramicImage||p.pano?'<span class="card-360">🌐 360°</span>':'')+'</div><div class="card-b"><div class="card-t">'+p.title+'</div><div class="card-l">📍 '+pLoc(p)+'</div><div class="card-p">'+pPrice(p)+'</div>'+(p.expectedPrice?'<div class="card-avm">💰 التقدير: '+fmt(p.expectedPrice)+' ر.س</div>':'')+'<div class="card-m"><span>🛏 '+p.rooms+'</span><span>📐 '+fmt(p.area)+' م²</span><span>🚿 '+p.baths+'</span>'+(p.type==='فيلا'&&p.apartments?'<span>🏢 '+p.apartments+' شقق</span>':'')+'</div></div></div>'
+    return'<div class="card" onclick="showDetail('+p.id+')"><div class="card-img"><img src="'+im+'" alt="'+p.title+'" loading="lazy" onerror="this.onerror=null;this.src=\''+pFallback(p)+'\'"><div class="badges"><span class="badge '+(p.purpose==='إيجار'?'badge-r':'badge-s')+'">'+p.purpose+'</span>'+(p.status==='حصري'?'<span class="badge badge-x">⭐ حصري</span>':'')+'</div><button class="fav '+(fav?'on':'')+'" onclick="toggleFav('+p.id+',event)">'+(fav?'❤':'🤍')+'</button><button class="card-ar" onclick="event.stopPropagation();openAR(\''+im.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\')">🥽 AR</button><span class="trust trust-'+tCls(p.trust)+'">'+tLbl(p.trust)+'</span>'+(p.panoramicImage||p.pano?'<span class="card-360">🌐 360°</span>':'')+'</div><div class="card-b"><div class="card-t">'+p.title+'</div><div class="card-l">📍 '+pLoc(p)+'</div><div class="card-p">'+pPrice(p)+'</div>'+(p.expectedPrice?'<div class="card-avm">💰 التقدير: '+fmt(p.expectedPrice)+' ر.س</div>':'')+'<div class="card-m"><span>🛏 '+p.rooms+'</span><span>📐 '+fmt(p.area)+' م²</span><span>🚿 '+p.baths+'</span>'+(p.type==='فيلا'&&p.apartments?'<span>🏢 '+p.apartments+' شقق</span>':'')+'</div></div></div>'
   }).join('');
 }
 
@@ -1684,7 +1684,7 @@ function showDetail(id){
   html+='<div id="pulse-card-'+p.id+'"><div class="load" style="padding:16px">جاري تحميل مؤشر نبض الحي...</div></div>'
   var ph=(p.agent&&p.agent.phone)?p.agent.phone.replace(/[^0-9]/g,''):'';
   html+='<div class="ag"><div class="ag-n">'+(p.agent&&p.agent.name||'دارك وحيك')+'</div><div class="ag-r">'+(p.agent&&p.agent.role||'بائع مباشر')+'</div><div id="ag-rating-'+p.id+'"></div><div class="ag-b">'+(ph?'<a class="ag-btn ag-w" href="https://wa.me/'+ph+'" target="_blank">💬 واتساب</a><a class="ag-btn ag-c" href="tel:+('+ph+')">📞 اتصال</a>':'')+'</div></div>';
-  html+='<div class="dacts"><button class="dbt p" onclick="openAR()">🥽 معاينة AR</button><button class="dbt s" onclick="openAVM(currentDetail)">🧮 قيمة تقديرية</button><button class="dbt s" onclick="openAIP(currentDetail)">🤖 تحليل السعر</button>'+(p.lat&&p.lng?'<button class="dbt s" onclick="open3D(currentDetail)">🏗️ عرض 3D</button>':'')+'<button class="dbt s" onclick="shareProp('+p.id+')">📤 مشاركة</button><button class="dbt d" onclick="reportAd('+p.id+')">🚩 بلاغ</button></div>';
+  html+='<div class="dacts"><button class="dbt p" onclick="openAR(currentDetail)">🥽 معاينة AR</button><button class="dbt s" onclick="openAVM(currentDetail)">🧮 قيمة تقديرية</button><button class="dbt s" onclick="openAIP(currentDetail)">🤖 تحليل السعر</button>'+(p.lat&&p.lng?'<button class="dbt s" onclick="open3D(currentDetail)">🏗️ عرض 3D</button>':'')+'<button class="dbt s" onclick="shareProp('+p.id+')">📤 مشاركة</button><button class="dbt d" onclick="reportAd('+p.id+')">🚩 بلاغ</button></div>';
   document.getElementById('ovp').innerHTML=html;
   document.getElementById('ov').classList.add('open');
   document.body.style.overflow='hidden';
@@ -1693,7 +1693,7 @@ function showDetail(id){
   var advId=p.agentUserId||(p.agent&&p.agent.id);
   if(advId)fetchAdvertiserRating(advId,p.id);
 }
-function openAR(){window.open('/ar-preview/','_blank','noopener')}
+function openAR(p){var im=p&&(p.images&&p.images[0]||pFallback(p))||'';window.open('/ar-preview/?img='+encodeURIComponent(im),'_blank','noopener')}
 function renderDetailAVM(p){
   var el=document.getElementById('avm-chip-'+(p&&p.id));
   if(!el)return;

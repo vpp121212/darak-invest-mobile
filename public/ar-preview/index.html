@@ -45,7 +45,7 @@ canvas{display:block}
   <div class="bottom">
     <div class="panel">
       <div class="status" id="status">🎯 وجّه الكاميرا نحو أرضية مسطحة ثم اضغط</div>
-      <div class="room" id="roomLabel">الغرفة الحالية: غرفة المعيشة 🏠</div>
+      <div class="room" id="roomLabel">جارٍ التحميل…</div>
       <button id="btnStart">🚀 ابدأ المعاينة AR</button>
     </div>
   </div>
@@ -68,17 +68,23 @@ const unsupported = document.getElementById('unsupported');
 const ROOM_A = 'roomA.gltf';
 const ROOM_B = 'roomB.gltf';
 const ROOM_SCALE = 0.55;
+const adImg = new URLSearchParams(location.search).get('img');
 
 let renderer, scene, camera, controls, arController;
 let arSupported = false, arSession = null, hitTestSource = null, referenceSpace = null;
 let lastHit = null, hasHit = false;
 
 let currentRoom = null;
-let showingRoomA = true;
+let currentIdx = 0;
 let busy = false;
 
+const contents = [];
+if (adImg) contents.push({ label: 'صورة العقار 🖼️', build: buildBillboard });
+contents.push({ label: 'غرفة المعيشة 🏠', build: () => loadRoom(ROOM_A) });
+contents.push({ label: 'غرفة النوم 🛏️', build: () => loadRoom(ROOM_B) });
+
 function status(m){ statusEl.innerHTML = m; }
-function roomLabel(){ roomLabelEl.textContent = 'الغرفة الحالية: ' + (showingRoomA ? 'غرفة المعيشة 🏠' : 'غرفة النوم 🛏️'); }
+function roomLabel(){ roomLabelEl.textContent = 'المعروض الآن: ' + contents[currentIdx].label; }
 
 function setupScene(){
   scene = new THREE.Scene();
@@ -133,6 +139,21 @@ async function loadRoom(url){
   return model;
 }
 
+async function buildBillboard(){
+  const tex = await new THREE.TextureLoader().loadAsync(new URL(adImg, location.origin).href);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  const i = tex.image;
+  const aspect = i && i.width && i.height ? i.width/i.height : 1.6;
+  const h = 1.7, w = h*aspect;
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthWrite: false }));
+  sprite.scale.set(w, h, 1);
+  sprite.position.y = h/2;
+  const g = new THREE.Group();
+  g.add(sprite);
+  return g;
+}
+
 function placeRoom(model, position, yaw){
   currentRoom = model.clone();
   currentRoom.position.copy(position);
@@ -158,19 +179,20 @@ async function placeOrSwitch(pos, yaw){
   if (busy) return;
   busy = true;
   if (!currentRoom){
-    placeRoom(roomA, pos, yaw);
-    showingRoomA = true;
+    placeRoom(contents[0].model, pos, yaw);
+    currentIdx = 0;
     roomLabel();
-    status('تم وضع غرفة المعيشة — اضغط مرة أخرى للتبديل إلى غرفة النوم');
+    status('تم وضع ' + contents[0].label + ' — اضغط مرة أخرى للتبديل');
   } else {
-    const next = showingRoomA ? roomB : roomA;
+    const nextIdx = (currentIdx + 1) % contents.length;
+    const nextLabel = contents[nextIdx].label;
     await fadeTo(1, 250);
     removeRoom();
-    placeRoom(next, pos, yaw);
-    showingRoomA = !showingRoomA;
+    placeRoom(contents[nextIdx].model, pos, yaw);
+    currentIdx = nextIdx;
     roomLabel();
     await fadeTo(0, 250);
-    status(showingRoomA ? 'غرفة المعيشة — اضغط للتبديل إلى غرفة النوم' : 'غرفة النوم — اضغط للتبديل إلى غرفة المعيشة');
+    status(nextLabel + ' — اضغط للتبديل إلى ' + contents[(nextIdx + 1) % contents.length].label);
   }
   busy = false;
 }
@@ -181,7 +203,7 @@ async function reset(){
   removeRoom();
   const glow = scene.getObjectByName('glow');
   if (glow) glow.visible = false;
-  showingRoomA = true;
+  currentIdx = 0;
   roomLabel();
   await fadeTo(0, 150);
   status('وجّه الكاميرا نحو أرضية مسطحة ثم اضغط');
@@ -205,7 +227,7 @@ function initDesktop(){
     const yaw = camera.rotation.y + Math.PI;
     placeOrSwitch(p, yaw);
   });
-  status('اضغط على الأرضية لوضع الغرفة، واضغط للتبديل بين الغرفتين');
+  status('اضغط على الأرضية لوضع المحتوى، واضغط للتبديل بين الصورة والغرفتين');
 }
 
 /* ---------- AR (WebXR) mode ---------- */
@@ -292,8 +314,8 @@ function animate(){
 /* ---------- boot ---------- */
 (async () => {
   setupScene();
-  const [roomA, roomB] = await Promise.all([loadRoom(ROOM_A), loadRoom(ROOM_B)]);
-  window.roomA = roomA; window.roomB = roomB;
+  for (const c of contents){ c.model = await c.build(); }
+  roomLabel();
   arSupported = !!(navigator.xr && await navigator.xr.isSessionSupported('immersive-ar').catch(() => false));
   if (arSupported) initAR(); else initDesktop();
   animate();
