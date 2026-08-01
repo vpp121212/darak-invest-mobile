@@ -1285,8 +1285,10 @@
 
 <script>
 var A=[],F=JSON.parse(localStorage.getItem('darak_favs')||'[]'),cur='',user=null,mapInstance=null,currentDetailImages=[];
-var API=(location.port==='5000'||location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.protocol==='https:'||location.hostname.indexOf('trycloudflare')>-1)?(location.origin+'/api'):'http://'+location.hostname+':5000/api';
-if(window.location.protocol==='file:')API='http://172.20.10.3:5000/api';
+var API='https://darak-invest-backend-j6hy.onrender.com/api';
+if(location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.port==='5000'||location.hostname.indexOf('trycloudflare')>-1){API=location.origin+'/api';}
+if(location.hostname==='darak-invest-backend-j6hy.onrender.com'){API=location.origin+'/api';}
+if(window.location.protocol==='file:'){API='http://172.20.10.3:5000/api';}
 var authToken=localStorage.getItem('darak_token')||null;
 
 function fmtErr(d){
@@ -3163,6 +3165,9 @@ async function runMktDesc(){
     var el=document.getElementById('mktDescResult');el.style.display='block';
     el.innerHTML='<div class="mkt-result">'+(d.description||'لم يتم التوليد')+'</div><div style="margin-top:10px;display:flex;gap:8px"><button class="fin-run" style="flex:1;font-size:12px" onclick="navigator.clipboard.writeText(document.querySelector(\'.mkt-result\').textContent);toast(\'تم النسخ ✓\')">📋 نسخ</button><button class="fin-run" style="flex:1;font-size:12px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff" onclick="navigator.share?navigator.share({text:document.querySelector(\'.mkt-result\').textContent}):toast(\'تم النسخ ✓\')">📤 مشاركة</button></div>';
     if(d.seoAnalysis){el.innerHTML+='<div class="fin-ai-box" style="margin-top:10px">📊 تحليل SEO:\n'+d.seoAnalysis+'</div>'}
+  } else if(d&&d.error){
+    var el=document.getElementById('mktDescResult');el.style.display='block';
+    el.innerHTML='<div class="mkt-result" style="color:var(--red);border-color:rgba(239,68,68,.4)">⚠️ تعذر التوليد: '+d.error+'</div>';
   }
 }
 async function runSeo(){

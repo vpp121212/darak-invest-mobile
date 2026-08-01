@@ -58,6 +58,9 @@ const io = new Server(httpServer, { cors: { origin: '*' } });
   // Body parser (must be before security middleware)
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+
+  // Cross-origin access (web preview on GitHub Pages / other hosts)
+  app.use(cors());
   
   // Apply security middleware (includes helmet)
   securityMiddleware(app);

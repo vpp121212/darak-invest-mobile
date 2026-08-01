@@ -25,6 +25,29 @@ async function askAI(systemPrompt, userMessage) {
   } catch (e) { console.error('AI Error:', e); return null; }
 }
 
+function buildFallbackDescription(data) {
+  const { title, type, purpose, city, district, area, rooms, baths, cars, facing, features, price, style } = data;
+  const styleLabel = style === 'عاطفي' ? 'مثالي للعائلة التي تبحث عن الدفء والراحة' : style === 'استثماري' ? 'فرصة استثمارية واعدة بعائد ممتاز' : 'بتصميم يلبي أرقى معايير الجودة والأناقة';
+  const name = title || (type ? `عقار ${type}` : 'عقار');
+  const lines = [];
+  lines.push(`${name} في ${[district, city].filter(Boolean).join('، ')} ${styleLabel}.`);
+
+  const specs = [];
+  if (area) specs.push(`مساحة ${area} م²`);
+  if (rooms) specs.push(`${rooms} غرف نوم`);
+  if (baths) specs.push(`${baths} حمامات`);
+  if (cars) specs.push(`${cars} مواقف`);
+  if (facing) specs.push(`واجهة ${facing}`);
+  if (specs.length) lines.push(`المميزات الرئيسية: ${specs.join(' · ')}.`);
+
+  if (features && features.length) lines.push(`يتميز العقار بـ ${features.join('، ')}.`);
+
+  if (price) lines.push(`السعر: ${price.toLocaleString('en-US')} ر.س${purpose === 'إيجار' ? ' / شهرياً' : ''}`);
+
+  lines.push('لمزيد من التفاصيل أو لترتيب معاينة، تواصل معنا الآن — فريق دارك وحيك جاهز لخدمتكم.');
+  return lines.join('\n');
+}
+
 router.post('/description', async (req, res) => {
   try {
     const { title, type, purpose, city, district, area, rooms, baths, cars, facing, features, price, description, style } = req.body;
@@ -43,7 +66,7 @@ router.post('/description', async (req, res) => {
 السعر: ${price?.toLocaleString()} ر.س | المميزات: ${features?.join('، ') || 'لا توجد'}
 الوصف الحالي: ${description || 'لا يوجد'}`;
 
-    const aiDescription = await askAI(systemPrompt, userMsg);
+    const aiDescription = await askAI(systemPrompt, userMsg) || buildFallbackDescription(req.body);
 
     let seoAnalysis = null;
     if (aiDescription) {
