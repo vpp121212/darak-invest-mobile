@@ -98,6 +98,38 @@ class Property {
     return price.toStringAsFixed(0);
   }
 
+  String get mainImage => images.isNotEmpty ? images.first : '';
+
+  Property copyWith({List<String>? images}) {
+    return Property(
+      id: id,
+      title: title,
+      type: type,
+      loc: loc,
+      district: district,
+      city: city,
+      price: price,
+      rooms: rooms,
+      baths: baths,
+      cars: cars,
+      area: area,
+      year: year,
+      age: age,
+      status: status,
+      lat: lat,
+      lng: lng,
+      street: street,
+      streetW: streetW,
+      facing: facing,
+      purpose: purpose,
+      desc: desc,
+      images: images ?? this.images,
+      features: features,
+      trust: trust,
+      agent: agent,
+    );
+  }
+
   factory Property.fromJson(Map<String, dynamic> json) {
     return Property(
       id: json['_id'] ?? json['id'] ?? '',

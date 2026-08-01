@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'theme/app_theme.dart';
-import 'services/auth_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void main() async {
+import 'screens/ai/estimate_screen.dart';
+import 'screens/ai/pulse_screen.dart';
+import 'screens/ai/roi_screen.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/auth/register_screen.dart';
+import 'screens/root/app_shell.dart';
+import 'theme/app_theme.dart';
+
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
   ));
-  runApp(const DarakApp());
+  runApp(const ProviderScope(child: DarakApp()));
 }
 
 class DarakApp extends StatelessWidget {
@@ -18,32 +24,28 @@ class DarakApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AuthService()..init(),
-      child: MaterialApp(
-        title: 'دارك وحيك',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.theme,
-        locale: const Locale('ar', 'SA'),
-        supportedLocales: const [
-          Locale('ar', 'SA'),
-        ],
-        localizationsDelegates: const [
-          DefaultMaterialLocalizations.delegate,
-          DefaultWidgetsLocalizations.delegate,
-        ],
-        builder: (context, child) {
-          return Directionality(
-            textDirection: TextDirection.rtl,
-            child: child!,
-          );
-        },
-        home: const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(color: AppTheme.gold),
-          ),
-        ),
+    return MaterialApp(
+      title: 'دارك وحيك',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.theme,
+      locale: const Locale('ar', 'SA'),
+      supportedLocales: const [Locale('ar', 'SA')],
+      localizationsDelegates: const [
+        DefaultMaterialLocalizations.delegate,
+        DefaultWidgetsLocalizations.delegate,
+      ],
+      builder: (context, child) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: child!,
       ),
+      home: const AppShell(),
+      routes: {
+        '/login': (_) => const LoginScreen(),
+        '/register': (_) => const RegisterScreen(),
+        '/estimate': (_) => const EstimateScreen(),
+        '/roi': (_) => const RoiScreen(),
+        '/pulse': (_) => const PulseScreen(),
+      },
     );
   }
 }

@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-const Color bgDark = Color(0xFF020617);
-const Color gold = Color(0xFFD4AF37);
-const Color cardDark = Color(0xFF0F172A);
-const Color textMuted = Color(0xFF94A3B8);
+import '../theme/app_theme.dart';
 
 class BottomNav extends StatelessWidget {
   final int currentIndex;

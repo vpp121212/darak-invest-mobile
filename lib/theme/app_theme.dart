@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 
-class AppTheme {
-  static const Color bgDark = Color(0xFF020617);
-  static const Color cardDark = Color(0xFF0F172A);
-  static const Color gold = Color(0xFFD4AF37);
-  static const Color goldLight = Color(0xFFF5D47B);
-  static const Color green = Color(0xFF22C55E);
-  static const Color blue = Color(0xFF3B82F6);
+import '../core/theme/app_colors.dart';
 
+/// Global palette aliases (single source of truth).
+const Color bgDark = AppColors.bgDark;
+const Color cardDark = AppColors.cardDark;
+const Color gold = AppColors.gold;
+const Color goldLight = AppColors.goldLight;
+const Color green = AppColors.green;
+const Color blue = AppColors.blue;
+const Color textLight = AppColors.textLight;
+const Color textMuted = AppColors.textMuted;
+
+class AppTheme {
   static ThemeData theme = ThemeData(
     scaffoldBackgroundColor: bgDark,
     brightness: Brightness.dark,
@@ -20,6 +25,7 @@ class AppTheme {
       backgroundColor: bgDark,
       elevation: 0,
       centerTitle: true,
+      iconTheme: IconThemeData(color: textMuted),
     ),
     cardTheme: CardThemeData(
       color: cardDark,
@@ -52,6 +58,10 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       ),
+    ),
+    snackBarTheme: const SnackBarThemeData(
+      backgroundColor: cardDark,
+      contentTextStyle: TextStyle(color: textLight),
     ),
   );
 }

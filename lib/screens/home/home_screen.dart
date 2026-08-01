@@ -1,248 +1,168 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-const Color bgDark = Color(0xFF020617);
-const Color gold = Color(0xFFD4AF37);
-const Color cardDark = Color(0xFF0F172A);
-const Color textLight = Color(0xFFF8FAFC);
-const Color textMuted = Color(0xFF94A3B8);
+import '../../models/property.dart';
+import '../../providers/properties_provider.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/property_card.dart';
+import '../property/property_detail_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
+
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  int _currentTab = 0;
-  int _currentNav = 0;
-  final List<String> _tabs = ['بيع', 'إيجار', 'مزاد'];
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  String _purpose = 'الكل';
   String? _selectedCity;
   String? _selectedType;
-
-  final List<Map<String, dynamic>> _properties = const [
-    {
-      'id': 1,
-      'title': 'فيلا فاخرة حي النرجس',
-      'price': 2500000,
-      'city': 'الرياض',
-      'district': 'حي النرجس',
-      'rooms': 6,
-      'baths': 4,
-      'area': 450,
-      'image': 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800',
-      'purpose': 'بيع',
-      'type': 'فيلا',
-      'trusted': true,
-      'agent': 'أحمد العلي',
-    },
-    {
-      'id': 2,
-      'title': 'شقة أنيقة حي الملقا',
-      'price': 850000,
-      'city': 'الرياض',
-      'district': 'حي الملقا',
-      'rooms': 3,
-      'baths': 2,
-      'area': 180,
-      'image': 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800',
-      'purpose': 'بيع',
-      'type': 'شقة',
-      'trusted': true,
-      'agent': 'محمد السالم',
-    },
-    {
-      'id': 3,
-      'title': 'دوبلكس حي الياسمين',
-      'price': 12000,
-      'city': 'جدة',
-      'district': 'حي الياسمين',
-      'rooms': 4,
-      'baths': 3,
-      'area': 250,
-      'image': 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800',
-      'purpose': 'إيجار',
-      'type': 'دوبلكس',
-      'trusted': false,
-      'agent': 'فهد المطيري',
-    },
-    {
-      'id': 4,
-      'title': 'مكتب تجاري حي العليا',
-      'price': 3500000,
-      'city': 'الرياض',
-      'district': 'حي العليا',
-      'rooms': 8,
-      'baths': 4,
-      'area': 500,
-      'image': 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800',
-      'purpose': 'بيع',
-      'type': 'مكتب',
-      'trusted': true,
-      'agent': 'خالد الشمري',
-    },
-    {
-      'id': 5,
-      'title': 'استوديو حي الحمراء',
-      'price': 4500,
-      'city': 'جدة',
-      'district': 'حي الحمراء',
-      'rooms': 1,
-      'baths': 1,
-      'area': 65,
-      'image': 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800',
-      'purpose': 'إيجار',
-      'type': 'استوديو',
-      'trusted': false,
-      'agent': 'سعود الحربي',
-    },
-    {
-      'id': 6,
-      'title': 'فيلا عصرية حي الراكة',
-      'price': 4200000,
-      'city': 'الدمام',
-      'district': 'حي الراكة',
-      'rooms': 7,
-      'baths': 5,
-      'area': 600,
-      'image': 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800',
-      'purpose': 'بيع',
-      'type': 'فيلا',
-      'trusted': true,
-      'agent': 'عبدالله القحطاني',
-    },
-  ];
-
-  final List<Map<String, String>> _sections = const [
-    {'icon': '🏠', 'label': 'بيع'},
-    {'icon': '🔑', 'label': 'إيجار'},
-    {'icon': '🏢', 'label': 'مكاتب'},
-    {'icon': '🤝', 'label': 'وسطاء'},
-    {'icon': '🏷️', 'label': 'مزادات'},
-  ];
-
-  String _formatPrice(int price) {
-    return price.toString().replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
-  }
+  final List<String> _purposes = ['الكل', 'بيع', 'إيجار'];
+  static const _cities = ['الرياض', 'جدة', 'مكة', 'الدمام', 'الخبر'];
+  static const _types = ['فيلا', 'شقة', 'دوبلكس', 'مكتب', 'استوديو', 'أرض', 'عمارة'];
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: bgDark,
-        appBar: AppBar(
-          backgroundColor: bgDark,
-          elevation: 0,
-          centerTitle: true,
-          title: Text(
-            'دارك وحيك',
-            style: GoogleFonts.cairo(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: gold,
-            ),
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.notifications_outlined, color: textMuted),
-              onPressed: () {},
-            ),
-          ],
+    final propertiesAsync = ref.watch(propertiesProvider);
+
+    return Scaffold(
+      backgroundColor: bgDark,
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(
+          'دارك وحيك',
+          style: GoogleFonts.cairo(fontSize: 28, fontWeight: FontWeight.bold, color: gold),
         ),
-        body: RefreshIndicator(
-          onRefresh: () async => setState(() {}),
-          color: gold,
-          backgroundColor: cardDark,
-          child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            children: [
-              const SizedBox(height: 12),
-              _buildSearchBar(),
-              const SizedBox(height: 16),
-              _buildFilterRow(),
-              const SizedBox(height: 20),
-              _buildSectionsBar(),
-              const SizedBox(height: 20),
-              _buildPropertiesHeader(),
-              const SizedBox(height: 12),
-              ..._properties.map((p) => _buildPropertyCard(p)),
-              const SizedBox(height: 20),
-            ],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined, color: textMuted),
+            onPressed: () => _showComingSoon('الإشعارات'),
           ),
+        ],
+      ),
+      body: RefreshIndicator(
+        color: gold,
+        backgroundColor: cardDark,
+        onRefresh: () => ref.read(propertiesProvider.notifier).load(),
+        child: propertiesAsync.when(
+          loading: () => const _HomeSkeleton(),
+          error: (e, _) => _HomeError(message: e.toString(), onRetry: () => ref.read(propertiesProvider.notifier).load()),
+          data: (properties) {
+            final filtered = _applyFilters(properties);
+            return ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              children: [
+                const SizedBox(height: 12),
+                _buildSearchBar(),
+                const SizedBox(height: 12),
+                _buildPurposeTabs(),
+                const SizedBox(height: 16),
+                _buildFilterRow(),
+                const SizedBox(height: 20),
+                _buildAiToolsRow(),
+                const SizedBox(height: 20),
+                _buildHeader('أحدث العقارات', properties.length),
+                const SizedBox(height: 12),
+                if (filtered.isEmpty)
+                  const _EmptyState()
+                else
+                  ...filtered.map((p) => PropertyCard(
+                        property: p,
+                        onTap: () => _openDetail(p),
+                      )),
+                const SizedBox(height: 20),
+              ],
+            );
+          },
         ),
-        bottomNavigationBar: _buildBottomNav(),
       ),
     );
   }
 
+  List<Property> _applyFilters(List<Property> all) {
+    return all.where((p) {
+      if (_purpose != 'الكل' && p.purpose != _purpose) return false;
+      if (_selectedCity != null && p.city != _selectedCity) return false;
+      if (_selectedType != null && p.type != _selectedType) return false;
+      return true;
+    }).toList();
+  }
+
+  void _openDetail(Property property) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => PropertyDetailScreen(property: property)),
+    );
+  }
+
+  void _showComingSoon(String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$feature — قريباً', style: GoogleFonts.cairo())),
+    );
+  }
+
   Widget _buildSearchBar() {
-    return Column(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: cardDark,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: gold.withOpacity(0.3)),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  child: Row(
-                    children: [
-                      Icon(Icons.search, color: textMuted, size: 22),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          'ابحث عن عقارك المثالي...',
-                          style: GoogleFonts.cairo(color: textMuted, fontSize: 15),
-                        ),
-                      ),
-                    ],
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, '/search'),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: cardDark,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: gold.withOpacity(0.3)),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.search, color: textMuted, size: 22),
+            const SizedBox(width: 10),
+            Text('ابحث عن عقارك المثالي...', style: GoogleFonts.cairo(color: textMuted, fontSize: 15)),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: gold.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text('بحث', style: GoogleFonts.cairo(color: gold, fontSize: 12, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPurposeTabs() {
+    return Row(
+      children: List.generate(_purposes.length, (index) {
+        final purpose = _purposes[index];
+        final isSelected = _purpose == purpose;
+        return Expanded(
+          child: GestureDetector(
+            onTap: () => setState(() => _purpose = purpose),
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                color: isSelected ? gold : cardDark,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: isSelected ? gold : textMuted.withOpacity(0.2)),
+              ),
+              child: Center(
+                child: Text(
+                  purpose,
+                  style: GoogleFonts.cairo(
+                    color: isSelected ? bgDark : textMuted,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
                   ),
                 ),
               ),
-            ],
+            ),
           ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: List.generate(_tabs.length, (index) {
-            final isSelected = _currentTab == index;
-            return Expanded(
-              child: GestureDetector(
-                onTap: () => setState(() => _currentTab = index),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: isSelected ? gold : cardDark,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isSelected ? gold : textMuted.withOpacity(0.2),
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      _tabs[index],
-                      style: GoogleFonts.cairo(
-                        color: isSelected ? bgDark : textMuted,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }),
-        ),
-      ],
+        );
+      }),
     );
   }
 
@@ -254,20 +174,18 @@ class _HomeScreenState extends State<HomeScreen> {
           _buildFilterChip(
             icon: Icons.location_city,
             label: _selectedCity ?? 'المدينة',
-            onTap: () => _showCityPicker(),
+            onTap: () => _showPicker('اختر المدينة', _cities, (v) => setState(() => _selectedCity = v)),
           ),
           const SizedBox(width: 8),
           _buildFilterChip(
             icon: Icons.home_outlined,
             label: _selectedType ?? 'النوع',
-            onTap: () => _showTypePicker(),
+            onTap: () => _showPicker('اختر النوع', _types, (v) => setState(() => _selectedType = v)),
           ),
-          const SizedBox(width: 8),
-          _buildFilterChip(
-            icon: Icons.attach_money,
-            label: 'نطاق السعر',
-            onTap: () {},
-          ),
+          if (_selectedCity != null || _selectedType != null) ...[
+            const SizedBox(width: 8),
+            _buildClearFiltersChip(),
+          ],
         ],
       ),
     );
@@ -294,324 +212,195 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(width: 6),
             Text(label, style: GoogleFonts.cairo(color: textLight, fontSize: 13)),
             const SizedBox(width: 4),
-            Icon(Icons.arrow_drop_down, size: 18, color: textMuted),
+            const Icon(Icons.arrow_drop_down, size: 18, color: textMuted),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSectionsBar() {
-    return SizedBox(
-      height: 90,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _sections.length,
-        itemBuilder: (context, index) {
-          return Container(
-            width: 72,
-            margin: const EdgeInsets.only(left: 10),
-            decoration: BoxDecoration(
-              color: cardDark,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: gold.withOpacity(0.15)),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(_sections[index]['icon']!, style: const TextStyle(fontSize: 28)),
-                const SizedBox(height: 8),
-                Text(
-                  _sections[index]['label']!,
-                  style: GoogleFonts.cairo(color: textLight, fontSize: 12, fontWeight: FontWeight.w600),
-                ),
-              ],
-            ),
-          );
-        },
+  Widget _buildClearFiltersChip() {
+    return GestureDetector(
+      onTap: () => setState(() {
+        _selectedCity = null;
+        _selectedType = null;
+      }),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.red.withOpacity(0.12),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.red.withOpacity(0.4)),
+        ),
+        child: Text('مسح الفلاتر', style: GoogleFonts.cairo(color: Colors.red, fontSize: 13)),
       ),
     );
   }
 
-  Widget _buildPropertiesHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          'أحدث العقارات',
-          style: GoogleFonts.cairo(color: textLight, fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        TextButton(
-          onPressed: () {},
-          child: Text('عرض الكل', style: GoogleFonts.cairo(color: gold, fontSize: 14)),
-        ),
-      ],
+  void _showPicker(String title, List<String> items, ValueChanged<String> onSelected) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: cardDark,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 12),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(color: textMuted, borderRadius: BorderRadius.circular(2)),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(title, style: GoogleFonts.cairo(color: gold, fontSize: 18, fontWeight: FontWeight.bold)),
+          ),
+          ...items.map((item) => ListTile(
+                title: Text(item, style: GoogleFonts.cairo(color: textLight)),
+                trailing: _selectedCity == item || _selectedType == item
+                    ? const Icon(Icons.check, color: gold)
+                    : null,
+                onTap: () {
+                  onSelected(item);
+                  Navigator.pop(ctx);
+                },
+              )),
+          const SizedBox(height: 16),
+        ],
+      ),
     );
   }
 
-  Widget _buildPropertyCard(Map<String, dynamic> property) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, '/property-detail', arguments: property);
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        decoration: BoxDecoration(
-          color: cardDark,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: textMuted.withOpacity(0.1)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                  child: Image.network(
-                    property['image'],
-                    height: 180,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (c, e, s) => Container(
-                      height: 180,
-                      color: cardDark,
-                      child: const Icon(Icons.home, size: 50, color: textMuted),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 10,
-                  right: 10,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: property['purpose'] == 'بيع' ? gold : const Color(0xFF1E40AF),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      property['purpose'],
-                      style: GoogleFonts.cairo(
-                        color: property['purpose'] == 'بيع' ? bgDark : textLight,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                if (property['trusted'])
-                  Positioned(
-                    top: 10,
-                    left: 10,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF059669),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.verified, size: 14, color: Colors.white),
-                          const SizedBox(width: 4),
-                          Text(
-                            'موثق',
-                            style: GoogleFonts.cairo(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(14),
+  Widget _buildAiToolsRow() {
+    final tools = [
+      ('تقدير السعر', Icons.calculate_outlined, '/estimate'),
+      ('نبض الحي', Icons.location_city, '/pulse'),
+      ('حاسبة ROI', Icons.trending_up, '/roi'),
+    ];
+    return Row(
+      children: tools.map((tool) {
+        return Expanded(
+          child: GestureDetector(
+            onTap: () => Navigator.pushNamed(context, tool.$3),
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              decoration: BoxDecoration(
+                color: cardDark,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: gold.withOpacity(0.25)),
+              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    property['title'],
-                    style: GoogleFonts.cairo(color: textLight, fontSize: 16, fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Icon(Icons.location_on, size: 16, color: gold),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${property['district']}، ${property['city']}',
-                        style: GoogleFonts.cairo(color: textMuted, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      _buildSpec(Icons.king_bed, '${property['rooms']} غرف'),
-                      const SizedBox(width: 14),
-                      _buildSpec(Icons.bathtub_outlined, '${property['baths']} حمام'),
-                      const SizedBox(width: 14),
-                      _buildSpec(Icons.square_foot, '${property['area']} م²'),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${_formatPrice(property['price'])} ${property['purpose'] == 'إيجار' ? 'ر.س/شهر' : 'ر.س'}',
-                        style: GoogleFonts.cairo(color: gold, fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        'الوكيل: ${property['agent']}',
-                        style: GoogleFonts.cairo(color: textMuted, fontSize: 12),
-                      ),
-                    ],
-                  ),
+                  Icon(tool.$2, color: gold, size: 24),
+                  const SizedBox(height: 8),
+                  Text(tool.$1, style: GoogleFonts.cairo(color: textLight, fontSize: 12, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      }).toList(),
     );
   }
 
-  Widget _buildSpec(IconData icon, String text) {
+  Widget _buildHeader(String title, int count) {
     return Row(
-      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Icon(icon, size: 16, color: textMuted),
-        const SizedBox(width: 4),
-        Text(text, style: GoogleFonts.cairo(color: textMuted, fontSize: 12)),
+        Text(title, style: GoogleFonts.cairo(color: textLight, fontSize: 20, fontWeight: FontWeight.bold)),
+        Text('$count عقار', style: GoogleFonts.cairo(color: textMuted, fontSize: 13)),
       ],
     );
   }
+}
 
-  void _showCityPicker() {
-    final cities = ['الرياض', 'جدة', 'الدمام', 'مكة', 'المدينة', 'الظهران', 'الأحساء'];
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: cardDark,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(color: textMuted, borderRadius: BorderRadius.circular(2)),
+class _HomeSkeleton extends StatelessWidget {
+  const _HomeSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        for (var i = 0; i < 4; i++)
+          Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            height: 320,
+            decoration: BoxDecoration(
+              color: cardDark,
+              borderRadius: BorderRadius.circular(16),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text('اختر المدينة', style: GoogleFonts.cairo(color: gold, fontSize: 18, fontWeight: FontWeight.bold)),
+            child: Center(
+              child: CircularProgressIndicator(color: gold.withOpacity(0.4), strokeWidth: 2),
             ),
-            ...cities.map((city) => ListTile(
-                  title: Text(city, style: GoogleFonts.cairo(color: textLight)),
-                  trailing: _selectedCity == city ? Icon(Icons.check, color: gold) : null,
-                  onTap: () {
-                    setState(() => _selectedCity = city);
-                    Navigator.pop(ctx);
-                  },
-                )),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
+          ),
+      ],
     );
   }
+}
 
-  void _showTypePicker() {
-    final types = ['فيلا', 'شقة', 'دوبلكس', 'مكتب', 'استوديو', 'أرض', 'عمارة'];
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: cardDark,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(color: textMuted, borderRadius: BorderRadius.circular(2)),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text('اختر النوع', style: GoogleFonts.cairo(color: gold, fontSize: 18, fontWeight: FontWeight.bold)),
-            ),
-            ...types.map((type) => ListTile(
-                  title: Text(type, style: GoogleFonts.cairo(color: textLight)),
-                  trailing: _selectedType == type ? Icon(Icons.check, color: gold) : null,
-                  onTap: () {
-                    setState(() => _selectedType = type);
-                    Navigator.pop(ctx);
-                  },
-                )),
-            const SizedBox(height: 16),
-          ],
+class _HomeError extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _HomeError({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(32),
+      children: [
+        const SizedBox(height: 80),
+        const Icon(Icons.cloud_off, size: 60, color: textMuted),
+        const SizedBox(height: 16),
+        Text(
+          'تعذّر تحميل العقارات',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold),
         ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNav() {
-    final items = [
-      {'icon': Icons.home, 'label': 'الرئيسية'},
-      {'icon': Icons.search, 'label': 'بحث'},
-      {'icon': Icons.add_circle_outline, 'label': 'إضافة'},
-      {'icon': Icons.dashboard_outlined, 'label': 'لوحة التحكم'},
-      {'icon': Icons.person_outline, 'label': 'حسابي'},
-    ];
-
-    return Container(
-      decoration: BoxDecoration(
-        color: cardDark,
-        border: Border(top: BorderSide(color: textMuted.withOpacity(0.1))),
-      ),
-      child: SafeArea(
-        child: SizedBox(
-          height: 70,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(items.length, (index) {
-              final isActive = _currentNav == index;
-              return GestureDetector(
-                onTap: () => setState(() => _currentNav = index),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      items[index]['icon'] as IconData,
-                      color: isActive ? gold : textMuted,
-                      size: index == 2 ? 36 : 24,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      items[index]['label'] as String,
-                      style: GoogleFonts.cairo(
-                        color: isActive ? gold : textMuted,
-                        fontSize: 11,
-                        fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
+        const SizedBox(height: 8),
+        Text(
+          message,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.cairo(color: textMuted, fontSize: 13),
+        ),
+        const SizedBox(height: 24),
+        Center(
+          child: GestureDetector(
+            onTap: onRetry,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+              decoration: BoxDecoration(
+                color: gold,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Text('إعادة المحاولة', style: GoogleFonts.cairo(color: bgDark, fontSize: 15, fontWeight: FontWeight.bold)),
+            ),
           ),
         ),
+      ],
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 40),
+      child: Column(
+        children: [
+          const Icon(Icons.search_off, size: 60, color: textMuted),
+          const SizedBox(height: 12),
+          Text('لا توجد عقارات مطابقة', style: GoogleFonts.cairo(color: textLight, fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 6),
+          Text('جرّب تغيير الفلاتر', style: GoogleFonts.cairo(color: textMuted, fontSize: 13)),
+        ],
       ),
     );
   }

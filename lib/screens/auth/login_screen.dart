@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-const Color bgDark = Color(0xFF020617);
-const Color gold = Color(0xFFD4AF37);
-const Color cardDark = Color(0xFF0F172A);
-const Color textLight = Color(0xFFF8FAFC);
-const Color textMuted = Color(0xFF94A3B8);
+import '../../providers/auth_provider.dart';
+import '../../theme/app_theme.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
+
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -29,43 +27,48 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
-    if (mounted) {
-      setState(() => _isLoading = false);
+    FocusScope.of(context).unfocus();
+    final success = await ref.read(authProvider.notifier).login(
+          _emailController.text.trim(),
+          _passwordController.text,
+        );
+    if (success && mounted) {
       Navigator.pushReplacementNamed(context, '/dashboard');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: bgDark,
-        body: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildLogo(),
-                  const SizedBox(height: 40),
-                  _buildTitle(),
-                  const SizedBox(height: 40),
-                  _buildEmailField(),
-                  const SizedBox(height: 16),
-                  _buildPasswordField(),
-                  const SizedBox(height: 10),
-                  _buildForgotPassword(),
-                  const SizedBox(height: 24),
-                  _buildLoginButton(),
-                  const SizedBox(height: 24),
-                  _buildRegisterLink(),
+    final auth = ref.watch(authProvider);
+
+    return Scaffold(
+      backgroundColor: bgDark,
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildLogo(),
+                const SizedBox(height: 40),
+                _buildTitle(),
+                const SizedBox(height: 40),
+                _buildEmailField(),
+                const SizedBox(height: 16),
+                _buildPasswordField(),
+                const SizedBox(height: 10),
+                _buildForgotPassword(),
+                if (auth.error != null) ...[
+                  const SizedBox(height: 8),
+                  _buildError(auth.error!),
                 ],
-              ),
+                const SizedBox(height: 24),
+                _buildLoginButton(auth.isLoading),
+                const SizedBox(height: 24),
+                _buildRegisterLink(),
+              ],
             ),
           ),
         ),
@@ -110,25 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
       controller: _emailController,
       keyboardType: TextInputType.emailAddress,
       style: GoogleFonts.cairo(color: textLight),
-      decoration: InputDecoration(
-        hintText: 'البريد الإلكتروني',
-        hintStyle: GoogleFonts.cairo(color: textMuted),
-        prefixIcon: const Icon(Icons.email_outlined, color: textMuted),
-        filled: true,
-        fillColor: cardDark,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: textMuted.withOpacity(0.2)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: textMuted.withOpacity(0.2)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: gold),
-        ),
-      ),
+      decoration: _inputDecoration('البريد الإلكتروني', Icons.email_outlined),
       validator: (val) {
         if (val == null || val.isEmpty) return 'البريد الإلكتروني مطلوب';
         if (!val.contains('@')) return 'البريد الإلكتروني غير صحيح';
@@ -142,10 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
       controller: _passwordController,
       obscureText: _obscurePassword,
       style: GoogleFonts.cairo(color: textLight),
-      decoration: InputDecoration(
-        hintText: 'كلمة المرور',
-        hintStyle: GoogleFonts.cairo(color: textMuted),
-        prefixIcon: const Icon(Icons.lock_outline, color: textMuted),
+      decoration: _inputDecoration('كلمة المرور', Icons.lock_outline).copyWith(
         suffixIcon: GestureDetector(
           onTap: () => setState(() => _obscurePassword = !_obscurePassword),
           child: Icon(
@@ -153,26 +135,33 @@ class _LoginScreenState extends State<LoginScreen> {
             color: textMuted,
           ),
         ),
-        filled: true,
-        fillColor: cardDark,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: textMuted.withOpacity(0.2)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: textMuted.withOpacity(0.2)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: gold),
-        ),
       ),
       validator: (val) {
         if (val == null || val.isEmpty) return 'كلمة المرور مطلوبة';
-        if (val.length < 6) return 'كلمة المرور 6 أحرف على الأقل';
         return null;
       },
+    );
+  }
+
+  InputDecoration _inputDecoration(String hint, IconData icon) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: GoogleFonts.cairo(color: textMuted),
+      prefixIcon: Icon(icon, color: textMuted),
+      filled: true,
+      fillColor: cardDark,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: textMuted.withOpacity(0.2)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: textMuted.withOpacity(0.2)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: gold),
+      ),
     );
   }
 
@@ -186,18 +175,54 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildLoginButton() {
+  Widget _buildError(String error) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.red.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.red.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, color: Colors.red, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              _readableError(error),
+              style: GoogleFonts.cairo(color: Colors.red, fontSize: 13),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _readableError(String raw) {
+    if (raw.contains('401') || raw.contains('Invalid') || raw.contains('invalid')) {
+      return 'البريد أو كلمة المرور غير صحيحة';
+    }
+    if (raw.contains('timeout') || raw.contains('Timeout')) {
+      return 'انتهت مهلة الاتصال، تحقق من اتصالك بالإنترنت';
+    }
+    if (raw.contains('SocketException') || raw.contains('Connection')) {
+      return 'تعذّر الاتصال بالخادم، حاول مجدداً';
+    }
+    return 'تعذّر تسجيل الدخول، حاول مجدداً';
+  }
+
+  Widget _buildLoginButton(bool isLoading) {
     return GestureDetector(
-      onTap: _isLoading ? null : _login,
+      onTap: isLoading ? null : _login,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: _isLoading ? gold.withOpacity(0.5) : gold,
+          color: isLoading ? gold.withOpacity(0.5) : gold,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Center(
-          child: _isLoading
+          child: isLoading
               ? const SizedBox(
                   width: 24,
                   height: 24,
