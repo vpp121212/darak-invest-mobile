@@ -1307,8 +1307,8 @@ async function api(path,opts){
 function fmt(n){return Number(n||0).toLocaleString('en')}
 function tLbl(t){return t==='verified'?'✓ موثق':t==='office'?'🏢 مكتب':'👤 مباشر'}
 function tCls(t){return t==='verified'?'v':t==='office'?'o':'d'}
-function pImg(p){return(p.images&&p.images[0])||(location.origin+'/api/placeholder/'+encodeURIComponent(p.type||'عقار')+'/'+p.id+'?title='+encodeURIComponent(p.title||p.type||''))}
-function pFallback(p){return location.origin+'/api/placeholder/'+encodeURIComponent(p.type||'عقار')+'/'+p.id+'?title='+encodeURIComponent(p.title||p.type||'')}
+function pImg(p){return(p.images&&p.images[0])||'/uploads/properties/default.jpg'}
+function pFallback(p){return'/uploads/properties/default.jpg'}
 function pPrice(p){return fmt(p.price)+' ر.س'+(p.purpose==='إيجار'?'/سنوي':'')}
 function pLoc(p){return p.loc||(p.district+'، '+p.city)}
 
