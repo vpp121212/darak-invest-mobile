@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: darak-invest-backend
+    env: node
+    region: ohio
+    plan: free
+    buildCommand: |
+      pip3 install --no-cache-dir -r requirements.txt --break-system-packages || pip3 install --no-cache-dir -r requirements.txt
+      npm install
+    startCommand: node src/server.js
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "5000"
+      - key: JWT_SECRET
+        sync: false
+      - key: MAPBOX_TOKEN
+        value: pk.eyJ1IjoidnBwLTY2IiwiYSI6ImNtcndoZW5hdzA2MGYzM3IzbTA4cW1yNnAifQ.bP-Z7H9Wn6WkgF2fXYITQw
+      - key: DATABASE_URL
+        sync: false
