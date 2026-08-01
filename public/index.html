@@ -1831,14 +1831,19 @@ function mapStyle(){return window._mbBlocked?fallbackStyle(true):'mapbox://style
 function probeMapbox(){
   if(window._mbBlocked!==undefined)return Promise.resolve(window._mbBlocked===false);
   if(_mbProbePromise)return _mbProbePromise;
+  try{
+    var cached=localStorage.getItem('mb_probe');
+    if(cached){var c=JSON.parse(cached);if(Date.now()-c.t<1800000){window._mbBlocked=!!c.blocked;return Promise.resolve(!c.blocked)}}
+  }catch(e){}
   _mbProbePromise=new Promise(function(res){
     var done=false;
     var ctl=('AbortController' in window)?new AbortController():null;
-    var t=setTimeout(function(){if(ctl)ctl.abort();if(!done){done=true;window._mbBlocked=true;res(false)}},7000);
+    function save(blocked){try{localStorage.setItem('mb_probe',JSON.stringify({blocked:blocked,t:Date.now()}))}catch(e){}}
+    var t=setTimeout(function(){if(ctl)ctl.abort();if(!done){done=true;window._mbBlocked=true;save(true);res(false)}},4000);
     fetch('https://api.mapbox.com/styles/v1/mapbox/streets-v12',{signal:ctl?ctl.signal:undefined}).then(function(){
-      if(!done){done=true;clearTimeout(t);window._mbBlocked=false;res(true)}
+      if(!done){done=true;clearTimeout(t);window._mbBlocked=false;save(false);res(true)}
     }).catch(function(){
-      if(!done){done=true;clearTimeout(t);window._mbBlocked=true;res(false)}
+      if(!done){done=true;clearTimeout(t);window._mbBlocked=true;save(true);res(false)}
     });
   });
   return _mbProbePromise;
@@ -1853,7 +1858,7 @@ function loadMapboxLib(){
     function attempt(){
       if(window.mapboxgl){resolve(true);return}
       var s=document.createElement('script');
-      s.src=_mapboxLibSources[i%_mapboxLibSources.length]+'?v='+Date.now();
+      s.src=_mapboxLibSources[i%_mapboxLibSources.length]+'?v=2';
       s.async=true;
       var done=false,t;
       function finish(ok){
@@ -1873,16 +1878,15 @@ function loadMapboxLib(){
 }
 
 function warmMapboxLib(){
-  if(window.mapboxgl)return;
   if(document.getElementById('mbwarm'))return;
   var w=document.createElement('div');w.id='mbwarm';w.style.display='none';document.body.appendChild(w);
-  loadMapboxLib();
+  ensureToken();
 }
 (function(){
   function warm(){warmMapboxLib();window.removeEventListener('touchstart',warm,true);window.removeEventListener('mousemove',warm,true)}
   window.addEventListener('touchstart',warm,{passive:true});
   window.addEventListener('mousemove',warm,{passive:true});
-  setTimeout(warm,8000);
+  setTimeout(warm,300);
 })();
 
 function withMap(cid,readyFn){
