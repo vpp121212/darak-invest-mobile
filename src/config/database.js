@@ -201,7 +201,16 @@ await sql.unsafe(`SET client_min_messages = WARNING;
   ALTER TABLE neighbourhood_pulse DROP CONSTRAINT IF EXISTS neighbourhood_pulse_district_key;
   ALTER TABLE neighbourhood_pulse ADD UNIQUE (city, district);
 
-  DELETE FROM neighbourhood_pulse WHERE city = 'الرياض';
+  UPDATE properties SET city = 'حائل',
+    district = REPLACE(district, 'الباحة', 'حائل'),
+    title = REPLACE(title, 'الباحة', 'حائل'),
+    description = REPLACE(description, 'الباحة', 'حائل'),
+    "agentName" = REPLACE("agentName", 'الباحة', 'حائل')
+  WHERE city = 'الباحة' OR "agentName" LIKE '%الباحة%' OR district LIKE '%الباحة%';
+
+  DELETE FROM official_indicators WHERE region LIKE '%الباحة%' OR city = 'الباحة';
+
+  DELETE FROM neighbourhood_pulse WHERE city IN ('الرياض', 'الباحة');
   INSERT INTO neighbourhood_pulse (city, district, avg_rent, avg_sale, roi, metro_stations, nearby_projects, sports_boulevard, walk_score, green_spaces, future_value_growth, data_source) VALUES
     ('الرياض', 'الصحافة', 50000, 1700000, 6.8, '[{"name": "طريق خالد بن الوليد", "line": "الأحمر", "year": 2024, "distance": "8 دقائق"}, {"name": "النزهة", "line": "الأحمر", "year": 2024, "distance": "12 دقيقة"}]', '[{"name": "المربع الجديد", "type": "مشروع ترفيهي", "year": 2030, "distance": "12 دقيقة"}]', false, 58, '[{"name": "حديقة الصحافة", "distance": "5 دقائق"}]', 12, 'تحليل السوق 2024-2026'),
     ('الرياض', 'الربيع', 65000, 2800000, 6.0, '[{"name": "الربيع", "line": "الأصفر", "year": 2024, "distance": "5 دقائق"}, {"name": "طريق عثمان بن عفان", "line": "الأصفر", "year": 2024, "distance": "8 دقائق"}]', '[{"name": "المسار الرياضي", "type": "مشروع رياضي", "year": 2026, "distance": "5 دقائق"}]', true, 72, '[{"name": "حديقة الربيع", "distance": "5 دقائق"}]', 15, 'تحليل السوق 2024-2026'),
@@ -324,11 +333,11 @@ await sql.unsafe(`SET client_min_messages = WARNING;
     ('الخبر', 'العقربية', 50000, 4200000, 4.0, '[]', '[]', false, 65, '[]', 8, 'تحليل السوق 2024-2026'),
     ('الخبر', 'الحزام الأخضر', 35000, 1800000, 5.5, '[]', '[]', false, 55, '[{"name":"الحزام الأخضر","distance":"2 دقائق"}]', 6, 'تحليل السوق 2024-2026'),
     ('الخبر', 'الخبر الشمالية', 45000, 2000000, 5.8, '[]', '[]', false, 60, '[]', 9, 'تحليل السوق 2024-2026'),
-    ('الباحة', 'القابل', 20000, 1200000, 4.5, '[]', '[]', false, 40, '[{"name":"غابة رغدان","distance":"15 دقيقة"}]', 5, 'تحليل السوق 2024-2026'),
-    ('الباحة', 'الشفا', 15000, 600000, 5.0, '[]', '[]', false, 50, '[{"name":"مصيف الشفا","distance":"5 دقائق"}]', 6, 'تحليل السوق 2024-2026'),
-    ('الباحة', 'بني كبير', 12000, 800000, 3.5, '[]', '[]', false, 20, '[{"name":"الغابات","distance":"20 دقيقة"}]', 3, 'تحليل السوق 2024-2026'),
-    ('الباحة', 'جرب', 15000, 650000, 4.8, '[]', '[]', false, 30, '[]', 4, 'تحليل السوق 2024-2026'),
-    ('الباحة', 'قرن ظبي', 12000, 500000, 5.0, '[]', '[]', false, 25, '[]', 3, 'تحليل السوق 2024-2026')
+    ('حائل', 'حي الزبارة', 24000, 1100000, 5.0, '[]', '[{"name":"مشروع حائل الجديدة","type":"سكني","year":2028,"distance":"10 دقائق"}]', false, 50, '[{"name":"حديقة الزبارة","distance":"5 دقائق"}]', 6, 'تحليل السوق 2024-2026'),
+    ('حائل', 'حي المطار', 26000, 1200000, 5.2, '[]', '[]', false, 55, '[]', 6, 'تحليل السوق 2024-2026'),
+    ('حائل', 'حي السمراء', 22000, 1000000, 5.4, '[]', '[]', false, 45, '[{"name":"منتزه السمراء","distance":"10 دقائق"}]', 5, 'تحليل السوق 2024-2026'),
+    ('حائل', 'حي السلام', 20000, 900000, 5.5, '[]', '[]', false, 40, '[]', 4, 'تحليل السوق 2024-2026'),
+    ('حائل', 'حي قفار', 18000, 850000, 5.0, '[]', '[]', false, 35, '[]', 4, 'تحليل السوق 2024-2026')
   ON CONFLICT (city, district) DO NOTHING;
 
   CREATE TABLE IF NOT EXISTS realestate_licenses (

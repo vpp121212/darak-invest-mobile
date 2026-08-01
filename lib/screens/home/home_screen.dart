@@ -20,7 +20,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String? _selectedCity;
   String? _selectedType;
   final List<String> _purposes = ['الكل', 'بيع', 'إيجار'];
-  static const _cities = ['الرياض', 'جدة', 'مكة', 'الدمام', 'الخبر'];
+  static const _cities = ['الرياض', 'جدة', 'مكة', 'الدمام', 'الخبر', 'حائل'];
   static const _types = ['فيلا', 'شقة', 'دوبلكس', 'مكتب', 'استوديو', 'أرض', 'عمارة'];
 
   @override

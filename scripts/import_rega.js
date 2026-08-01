@@ -5,7 +5,7 @@ import sql from '../src/config/database.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, '..', 'data', 'rega');
-const RELEVANT_CITIES = new Set(['الرياض', 'جدة', 'مكة', 'الدمام', 'الخبر', 'الباحة', 'مكة المكرمة']);
+const RELEVANT_CITIES = new Set(['الرياض', 'جدة', 'مكة', 'الدمام', 'الخبر', 'حائل', 'مكة المكرمة']);
 
 function parseCSV(text) {
   const rows = [];
@@ -59,7 +59,6 @@ const DATASETS = [
   { file: 'makkah_rent_city.csv', slug: 'makkah-rent-city' },
   { file: 'madinah_rent_city.csv', slug: 'madinah-rent-city' },
   { file: 'qassim_rent_city.csv', slug: 'qassim-rent-city' },
-  { file: 'baha_rent_city.csv', slug: 'baha-rent-city' },
   { file: 'eastern_rent_city.csv', slug: 'eastern-rent-city' },
 ];
 

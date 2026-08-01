@@ -16,7 +16,7 @@ class SearchScreen extends ConsumerStatefulWidget {
 }
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
-  static const _cities = ['الرياض', 'جدة', 'مكة', 'المدينة', 'الدمام', 'الخبر'];
+  static const _cities = ['الرياض', 'جدة', 'مكة', 'المدينة', 'الدمام', 'الخبر', 'حائل'];
   static const _types = ['فيلا', 'شقة', 'دوبلكس', 'مكتب', 'استوديو', 'أرض', 'عمارة'];
   static const _purposes = ['بيع', 'إيجار'];
   static const _facings = ['شرقية', 'غربية', 'شمالية', 'جنوبية'];

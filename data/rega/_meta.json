@@ -60,18 +60,6 @@
     "source_url": "https://open.data.gov.sa/ar/datasets/view/75d8dd7a-88fe-4d48-b69b-485a7afb0cc4"
   },
   {
-    "dataset_id": "5841795c-c6a7-45ad-97b8-49b4533f36f6",
-    "slug": "baha_rent_city",
-    "title": "مؤشرات الايجار لمنطقة الباحة على مستوى المدن",
-    "period": {
-      "fromDate": "2024-01-01",
-      "toDate": "2024-12-31"
-    },
-    "file": "baha_rent_city.csv",
-    "size": 59720,
-    "source_url": "https://open.data.gov.sa/ar/datasets/view/5841795c-c6a7-45ad-97b8-49b4533f36f6"
-  },
-  {
     "dataset_id": "2dde7e8c-db79-4aec-be4e-37cef64c1d4d",
     "slug": "riyadh_rent_q1_2026",
     "title": "مؤشر الايجار لمنطقة الرياض الربع الاول من عام 2026",
