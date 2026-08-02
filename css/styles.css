@@ -214,6 +214,7 @@
 .auth-wrapper{width:100%;max-width:400px}
 .brand-header{text-align:center;margin-bottom:26px}
 .logo-icon{font-size:48px;margin-bottom:8px;filter:drop-shadow(0 4px 10px rgba(0,230,118,.3))}
+.logo-icon img{height:84px;width:auto;display:block;margin:0 auto;border-radius:12px;filter:none}
 .brand-title{font-size:26px;font-weight:800;color:var(--g);letter-spacing:.5px}
 .brand-subtitle{font-size:13px;color:var(--m);margin-top:6px}
 .auth-card{background:var(--c);border:1px solid rgba(212,175,55,.18);border-radius:20px;padding:26px 22px;box-shadow:0 14px 44px rgba(0,0,0,.45)}
