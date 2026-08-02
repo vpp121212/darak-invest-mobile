@@ -1342,8 +1342,8 @@ function renderMapSidebar(ads){
 }
 function closeMap3d(){}
 /* LOGIN */
-function openLogin(){document.getElementById('login').classList.add('on')}
-function closeLogin(){document.getElementById('login').classList.remove('on')}
+function openLogin(){var el=document.getElementById('login');if(el)el.classList.add('on')}
+function closeLogin(){var el=document.getElementById('login');if(el)el.classList.remove('on')}
 function switchLoginTab(el,formId){
   document.querySelectorAll('.login-tab').forEach(function(t){t.classList.remove('on')});
   el.classList.add('on');
