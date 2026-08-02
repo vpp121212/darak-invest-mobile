@@ -50,3 +50,8 @@ node_modules/
 *.db-shm
 *.db-wal
 .env
+
+# Release keystore (never commit secrets)
+android/key.properties
+*.jks
+*.keystore
