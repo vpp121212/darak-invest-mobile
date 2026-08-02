@@ -1,4 +1,4 @@
-const CACHE_NAME = 'darak-v10';
+const CACHE_NAME = 'darak-v11';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -21,26 +21,20 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  if (request.destination === 'document') {
-    event.respondWith(fetch(request).catch(() => caches.match(request)));
-    return;
-  }
-
   if (url.pathname.startsWith('/api/') || url.origin !== self.location.origin) {
     event.respondWith(fetch(request));
     return;
   }
 
   event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request).then((response) => {
-        if (response.ok && request.method === 'GET') {
+    fetch(request)
+      .then((response) => {
+        if (response.ok && request.method === 'GET' && request.destination !== 'document') {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
         }
         return response;
-      }).catch(() => new Response('', { status: 503, statusText: 'Offline' }));
-    })
+      })
+      .catch(() => caches.match(request).then((cached) => cached || new Response('', { status: 503, statusText: 'Offline' })))
   );
 });
