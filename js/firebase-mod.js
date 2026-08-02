@@ -1,18 +1,19 @@
-/* firebase-mod.js — تهيئة Firebase للوحدات (ESM)
- * الصق إعدادات مشروعك من Firebase Console → Project settings → Web app.
- * تأكد من تفعيل Authentication (Email/Password) و Firestore. */
-export const FB_KEYS={
-  apiKey:'',
-  authDomain:'',
-  projectId:'',
-  storageBucket:'',
-  messagingSenderId:'',
-  appId:''
-};
-export const isConfigured=!!(FB_KEYS.apiKey&&FB_KEYS.apiKey.length>4);
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-let app=null,auth=null,db=null;
-if(isConfigured){app=initializeApp(FB_KEYS);auth=getAuth(app);db=getFirestore(app)}
-export {app,auth,db};
+
+// إعدادات البيئة التجريبية الحية لمنصة دارك وهتوك
+const firebaseConfig = {
+  apiKey: "AIzaSyD-DEMO-KEY-FOR-DARAK-HATTOK",
+  authDomain: "darak-hattok.firebaseapp.com",
+  projectId: "darak-hattok",
+  storageBucket: "darak-hattok.appspot.com",
+  messagingSenderId: "1234567890",
+  appId: "1:1234567890:web:demo1234"
+};
+
+export const isConfigured = !!(firebaseConfig.apiKey && firebaseConfig.apiKey.length > 4);
+
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
