@@ -1,39 +1,90 @@
-/* portfolio.js — المحفظة والمفضلة (toggleFav + عرض المفضلة في الصفحة الشخصية) */
+/* portfolio.js — لوحة المحفظة الاستثمارية (وحدة ESM تعتمد Firebase Auth + Firestore) */
+import { auth, db, isConfigured } from './firebase-mod.js';
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-function renderPortfolio(){
-  var pg=document.getElementById('pg-profile');if(!pg)return;
-  var wrap=pg.querySelector('.prof');if(!wrap)return;
-  var fav=A.filter(function(p){return F.indexOf(p.id)>-1});
-  var box=document.getElementById('pf-favs');
-  if(!box){box=document.createElement('div');box.id='pf-favs';wrap.appendChild(box)}
-  if(!fav.length){
-    box.innerHTML='<div style="font-size:12px;color:var(--m);margin-top:16px;text-align:center;padding:24px;border:1px dashed var(--b);border-radius:12px">💛 لم تُضف عقارات إلى المفضلة بعد — اضغط &#x2764; على أي عقار</div>';
-    return;
+const $=id=>document.getElementById(id);
+const setTxt=(id,t)=>{const e=$(id);if(e)e.textContent=t};
+const fmt=n=>Number(n||0).toLocaleString('en-US');
+let curUser=null,curDoc=null,docRef=null;
+
+function toast(msg){
+  let t=$('toasts');
+  if(!t){t=document.createElement('div');t.id='toasts';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:8px;align-items:center';document.body.appendChild(t)}
+  const x=document.createElement('div');
+  x.textContent=msg;
+  x.style.cssText='background:var(--c);color:var(--t);border:1px solid rgba(212,175,55,.4);border-radius:12px;padding:10px 16px;font-size:13px;box-shadow:0 10px 30px rgba(0,0,0,.5)';
+  t.appendChild(x);
+  setTimeout(()=>x.remove(),3200);
+}
+
+function renderBalance(){setTxt('balance-display',fmt(curDoc.balance)+' ر.س')}
+function renderInvestments(){
+  const box=$('my-investments-list');if(!box)return;
+  const list=curDoc.investments||[];
+  if(!list.length){box.innerHTML='<div class="empty-state">لا توجد استثمارات بعد — ابدأ باستثمار أول فرصة ✨</div>';return}
+  box.innerHTML=list.map(iv=>{
+    const d=iv.at?new Date(iv.at):new Date();
+    return '<div class="invest-item"><div class="invest-item-name">📈 '+(iv.name||'')+'</div>'+
+      '<div class="invest-item-meta"><span>المبلغ: <strong>'+fmt(iv.amount)+' ر.س</strong></span><span class="invest-item-roi">+'+iv.roi+' عائد</span></div>'+
+      '<div class="invest-item-at">'+d.toLocaleDateString('ar-SA')+'</div></div>';
+  }).join('');
+}
+
+async function loadUser(user){
+  docRef=doc(db,'users',user.uid);
+  let snap=await getDoc(docRef);
+  if(!snap.exists()){
+    await setDoc(docRef,{name:user.displayName||'مستثمر',email:user.email,balance:10000,investments:[],createdAt:new Date().toISOString()});
+    snap=await getDoc(docRef);
   }
-  var total=fav.reduce(function(s,p){return s+(p.price||0)},0);
-  box.innerHTML=
-    '<div style="font-size:13px;font-weight:700;color:var(--g);margin:18px 0 4px">💛 عقاراتك المفضلة <span style="color:var(--m);font-weight:500">('+fav.length+' · قيمة تقريبية '+fmt(total)+' ر.س)</span></div>'+
-    '<div class="grid" style="grid-template-columns:1fr">'+fav.map(cardHTML).join('')+'</div>';
+  curDoc=snap.data();
+  setTxt('user-display-name',curDoc.name||'مستثمر');
+  renderBalance();
+  renderInvestments();
 }
 
-var __navPF=window.__baseNav||nav;
-function nav(page){
-  var r=__navPF(page);
-  if(page==='profile')renderPortfolio();
-  return r;
+if(isConfigured){
+  onAuthStateChanged(auth,user=>{
+    if(!user){window.location.href='auth.html';return}
+    curUser=user;
+    setTxt('user-display-name','جاري التحميل...');
+    loadUser(user).catch(e=>toast('تعذر تحميل المحفظة: '+(e.message||e)));
+  });
+}else{
+  setTxt('user-display-name','⚠️ لم تُضبط مفاتيح Firebase');
+  const el=$('my-investments-list');
+  if(el)el.innerHTML='<div class="empty-state">أكمل تهيئة Firebase (املأ مفاتيحك في js/firebase-mod.js) لتشغيل المحفظة الاستثمارية</div>';
 }
 
-async function toggleFav(id,e){
-  if(e)e.stopPropagation();
-  var i=F.indexOf(id);if(i>-1)F.splice(i,1);else F.push(id);
-  localStorage.setItem('darak_favs',JSON.stringify(F));
-  if(authToken){await api('/properties/'+id+'/favorite',{method:'POST'}).catch(function(){})}
-  if(document.getElementById('pg'))render();
-  if(document.getElementById('pf-favs'))renderPortfolio();
-  var profs=document.getElementById('prof-stats');
-  if(profs&&F.length){profs.innerHTML='<div class="prof-stat"><div class="prof-stat-v">'+F.length+'</div><div class="prof-stat-l">المفضلة</div></div><div class="prof-stat"><div class="prof-stat-v">'+(A.length||'—')+'</div><div class="prof-stat-l">العقارات</div></div><div class="prof-stat"><div class="prof-stat-v">'+(user?'👤':'—')+'</div><div class="prof-stat-l">الحالة</div></div>'}
-}
+const btnLogout=$('btn-logout');
+if(btnLogout)btnLogout.addEventListener('click',async()=>{if(!isConfigured)return;await signOut(auth);window.location.href='auth.html'});
 
-document.addEventListener('DOMContentLoaded',function(){
-  if(document.getElementById('pg-profile'))setTimeout(renderPortfolio,600);
+const btnDeposit=$('btn-deposit');
+if(btnDeposit)btnDeposit.addEventListener('click',()=>{
+  if(!curDoc){toast('جاري تحميل المحفظة...');return}
+  const v=prompt('المبلغ المراد إيداعه (ر.س):');
+  if(v===null)return;
+  const amt=parseFloat(v);
+  if(isNaN(amt)||amt<=0){toast('أدخل مبلغًا صحيحًا');return}
+  curDoc.balance=(curDoc.balance||0)+amt;
+  updateDoc(docRef,{balance:curDoc.balance}).then(renderBalance).catch(e=>toast('فشل الإيداع: '+(e.message||e)));
 });
+
+window.handleInvest=async function(name,amount,roi){
+  if(!isConfigured||!curDoc){toast('المحفظة غير متاحة بعد');return}
+  const amt=Number(amount);
+  if(isNaN(amt)||amt<=0)return;
+  if((curDoc.balance||0)<amt){toast('رصيد غير كافٍ للاستثمار');return}
+  curDoc.balance-=amt;
+  curDoc.investments=curDoc.investments||[];
+  curDoc.investments.unshift({name:String(name),amount:amt,roi:String(roi),at:new Date().toISOString()});
+  try{
+    await updateDoc(docRef,{balance:curDoc.balance,investments:curDoc.investments});
+    renderBalance();renderInvestments();
+    toast('تم الاستثمار في '+name+' ✓');
+  }catch(e){
+    curDoc.balance+=amt;curDoc.investments.shift();
+    toast('فشل الاستثمار: '+(e.message||e));
+  }
+};
