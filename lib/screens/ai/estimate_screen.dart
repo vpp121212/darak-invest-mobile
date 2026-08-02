@@ -28,17 +28,30 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
 
   String _type = '';
   String _purpose = 'بيع';
+  bool _prefilled = false;
 
   @override
   void initState() {
     super.initState();
+    _city = TextEditingController();
+    _district = TextEditingController();
+    _area = TextEditingController();
+    _rooms = TextEditingController();
+    _baths = TextEditingController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_prefilled) return;
     final args = ModalRoute.of(context)?.settings.arguments;
     final property = args is Property ? args : null;
-    _city = TextEditingController(text: property?.city ?? '');
-    _district = TextEditingController(text: property?.district ?? '');
-    _area = TextEditingController(text: property != null ? '${property.area.round()}' : '');
-    _rooms = TextEditingController(text: property != null ? '${property.rooms}' : '');
-    _baths = TextEditingController(text: property != null ? '${property.baths}' : '');
+    _prefilled = true;
+    _city.text = property?.city ?? '';
+    _district.text = property?.district ?? '';
+    _area.text = property != null ? '${property.area.round()}' : '';
+    _rooms.text = property != null ? '${property.rooms}' : '';
+    _baths.text = property != null ? '${property.baths}' : '';
     _type = property?.type ?? '';
     _purpose = property?.purpose ?? 'بيع';
   }

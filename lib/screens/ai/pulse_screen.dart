@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/utils/formatters.dart';
+import '../../models/investment_opportunity.dart';
 import '../../models/neighborhood_pulse.dart';
 import '../../providers/pulse_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/ai_field.dart';
+import '../../widgets/neighborhood_radar_card.dart';
 
 class PulseScreen extends ConsumerStatefulWidget {
   const PulseScreen({super.key});
@@ -21,8 +23,16 @@ class _PulseScreenState extends ConsumerState<PulseScreen> {
   @override
   void initState() {
     super.initState();
+    _district = TextEditingController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
-    _district = TextEditingController(text: args is String ? args : '');
+    if (args is String && _district.text.isEmpty) {
+      _district.text = args;
+    }
   }
 
   @override
@@ -83,6 +93,8 @@ class _PulseScreenState extends ConsumerState<PulseScreen> {
             ),
           ),
           const SizedBox(height: 20),
+          _buildRadar(),
+          const SizedBox(height: 20),
           _buildResult(pulseAsync),
           const SizedBox(height: 20),
         ],
@@ -117,6 +129,35 @@ class _PulseScreenState extends ConsumerState<PulseScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildRadar() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'رادار الأحياء والفرص الواعدة',
+          style: GoogleFonts.cairo(color: gold, fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'فرص استثمارية مختارة بناءً على مؤشرات النمو',
+          style: GoogleFonts.cairo(color: textMuted, fontSize: 12),
+        ),
+        const SizedBox(height: 12),
+        ...kInvestmentOpportunities.map((opp) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: NeighborhoodRadarCard(
+                opportunity: opp,
+                onViewDistrict: () {
+                  _district.text = opp.district;
+                  _load();
+                },
+                onInvest: () => _snack('الاستثمار الجماعي في ${opp.district} قريباً'),
+              ),
+            )),
+      ],
     );
   }
 

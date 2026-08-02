@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import '../core/security/token_storage.dart';
 import '../models/user.dart';
 import '../services/api_service.dart';
 
@@ -42,18 +42,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
     _init();
   }
 
-  static const _tokenKey = 'auth_token';
-  static const _userKey = 'auth_user';
-
   Future<void> _init() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString(_tokenKey);
+    final token = await TokenStorage.readToken();
     if (token == null || token.isEmpty) return;
 
     ApiService.setToken(token);
-    final cachedUser = prefs.getString(_userKey);
+    final cachedUser = await TokenStorage.readUser();
     if (cachedUser != null) {
       try {
+
         state = AuthState(token: token, user: User.fromJson(jsonDecode(cachedUser)));
       } catch (_) {
         /* ignore corrupt cache */
@@ -63,12 +60,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> _refreshProfile() async {
+    final token = state.token;
+    if (token == null || token.isEmpty) return;
     try {
       final res = await ApiService.getMe();
       final user = User.fromJson((res['user'] ?? res) as Map<String, dynamic>);
       state = state.copyWith(user: user);
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_userKey, jsonEncode(user.toJson()));
+      await TokenStorage.saveSession(token, jsonEncode(user.toJson()));
     } catch (_) {
       /* offline: keep cached user */
     }
@@ -82,9 +80,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final user = User.fromJson((res['user'] ?? res) as Map<String, dynamic>);
       ApiService.setToken(token);
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_tokenKey, token);
-      await prefs.setString(_userKey, jsonEncode(user.toJson()));
+      await TokenStorage.saveSession(token, jsonEncode(user.toJson()));
 
       state = AuthState(token: token, user: user);
       return true;
@@ -102,9 +98,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (token != null) {
         ApiService.setToken(token);
         final user = User.fromJson((res['user'] ?? res) as Map<String, dynamic>);
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString(_tokenKey, token);
-        await prefs.setString(_userKey, jsonEncode(user.toJson()));
+        await TokenStorage.saveSession(token, jsonEncode(user.toJson()));
         state = AuthState(token: token, user: user);
       } else {
         state = state.copyWith(isLoading: false);
@@ -117,9 +111,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_tokenKey);
-    await prefs.remove(_userKey);
+    await TokenStorage.clear();
     ApiService.setToken(null);
     state = const AuthState();
   }

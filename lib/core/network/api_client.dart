@@ -12,7 +12,7 @@ import 'app_exception.dart';
 /// unified error mapping so callers only deal with [AppException].
 class ApiClient {
   static const String baseUrl = 'https://darak-invest-backend-j6hy.onrender.com';
-  static const Duration timeout = Duration(seconds: 20);
+  static const Duration timeout = Duration(seconds: 45);
 
   ApiClient._();
   static final ApiClient instance = ApiClient._();

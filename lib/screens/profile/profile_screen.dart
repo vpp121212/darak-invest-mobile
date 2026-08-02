@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../providers/auth_provider.dart';
 import '../../theme/app_theme.dart';
@@ -45,6 +46,8 @@ class ProfileScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             _buildLogoutButton(ref),
           ],
+          const SizedBox(height: 24),
+          const _AppVersion(),
         ],
       ),
     );
@@ -170,5 +173,29 @@ class ProfileScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+class _AppVersion extends StatelessWidget {
+  const _AppVersion();
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String>(
+      future: _loadVersion(),
+      builder: (context, snapshot) {
+        final version = snapshot.data;
+        return Text(
+          version == null ? '' : 'دارك وحيك — الإصدار $version',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.cairo(color: textMuted, fontSize: 12),
+        );
+      },
+    );
+  }
+
+  Future<String> _loadVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    return '${info.version} (${info.buildNumber})';
   }
 }

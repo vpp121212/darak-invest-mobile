@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'screens/ai/estimate_screen.dart';
 import 'screens/ai/pulse_screen.dart';
@@ -28,11 +29,12 @@ class DarakApp extends StatelessWidget {
       title: 'دارك وحيك',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
-      locale: const Locale('ar', 'SA'),
-      supportedLocales: const [Locale('ar', 'SA')],
+      locale: const Locale('ar'),
+      supportedLocales: const [Locale('ar'), Locale('en')],
       localizationsDelegates: const [
-        DefaultMaterialLocalizations.delegate,
-        DefaultWidgetsLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
       ],
       builder: (context, child) => Directionality(
         textDirection: TextDirection.rtl,

@@ -15,7 +15,7 @@ class AgentInfo {
 
   factory AgentInfo.fromJson(Map<String, dynamic> json) {
     return AgentInfo(
-      id: json['_id'] ?? json['id'] ?? '',
+      id: (json['_id'] ?? json['id'] ?? '').toString(),
       name: json['name'] ?? '',
       phone: json['phone'] ?? '',
       email: json['email'],
@@ -132,7 +132,7 @@ class Property {
 
   factory Property.fromJson(Map<String, dynamic> json) {
     return Property(
-      id: json['_id'] ?? json['id'] ?? '',
+      id: (json['_id'] ?? json['id'] ?? '').toString(),
       title: json['title'] ?? '',
       type: json['type'] ?? '',
       loc: json['loc'] ?? json['location'] ?? '',
@@ -155,9 +155,28 @@ class Property {
       desc: json['desc'] ?? json['description'] ?? '',
       images: (json['images'] as List?)?.map((e) => e.toString()).toList() ?? [],
       features: (json['features'] as List?)?.map((e) => e.toString()).toList() ?? [],
-      trust: json['trust'] ?? 0,
+      trust: _parseTrust(json['trust']),
       agent: json['agent'] != null ? AgentInfo.fromJson(json['agent']) : null,
     );
+  }
+
+  /// The API reports trust as a status string ('verified'/'office'/'direct')
+  /// while the UI renders it as a 0–100 score.
+  static int _parseTrust(dynamic value) {
+    if (value is num) return value.round();
+    if (value is String) {
+      switch (value) {
+        case 'verified':
+          return 100;
+        case 'office':
+          return 60;
+        case 'direct':
+          return 20;
+        default:
+          return int.tryParse(value) ?? 0;
+      }
+    }
+    return 0;
   }
 
   Map<String, dynamic> toJson() {

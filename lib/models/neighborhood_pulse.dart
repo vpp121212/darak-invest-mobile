@@ -46,6 +46,17 @@ class NeighborhoodPulse {
 
   static List<String> _asList(dynamic v) {
     if (v == null) return const [];
-    return (v as List).map((e) => e.toString()).toList();
+    return (v as List)
+        .map((e) {
+          if (e is Map) {
+            final name = e['name']?.toString() ?? '';
+            final extra = e['distance']?.toString();
+            if (name.isEmpty) return '';
+            return extra != null && extra.isNotEmpty ? '$name ($extra)' : name;
+          }
+          return e.toString();
+        })
+        .where((s) => s.isNotEmpty)
+        .toList();
   }
 }

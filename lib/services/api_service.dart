@@ -44,16 +44,19 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> estimate(Map<String, dynamic> data) async {
-    return _client.post('/api/ai/estimate', body: data) as Future<Map<String, dynamic>>;
+    final res = await _client.post('/api/ai/estimate', body: data);
+    return res as Map<String, dynamic>;
   }
 
   static Future<Map<String, dynamic>> match(Map<String, dynamic> data) async {
-    return _client.post('/api/ai/match', body: data) as Future<Map<String, dynamic>>;
+    final res = await _client.post('/api/ai/match', body: data);
+    return res as Map<String, dynamic>;
   }
 
   static Future<Map<String, dynamic>> getNeighborhoodPulse(String district) async {
-    return _client.get('/api/pulse/neighborhood/${Uri.encodeComponent(district)}')
-        as Future<Map<String, dynamic>>;
+    final res =
+        await _client.get('/api/pulse/neighborhood/${Uri.encodeComponent(district)}');
+    return res as Map<String, dynamic>;
   }
 
   static Future<List<String>> getCities() async {
@@ -81,6 +84,7 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> getMe() async {
-    return _client.get('/api/auth/me') as Future<Map<String, dynamic>>;
+    final res = await _client.get('/api/auth/me');
+    return res as Map<String, dynamic>;
   }
 }

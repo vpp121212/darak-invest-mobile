@@ -22,18 +22,29 @@ class _RoiScreenState extends State<RoiScreen> {
   double? _roi;
   double? _netAnnual;
   double? _paybackYears;
+  bool _prefilled = false;
 
   @override
   void initState() {
     super.initState();
+    _price = TextEditingController();
+    _rent = TextEditingController();
+    _costs = TextEditingController();
+    _appreciation = TextEditingController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_prefilled) return;
     final args = ModalRoute.of(context)?.settings.arguments;
     final property = args is Property ? args : null;
-    _price = TextEditingController(
-        text: property != null && property.purpose != 'إيجار' ? '${property.price.round()}' : '');
-    _rent = TextEditingController(
-        text: property != null && property.purpose == 'إيجار' ? '${property.price.round()}' : '');
-    _costs = TextEditingController(text: '');
-    _appreciation = TextEditingController(text: '5');
+    _prefilled = true;
+    _price.text =
+        property != null && property.purpose != 'إيجار' ? '${property.price.round()}' : '';
+    _rent.text =
+        property != null && property.purpose == 'إيجار' ? '${property.price.round()}' : '';
+    _appreciation.text = '5';
   }
 
   @override
