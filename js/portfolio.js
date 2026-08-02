@@ -1,12 +1,8 @@
-/* portfolio.js — لوحة المحفظة الاستثمارية (وحدة ESM تعتمد Firebase Auth + Firestore) */
-import { auth, db, isConfigured } from './firebase-mod.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
+/* portfolio.js — لوحة المحفظة الاستثمارية (نسخة محلية عبر localStorage، بدون Firebase) */
 const $=id=>document.getElementById(id);
 const setTxt=(id,t)=>{const e=$(id);if(e)e.textContent=t};
 const fmt=n=>Number(n||0).toLocaleString('en-US');
-let curUser=null,curDoc=null,docRef=null;
+let curUser=null;
 
 function toast(msg){
   let t=$('toasts');
@@ -18,10 +14,13 @@ function toast(msg){
   setTimeout(()=>x.remove(),3200);
 }
 
-function renderBalance(){setTxt('balance-display',fmt(curDoc.balance)+' ر.س')}
+function save(){localStorage.setItem('darak_user',JSON.stringify(curUser))}
+
+function renderBalance(){setTxt('balance-display',fmt(curUser.balance)+' ر.س')}
+
 function renderInvestments(){
   const box=$('my-investments-list');if(!box)return;
-  const list=curDoc.investments||[];
+  const list=curUser.investments||[];
   if(!list.length){box.innerHTML='<div class="empty-state">لا توجد استثمارات بعد — ابدأ باستثمار أول فرصة ✨</div>';return}
   box.innerHTML=list.map(iv=>{
     const d=iv.at?new Date(iv.at):new Date();
@@ -31,60 +30,42 @@ function renderInvestments(){
   }).join('');
 }
 
-async function loadUser(user){
-  docRef=doc(db,'users',user.uid);
-  let snap=await getDoc(docRef);
-  if(!snap.exists()){
-    await setDoc(docRef,{name:user.displayName||'مستثمر',email:user.email,balance:10000,investments:[],createdAt:new Date().toISOString()});
-    snap=await getDoc(docRef);
-  }
-  curDoc=snap.data();
-  setTxt('user-display-name',curDoc.name||'مستثمر');
+function loadUser(){
+  try{curUser=JSON.parse(localStorage.getItem('darak_user')||'null')}catch(e){curUser=null}
+  if(!curUser||!curUser.email){window.location.href='auth.html';return}
+  curUser.investments=curUser.investments||[];
+  curUser.balance=Number(curUser.balance)||0;
+  setTxt('user-display-name',curUser.name||'مستثمر');
   renderBalance();
   renderInvestments();
 }
 
-if(isConfigured){
-  onAuthStateChanged(auth,user=>{
-    if(!user){window.location.href='auth.html';return}
-    curUser=user;
-    setTxt('user-display-name','جاري التحميل...');
-    loadUser(user).catch(e=>toast('تعذر تحميل المحفظة: '+(e.message||e)));
-  });
-}else{
-  setTxt('user-display-name','⚠️ لم تُضبط مفاتيح Firebase');
-  const el=$('my-investments-list');
-  if(el)el.innerHTML='<div class="empty-state">أكمل تهيئة Firebase (املأ مفاتيحك في js/firebase-mod.js) لتشغيل المحفظة الاستثمارية</div>';
-}
+loadUser();
 
 const btnLogout=$('btn-logout');
-if(btnLogout)btnLogout.addEventListener('click',async()=>{if(!isConfigured)return;await signOut(auth);window.location.href='auth.html'});
+if(btnLogout)btnLogout.addEventListener('click',()=>{localStorage.removeItem('darak_user');window.location.href='auth.html'});
 
 const btnDeposit=$('btn-deposit');
 if(btnDeposit)btnDeposit.addEventListener('click',()=>{
-  if(!curDoc){toast('جاري تحميل المحفظة...');return}
   const v=prompt('المبلغ المراد إيداعه (ر.س):');
   if(v===null)return;
   const amt=parseFloat(v);
   if(isNaN(amt)||amt<=0){toast('أدخل مبلغًا صحيحًا');return}
-  curDoc.balance=(curDoc.balance||0)+amt;
-  updateDoc(docRef,{balance:curDoc.balance}).then(renderBalance).catch(e=>toast('فشل الإيداع: '+(e.message||e)));
+  curUser.balance+=amt;
+  save();
+  renderBalance();
+  toast('تم الإيداع +'+fmt(amt)+' ر.س ✓');
 });
 
-window.handleInvest=async function(name,amount,roi){
-  if(!isConfigured||!curDoc){toast('المحفظة غير متاحة بعد');return}
+window.handleInvest=function(name,amount,roi){
+  if(!curUser){toast('المحفظة غير متاحة');return}
   const amt=Number(amount);
   if(isNaN(amt)||amt<=0)return;
-  if((curDoc.balance||0)<amt){toast('رصيد غير كافٍ للاستثمار');return}
-  curDoc.balance-=amt;
-  curDoc.investments=curDoc.investments||[];
-  curDoc.investments.unshift({name:String(name),amount:amt,roi:String(roi),at:new Date().toISOString()});
-  try{
-    await updateDoc(docRef,{balance:curDoc.balance,investments:curDoc.investments});
-    renderBalance();renderInvestments();
-    toast('تم الاستثمار في '+name+' ✓');
-  }catch(e){
-    curDoc.balance+=amt;curDoc.investments.shift();
-    toast('فشل الاستثمار: '+(e.message||e));
-  }
+  if((curUser.balance||0)<amt){toast('رصيد غير كافٍ للاستثمار');return}
+  curUser.balance-=amt;
+  curUser.investments.unshift({name:String(name),amount:amt,roi:String(roi),at:new Date().toISOString()});
+  save();
+  renderBalance();
+  renderInvestments();
+  toast('تم الاستثمار في '+name+' ✓');
 };
