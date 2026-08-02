@@ -2,24 +2,24 @@
   "name": "دارك وحيك - منصة العقارات",
   "short_name": "دارك وحيك",
   "description": "منصة عقارية ذكية للبيع والإيجار والمزادات",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#05060a",
   "theme_color": "#d4af37",
   "orientation": "portrait-primary",
-  "scope": "/",
+  "scope": ".",
   "lang": "ar",
   "dir": "rtl",
   "categories": ["business", "finance", "shopping"],
   "icons": [
     {
-      "src": "/icons/icon-192.svg",
+      "src": "icons/icon-192.svg",
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-512.svg",
+      "src": "icons/icon-512.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
@@ -27,7 +27,7 @@
   ],
   "screenshots": [
     {
-      "src": "/screenshots/splash.png",
+      "src": "screenshots/splash.png",
       "sizes": "1290x2796",
       "type": "image/png",
       "form_factor": "narrow"
@@ -37,20 +37,20 @@
     {
       "name": "عقارات للبيع",
       "short_name": "بيع",
-      "url": "/?purpose=بيع",
-      "icons": [{ "src": "/icons/sell.png", "sizes": "96x96" }]
+      "url": "./?purpose=بيع",
+      "icons": [{ "src": "icons/sell.png", "sizes": "96x96" }]
     },
     {
       "name": "عقارات للإيجار",
       "short_name": "إيجار",
-      "url": "/?purpose=إيجار",
-      "icons": [{ "src": "/icons/rent.png", "sizes": "96x96" }]
+      "url": "./?purpose=إيجار",
+      "icons": [{ "src": "icons/rent.png", "sizes": "96x96" }]
     },
     {
       "name": "لوحة التحكم",
       "short_name": "لوحة التحكم",
-      "url": "/dashboard",
-      "icons": [{ "src": "/icons/dashboard.png", "sizes": "96x96" }]
+      "url": "./dashboard.html",
+      "icons": [{ "src": "icons/dashboard.png", "sizes": "96x96" }]
     }
   ]
 }

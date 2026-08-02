@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
+  <title>دارك وحيك</title>
+  <meta name="description" content="منصة عقارية للبيع والإيجار في المملكة العربية السعودية">
+  <meta name="theme-color" content="#d4af37">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="دارك وحيك">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="دارك وحيك">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.svg">
+  <link rel="icon" type="image/svg+xml" href="icons/icon-192.svg">
+  <link href="mapbox-gl.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <link rel="preload" href="mapbox-gl-rtl-text.js" as="script">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="hd"><div class="wrap"><a href="#" onclick="nav('home');return false" class="logo"><span class="logo-i">د</span> دارك وحيك</a><div style="display:flex;gap:8px"><a href="#" onclick="openNotif();return false">🔔</a><a href="auth.html">دخول</a></div></div></header>
+  <main class="wrap" style="padding-top:12px;padding-bottom:80px" id="detailPage">
+    <div class="load" style="padding:60px 0">جاري تحميل تفاصيل العقار...</div>
+  </main>
+  <nav class="bn" style="z-index:99">
+    <div class="bi on" onclick="goHome()" id="nav-home"><div class="bii">🏠</div>الرئيسية</div>
+    <div class="bi" onclick="goBack()" id="nav-back"><div class="bii">↩️</div>رجوع</div>
+  </nav>
+  <!-- Overlays -->
+  <div class="ov" id="ov"><div class="ov-p" id="ovp"></div></div>
+
+  <div class="no" id="notif"><div class="np"><div class="nh"><div class="nt">الإشعارات</div><div class="nx" onclick="closeNotif()">✕</div></div>
+    <div id="notifList"><div class="ni un"><div class="nic g">📈</div><div><div class="ntt">لا توجد إشعارات جديدة</div><div class="ntm">قم بتسجيل الدخول لعرض إشعاراتك</div></div></div></div>
+  </div></div>
+
+  <div class="logino" id="login"><div class="login-box" style="position:relative"><div class="login-close" onclick="closeLogin()">✕</div><div class="login-logo">د</div><div class="login-title">دارك وحيك</div><div class="login-sub">سجّل دخولك للوصول إلى عقاراتك وإعداداتك</div>
+    <div class="login-tabs"><button class="login-tab on" onclick="switchLoginTab(this,'login-form')">بريد</button><button class="login-tab" onclick="switchLoginTab(this,'phone-form')">جوال</button><button class="login-tab" onclick="switchLoginTab(this,'register-form')">جديد</button></div>
+    <div class="login-form" id="login-form"><div class="login-field"><input type="email" id="login-email" placeholder="البريد الإلكتروني"></div><div class="login-field"><input type="password" id="login-pass" placeholder="كلمة المرور"></div><button class="login-btn" onclick="doLogin()">تسجيل الدخول</button></div>
+    <div class="login-form" id="phone-form" style="display:none"><div class="login-field" id="otp-field-group"><input type="tel" id="otp-phone" placeholder="رقم الجوال (05XXXXXXXX)" maxlength="13" oninput="formatOtpPhone(this)" style="direction:ltr;text-align:left"></div><button class="login-btn" id="otp-send-btn" onclick="doSendOtp()">إرسال كود التحقق</button><div class="login-field" id="otp-code-group" style="display:none;margin-top:10px"><input type="text" id="otp-code" placeholder="كود التحقق (6 أرقام)" maxlength="6" style="direction:ltr;text-align:center;font-size:20px;letter-spacing:6px"></div><button class="login-btn" id="otp-verify-btn" style="display:none" onclick="doVerifyOtp()">تأكيد الدخول</button><div id="otp-timer" style="text-align:center;font-size:11px;color:var(--m);margin-top:8px;display:none"></div></div>
+    <div class="login-form" id="register-form" style="display:none"><div class="login-field"><input type="text" id="reg-name" placeholder="الاسم الكامل"></div><div class="login-field"><input type="email" id="reg-email" placeholder="البريد الإلكتروني"></div><div class="login-field"><input type="tel" id="reg-phone" placeholder="رقم الجوال"></div><div class="login-field"><input type="password" id="reg-pass" placeholder="كلمة المرور"></div><label class="agree" style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--m);text-align:right;cursor:pointer;margin-top:4px"><input type="checkbox" id="reg-agree" style="width:16px;height:16px;accent-color:var(--g);flex-shrink:0">أوافق على <a href="#" onclick="nav('legal');closeLogin();return false" style="color:var(--g);text-decoration:underline">الصفحة القانونية</a> وشروط الخدمة</label><button class="login-btn" onclick="doRegister()">إنشاء حساب</button></div>
+  </div></div>
+
+  <div class="ai-price" id="aip"><div class="aip-box"><div class="aip-close" onclick="closeAIP()">✕</div>
+    <div class="aip-header"><div class="aip-header-icon">🤖</div><div class="aip-title">توقع سعر العقار</div><div class="aip-sub">تحليل ذكي للسعر بناءً على الموقع والمواصفات</div></div>
+    <div class="aip-prices"><div class="aip-price-card expected"><div class="aip-price-label">📊 السعر المتوقع</div><div class="aip-price-val" id="aip-expected">—</div></div><div class="aip-price-card suitable"><div class="aip-price-label">✅ السعر المناسب</div><div class="aip-price-val" id="aip-suitable">—</div></div><div class="aip-price-card maximum"><div class="aip-price-label">🏆 السعر الأعلى</div><div class="aip-price-val" id="aip-max">—</div></div></div>
+    <div class="aip-sale-chance"><div style="font-size:11px;color:var(--m);margin-bottom:6px">نسبة البيع خلال 30 يوم</div><div class="aip-sale-pct" id="aip-pct">—</div></div>
+    <button class="aip-analyze" onclick="runAIPrice()">🤖 تحليل السعر</button>
+  </div></div>
+
+  <div class="ai-price" id="avmOv"><div class="aip-box"><div class="aip-close" onclick="closeAVM()">✕</div>
+    <div class="aip-header"><div class="aip-header-icon">🧮</div><div class="aip-title">القيمة التقديرية</div><div class="aip-sub">تقييم آلي يدمج الأسعار المنشورة مع البيانات الرسمية للهيئة العامة للعقار</div></div>
+    <div id="avm-body">
+      <div style="display:flex;gap:10px;align-items:stretch;margin:14px 0">
+        <div class="aip-price-card expected" style="flex:1"><div class="aip-price-label">💰 القيمة التقديرية</div><div class="aip-price-val" id="avm-est">—</div></div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:10px;border-radius:14px;background:rgba(18,20,30,.5);border:1px solid var(--b)">
+          <div style="font-size:11px;color:var(--m);margin-bottom:4px">النطاق المتوقع</div>
+          <div style="font-size:13px;color:var(--t);font-weight:700" id="avm-range">—</div>
+          <div style="font-size:10px;color:var(--m);margin-top:2px" id="avm-perm2">—</div>
+        </div>
+      </div>
+      <div style="margin:10px 0">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--m);margin-bottom:4px"><span>دقة التقدير</span><span id="avm-conf-label">—</span></div>
+        <div style="height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden"><div id="avm-conf-bar" style="height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,#d4af37,#f0d878);transition:width .5s"></div></div>
+      </div>
+      <div id="avm-factors" style="margin:10px 0"></div>
+      <div id="avm-pricecheck" style="display:none;margin:10px 0;padding:10px;border-radius:12px;background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.2);font-size:12px;color:var(--t)"></div>
+      <div style="font-size:10px;color:var(--m);line-height:1.6;margin-top:8px" id="avm-note"></div>
+    </div>
+    <button class="aip-analyze" onclick="runAVM()">🧮 احسب القيمة التقديرية</button>
+  </div></div>
+
+  <div class="v3" id="vr360"><div class="v3h"><div class="v3t">🌐 جولة 360°</div><div class="v3x" onclick="closeVR()">✕</div></div><div class="v3v"><canvas class="v3canvas" id="vrCanvas"></canvas><div class="v3hint" id="vrHint"><div class="v3hint-i">👆</div><div class="v3hint-t">اسحب لاستكشاف الغرفة</div></div></div><div class="v3rooms"><div class="v3rb" id="vrRooms"></div></div></div>
+
+  <div class="mapo" id="ov3d"><div class="map-hdr"><div class="map-hdr-t">🏗️ العرض ثلاثي الأبعاد</div><div class="map-hdr-x" onclick="close3D()">✕</div></div><div class="map-container" style="position:relative"><div style="position:absolute;top:100px;left:12px;right:12px;z-index:10;display:flex;gap:8px"><input id="map3dSearchInput" type="text" placeholder="🔍 ابحث عن منطقة..." style="flex:1;padding:10px 14px;border-radius:12px;background:rgba(14,16,24,.95);border:1px solid rgba(212,175,55,.3);color:var(--t);font-size:13px;font-family:'Cairo',sans-serif;outline:none;direction:rtl;backdrop-filter:blur(12px)" oninput="map3dSearchDebounced()" onkeydown="if(event.key==='Enter')map3dSearchNow()"><div id="map3dSearchResults" style="position:absolute;top:44px;left:0;right:0;background:rgba(14,16,24,.98);border:1px solid rgba(212,175,55,.2);border-radius:12px;display:none;max-height:200px;overflow-y:auto;z-index:20;backdrop-filter:blur(12px)"></div><button onclick="map3dLocateMe()" style="width:42px;height:42px;border-radius:12px;background:rgba(14,16,24,.95);border:1px solid rgba(212,175,55,.3);color:var(--g);font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)" title="موقعك الحالي">📍</button></div><div id="map3d" style="width:100%;height:100%"></div></div></div>
+
+  <div class="tb" id="toasts"></div>
+
+  <div class="pb" id="pb"><span class="pb-t">أضف للشاشة الرئيسية</span><button class="pb-a" onclick="doInstall()">تثبيت</button><button class="pb-x" onclick="closePB()">×</button></div>
+
+  <div class="ios-hint" id="ios"><button class="close-ios" onclick="document.getElementById('ios').style.display='none'">×</button>للتثبيت: اضغط زر المشاركة <b>⬆</b> ثم "إضافة إلى الشاشة الرئيسية"</div>
+  <footer class="ft"><div class="wrap">دارك وحيك © 2026 — جميع الحقوق محفوظة · بإدارة المهندس / سعد الرويس · <a href="#" onclick="nav('legal');return false" style="color:var(--g)">الصفحة القانونية</a></div></footer>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/portfolio.js"></script>
+  <script>
+  function goHome(){window.location.href=authToken?'dashboard.html':'index.html'}
+  function goBack(){if(history.length>1)history.back();else goHome()}
+  document.addEventListener('DOMContentLoaded',function(){
+    var q=new URLSearchParams(location.search).get('id');
+    if(!q)return;
+    var tries=0;var t=setInterval(function(){
+      if(A.length){clearInterval(t);showDetail(Number(q));var dp=document.getElementById('detailPage');if(dp)dp.scrollIntoView()}
+      if(++tries>60)clearInterval(t);
+    },400);
+  });
+  </script>
+</body>
+</html>

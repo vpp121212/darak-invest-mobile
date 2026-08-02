@@ -1,4 +1,4 @@
-const CACHE_NAME = 'darak-v9';
+const CACHE_NAME = 'darak-v10';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -21,12 +21,12 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  if (request.destination === 'document' || url.pathname === '/' || url.pathname === '/index.html') {
-    event.respondWith(fetch(request));
+  if (request.destination === 'document') {
+    event.respondWith(fetch(request).catch(() => caches.match(request)));
     return;
   }
 
-  if (url.pathname.startsWith('/api/')) {
+  if (url.pathname.startsWith('/api/') || url.origin !== self.location.origin) {
     event.respondWith(fetch(request));
     return;
   }

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>دارك وحيك - الدخول | المنصة العقارية الاستثمارية</title>
+  <meta name="theme-color" content="#d4af37">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icons/icon-192.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="auth-wrapper">
+
+      <!-- شعار المنصة وتفاصيل الهوية -->
+      <div class="brand-header">
+        <div class="logo-icon">🏛️</div>
+        <h1 class="brand-title">دارك وحيك</h1>
+        <p class="brand-subtitle">استثمر في مستقبل العقار والأحياء الواعدة</p>
+      </div>
+
+      <!-- بطاقة نماذج الدخول والتسجيل -->
+      <div class="auth-card">
+        <h2 id="form-title" class="form-title">تسجيل الدخول</h2>
+
+        <!-- حقل الاسم (يظهر فقط عند إنشاء حساب جديد) -->
+        <div class="input-group" id="name-group" style="display: none;">
+          <label for="user-name">الاسم الكامل</label>
+          <input type="text" id="user-name" class="input-field" placeholder="مثال: عبد الله السلمان" autocomplete="name">
+        </div>
+
+        <!-- حقل الجوال (يظهر فقط عند إنشاء حساب جديد) -->
+        <div class="input-group" id="phone-group" style="display: none;">
+          <label for="user-phone">رقم الجوال</label>
+          <input type="tel" id="user-phone" class="input-field" placeholder="05xxxxxxxx" maxlength="13" autocomplete="tel" style="direction:ltr;text-align:left">
+        </div>
+
+        <div class="input-group">
+          <label for="user-email">البريد الإلكتروني</label>
+          <input type="email" id="user-email" class="input-field" placeholder="name@domain.com" autocomplete="email">
+        </div>
+
+        <div class="input-group">
+          <label for="user-password">كلمة المرور</label>
+          <input type="password" id="user-password" class="input-field" placeholder="••••••••" autocomplete="current-password">
+        </div>
+
+        <!-- رسالة الخطأ أو التنبيه -->
+        <div id="auth-error" class="error-message"></div>
+
+        <button id="btn-submit" class="btn-primary">دخول للمنصة</button>
+
+        <button id="btn-toggle-mode" class="btn-secondary-link">
+          ليس لديك حساب؟ <strong>إنشاء حساب جديد</strong>
+        </button>
+      </div>
+
+      <!-- شارة الأمان والالتزام -->
+      <div class="security-badge">
+        <span>🔒 معاملات محمية وموثقة وفق أعلى المعاير المالية</span>
+      </div>
+
+      <a class="auth-back" href="index.html">→ العودة إلى الصفحة الرئيسية</a>
+
+    </div>
+  </div>
+
+  <div class="tb" id="toasts"></div>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+  function setAuthMode(reg){
+    document.getElementById('form-title').textContent=reg?'إنشاء حساب':'تسجيل الدخول';
+    document.getElementById('name-group').style.display=reg?'block':'none';
+    document.getElementById('phone-group').style.display=reg?'block':'none';
+    document.getElementById('btn-submit').textContent=reg?'إنشاء حساب':'دخول للمنصة';
+    document.getElementById('btn-toggle-mode').innerHTML=reg?'لديك حساب؟ <strong>تسجيل الدخول</strong>':'ليس لديك حساب؟ <strong>إنشاء حساب جديد</strong>';
+    if(reg)document.getElementById('user-password').setAttribute('autocomplete','new-password');
+    else document.getElementById('user-password').setAttribute('autocomplete','current-password');
+  }
+  function setAuthErr(msg){
+    var e=document.getElementById('auth-error');
+    e.textContent=msg;e.style.display=msg?'block':'none';
+  }
+  async function submitAuth(){
+    var btn=document.getElementById('btn-submit');
+    if(btn.disabled)return;
+    var reg=document.getElementById('name-group').style.display!=='none';
+    var em=document.getElementById('user-email').value.trim();
+    var pw=document.getElementById('user-password').value;
+    setAuthErr('');
+    btn.disabled=true;btn.textContent='جاري المعالجة...';
+    try{
+      if(reg){
+        var nm=document.getElementById('user-name').value.trim();
+        var ph=document.getElementById('user-phone').value.trim();
+        if(!nm||!em||!ph||!pw){setAuthErr('أكمل جميع الحقول');return}
+        if(!/^(\+966|0)?5\d{8}$/.test(ph)){setAuthErr('رقم الجوال غير صالح (مثال: 05xxxxxxxx)');return}
+        var d=await api('/auth/register',{method:'POST',body:JSON.stringify({name:nm,email:em,phone:ph,password:pw})});
+        if(d&&d.success){setSession(d);window.location.href='dashboard.html';return}
+        setAuthErr(d.error||'فشل إنشاء الحساب');
+      }else{
+        if(!em||!pw){setAuthErr('أدخل البريد وكلمة المرور');return}
+        var d=await api('/auth/login',{method:'POST',body:JSON.stringify({email:em,password:pw})});
+        if(d&&d.success){setSession(d);window.location.href='dashboard.html';return}
+        setAuthErr(d.error||'فشل تسجيل الدخول');
+      }
+    }catch(err){setAuthErr('حدث خطأ غير متوقع، حاول مجددًا')}
+    finally{btn.disabled=false;btn.textContent=reg?'إنشاء حساب':'دخول للمنصة'}
+  }
+  document.getElementById('btn-toggle-mode').addEventListener('click',function(){
+    setAuthMode(document.getElementById('name-group').style.display==='none');
+  });
+  document.getElementById('btn-submit').addEventListener('click',submitAuth);
+  document.getElementById('user-password').addEventListener('keydown',function(e){if(e.key==='Enter')submitAuth()});
+  document.getElementById('user-email').addEventListener('keydown',function(e){if(e.key==='Enter')submitAuth()});
+  </script>
+</body>
+</html>
