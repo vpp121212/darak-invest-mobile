@@ -114,7 +114,7 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
   }
 
   void _load() {
-    _controller.loadHtmlString(_html(), baseUrl: Uri.parse('https://localhost/'));
+    _controller.loadHtmlString(_html(), baseUrl: 'https://localhost/');
   }
 
   String _html() {
