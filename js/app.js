@@ -408,16 +408,26 @@ function destroyVT(){
   if(f){try{f.src='about:blank'}catch(e){}if(f.parentNode)f.parentNode.removeChild(f)}
   var pc=document.getElementById('vt-pano');
   if(pc)pc.innerHTML='';
+  var inn=document.getElementById('vt-in');
+  if(inn){inn.innerHTML='';delete inn.dataset.built}
   ['doll','plan'].forEach(function(x){
     var e=document.getElementById('vt-'+x);
     if(e)e.innerHTML='';
   });
 }
 function initVTSection(p){
-  var tour=p.tourUrl||p.matterport||p.tour3d;
-  var pano=p.panoramicImage||p.pano;
   var el=document.getElementById('vt-in');
   if(!el)return;
+  if(el.style.display!=='none')vtBuildInside(p);
+  var model=p.model3dUrl||p.model3d||null;
+  if(model){vtModel3D(document.getElementById('vt-doll'),'doll',model);vtModel3D(document.getElementById('vt-plan'),'plan',model);}
+}
+function vtBuildInside(p){
+  var el=document.getElementById('vt-in');
+  if(!el||el.dataset.built)return;
+  el.dataset.built='1';
+  var tour=p.tourUrl||p.matterport||p.tour3d;
+  var pano=p.panoramicImage||p.pano;
   el.innerHTML='';
   if(tour){
     var f=document.createElement('iframe');
@@ -445,8 +455,6 @@ function initVTSection(p){
     b.onclick=function(){tbPreload(currentDetail.images)};
     el.appendChild(b);
   }
-  var model=p.model3dUrl||p.model3d||null;
-  if(model){vtModel3D(document.getElementById('vt-doll'),'doll',model);vtModel3D(document.getElementById('vt-plan'),'plan',model);}
 }
 function vtSetMode(mode){
   var p=currentDetail;if(!p)return;
@@ -456,7 +464,8 @@ function vtSetMode(mode){
     var e=document.getElementById('vt-'+x);
     if(e)e.style.display=(x===mode)?'block':'none';
   });
-  if((mode==='doll'||mode==='plan')&&!p.model3dUrl&&!p.model3d){
+  if(mode==='in'){vtBuildInside(p);return}
+  if(!p.model3dUrl&&!p.model3d){
     var el=document.getElementById('vt-'+mode);
     if(el&&!el.querySelector('model-viewer')){
       el.innerHTML='<div class="vt-empty"><div class="vt-empty-i">🧊</div><div class="vt-empty-t">لا يوجد نموذج ثلاثي الأبعاد لهذا العقار</div><div class="vt-empty-s">يُعرض بيت الدمية والمخطط من نموذج GLB/GLTF يُضاف عند نشر العقار</div><button class="vt-sample" onclick="vtSampleModel(\''+mode+'\')">🧪 جرّب نموذجًا تجريبيًا</button></div>';
