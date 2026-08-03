@@ -447,7 +447,7 @@
         </div>
         <div class="tb-setting">
           <div class="tb-setting-l">الجودة</div>
-          <select id="tbQual"><option value="1280">سريع (1280×640)</option><option value="1600" selected>متوسط (1600×800)</option><option value="2048">عالي (2048×1024)</option></select>
+          <select id="tbQual"><option value="1280">سريع (1280×640)</option><option value="1600">متوسط (1600×800)</option><option value="2048" selected>عالي (2048×1024)</option></select>
         </div>
       </div>
       <button class="tb-gen" id="tbGen" onclick="tbGenerate()" style="display:none">⚙️ توليد الجولة البانورامية 360°</button>
@@ -458,7 +458,8 @@
         <button class="tb-preview" onclick="tbPreviewAll()">🎬 معاينة تفاعلية في الجولة 360°</button>
         <button class="tb-dl" onclick="tbDownloadAll()">⬇ تحميل كل البانورامات</button>
       </div>
-      <div class="tb-note">يُولّد المحرك لكل صورة بانوراما Equirectangular (نسبة 2:1) تعمل مع عارض Pannellum التفاعلي: اسحب للتنقل، وبدّل بين المشاهد من الأزرار أسفل الجولة.</div>
+      <button class="tb-gen" id="tbMerge" onclick="tbMergeAll()" style="display:none;margin-top:10px">🧩 دمج كل الصور في جولة 360° واحدة (كل الاتجاهات)</button>
+      <div class="tb-note">يُولّد المحرك لكل صورة بانوراما Equirectangular (نسبة 2:1) تعمل مع عارض Pannellum التفاعلي: اسحب للتنقل، وبدّل بين المشاهد من الأزرار أسفل الجولة. مع 2 صور فأكثر يمكنك دمجها في جولة 360° كاملة تغطي كل الاتجاهات.</div>
       <div class="tb-tour3d">
         <div class="tb-tour3d-t">🕶️ جولة 3D جاهزة</div>
         <div class="tb-tour3d-s">لديك رابط جولة افتراضية (Matterport، jawla360.com…؟) الصقه لعرضها فورًا</div>

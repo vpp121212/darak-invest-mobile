@@ -59,20 +59,12 @@ function imgToEquirect(img,hfovDeg,outW){
   var vfovDeg=hfovDeg*(ih/iw);
   var src=document.createElement('canvas');
   src.width=iw;src.height=ih;
-  src.getContext('2d').drawImage(img,0,0);
-  var sd=src.getContext('2d').getImageData(0,0,iw,ih).data;
+  var sctx=src.getContext('2d');
+  sctx.drawImage(img,0,0);
+  var sd=sctx.getImageData(0,0,iw,ih).data;
   var cv=document.createElement('canvas');cv.width=outW;cv.height=outH;
   var ctx=cv.getContext('2d');
-  var halfH=hfovDeg/2,halfV=vfovDeg/2;
-  var scale=Math.max(outW/iw,outH/ih);
-  var w=iw*scale,h=ih*scale;
-  if(ctx.filter){
-    ctx.filter='blur('+Math.max(18,Math.round(outW/50))+'px)';
-    ctx.drawImage(img,(outW-w)/2,(outH-h)/2,w,h);
-    ctx.filter='none';
-  }else{
-    ctx.drawImage(img,(outW-w)/2,(outH-h)/2,w,h);
-  }
+  var halfH=hfovDeg/2,halfV=vfovDeg/2,backSpan=180-halfH;
   var id=ctx.getImageData(0,0,outW,outH),d=id.data;
   var iX=iw-1,iY=ih-1,topY=0,botY=ih-1;
   for(var y=0;y<outH;y++){
@@ -85,38 +77,113 @@ function imgToEquirect(img,hfovDeg,outW){
       var yaw=(x/outW)*360-180;
       var ax=Math.abs(yaw);
       var di=(y*outW+x)*4;
-      var r=0,g=0,b=0;
+      var sx,k=1;
       if(ax<=halfH){
-        var fx=(yaw+halfH)/(2*halfH)*iw;
-        var fx0=Math.max(0,Math.min(iX,Math.floor(fx)));
-        var fx1=Math.min(iX,fx0+1);
-        var wx=fx-fx0;
+        sx=(yaw+halfH)/(2*halfH)*iw;
+      }else{
+        var t=(ax-halfH)/backSpan;
+        sx=(yaw>0)?iw*(1-t):iw*t;
+        k=1-0.6*t;
+      }
+      var fx0=Math.max(0,Math.min(iX,Math.floor(sx)));
+      var fx1=Math.min(iX,fx0+1);
+      var wx=sx-fx0;
+      var r,g,b;
+      if(pitch>halfV){
+        var s=(topY*iw+fx0)*4;
+        var up=Math.min(1,(pitch-halfV)/(90-halfV));
+        r=sd[s]*(1-up*0.35);g=sd[s+1]*(1-up*0.35);b=sd[s+2]*(1-up*0.35);
+      }else if(pitch<-halfV){
+        var s2=(botY*iw+fx0)*4;
+        var dn=Math.min(1,(-pitch-halfV)/(90-halfV));
+        r=sd[s2]*(1-dn*0.55);g=sd[s2+1]*(1-dn*0.55);b=sd[s2+2]*(1-dn*0.55);
+      }else{
         var s00=(fy0*iw+fx0)*4,s01=(fy0*iw+fx1)*4,s10=(fy1*iw+fx0)*4,s11=(fy1*iw+fx1)*4;
         r=(sd[s00]*(1-wx)+sd[s01]*wx)*(1-wy)+(sd[s10]*(1-wx)+sd[s11]*wx)*wy;
         g=(sd[s00+1]*(1-wx)+sd[s01+1]*wx)*(1-wy)+(sd[s10+1]*(1-wx)+sd[s11+1]*wx)*wy;
         b=(sd[s00+2]*(1-wx)+sd[s01+2]*wx)*(1-wy)+(sd[s10+2]*(1-wx)+sd[s11+2]*wx)*wy;
-      }else if(pitch>halfV){
-        var cx1=Math.max(0,Math.min(iX,Math.round((yaw+180)/360*iw)));
-        var s=(topY*iw+cx1)*4;
-        var up=Math.min(1,(pitch-halfV)/(90-halfV));
-        r=sd[s]*(1-up*0.4);g=sd[s+1]*(1-up*0.4);b=sd[s+2]*(1-up*0.4);
-      }else if(pitch<-halfV){
-        var cx2=Math.max(0,Math.min(iX,Math.round((yaw+180)/360*iw)));
-        var s2=(botY*iw+cx2)*4;
-        var dn=Math.min(1,(-pitch-halfV)/(90-halfV));
-        r=sd[s2]*(1-dn*0.6);g=sd[s2+1]*(1-dn*0.6);b=sd[s2+2]*(1-dn*0.6);
-      }else{
-        var ex=(yaw<0)?0:iw-1;
-        var es=(fy0*iw+ex)*4;
-        var fade=Math.min(1,((ax-halfH)/(180-halfH))*1.5+0.25);
-        var k=1-fade*0.8;
-        r=sd[es]*k;g=sd[es+1]*k;b=sd[es+2]*k;
       }
-      d[di]=r;d[di+1]=g;d[di+2]=b;d[di+3]=255;
+      d[di]=r*k;d[di+1]=g*k;d[di+2]=b*k;d[di+3]=255;
     }
   }
   ctx.putImageData(id,0,0);
   return cv;
+}
+
+function equirectMulti(imgs,outW){
+  var outH=Math.round(outW/2);
+  var N=imgs.length;
+  if(N<1)return null;
+  if(N===1)return imgToEquirect(imgs[0],150,outW);
+  var list=[];
+  for(var i=0;i<N;i++){
+    var img=imgs[i];
+    var iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
+    var c=document.createElement('canvas');c.width=iw;c.height=ih;
+    c.getContext('2d').drawImage(img,0,0);
+    var slice=360/N;
+    var halfV=Math.min(50,slice*(ih/iw)/2);
+    list.push({iw:iw,ih:ih,data:c.getContext('2d').getImageData(0,0,iw,ih).data,halfV:halfV});
+  }
+  var out=document.createElement('canvas');out.width=outW;out.height=outH;
+  var octx=out.getContext('2d');
+  var oid=octx.getImageData(0,0,outW,outH),od=oid.data;
+  var sliceDeg=360/N;
+  var pixAt=function(idx,tt,pitch){
+    var o=list[idx],iw=o.iw,ih=o.ih,sd=o.data,iX=iw-1,iY=ih-1;
+    if(tt<0)tt=0;if(tt>1)tt=1;
+    var fx=tt*iw;
+    var fx0=Math.max(0,Math.min(iX,Math.floor(fx))),fx1=Math.min(iX,fx0+1),wx=fx-fx0;
+    var halfV=o.halfV;
+    if(pitch>halfV){
+      var up=Math.min(1,(pitch-halfV)/(90-halfV));
+      var s=(0*iw+fx0)*4;
+      return [sd[s]*(1-up*0.35),sd[s+1]*(1-up*0.35),sd[s+2]*(1-up*0.35)];
+    }
+    if(pitch<-halfV){
+      var dn=Math.min(1,(-pitch-halfV)/(90-halfV));
+      var s2=((ih-1)*iw+fx0)*4;
+      return [sd[s2]*(1-dn*0.55),sd[s2+1]*(1-dn*0.55),sd[s2+2]*(1-dn*0.55)];
+    }
+    var fy=(halfV-pitch)/(2*halfV)*ih;
+    var fy0=Math.max(0,Math.min(iY,Math.floor(fy))),fy1=Math.min(iY,fy0+1),wy=fy-fy0;
+    var s00=(fy0*iw+fx0)*4,s01=(fy0*iw+fx1)*4,s10=(fy1*iw+fx0)*4,s11=(fy1*iw+fx1)*4;
+    var r=(sd[s00]*(1-wx)+sd[s01]*wx)*(1-wy)+(sd[s10]*(1-wx)+sd[s11]*wx)*wy;
+    var g=(sd[s00+1]*(1-wx)+sd[s01+1]*wx)*(1-wy)+(sd[s10+1]*(1-wx)+sd[s11+1]*wx)*wy;
+    var b=(sd[s00+2]*(1-wx)+sd[s01+2]*wx)*(1-wy)+(sd[s10+2]*(1-wx)+sd[s11+2]*wx)*wy;
+    return [r,g,b];
+  };
+  for(var y=0;y<outH;y++){
+    var pitch=90-(y/outH)*180;
+    for(var x=0;x<outW;x++){
+      var yaw=(x/outW)*360-180;
+      var di=(y*outW+x)*4;
+      var i0=Math.floor((yaw+180)/sliceDeg);
+      if(i0>=N)i0=N-1;
+      var start=-180+i0*sliceDeg;
+      var t=(yaw-start)/sliceDeg;
+      var B=0.1;
+      var col;
+      if(t<B&&N>1){
+        var prev=(i0-1+N)%N;
+        var p1=pixAt(prev,1-(B-t)/(2*B),pitch);
+        var p2=pixAt(i0,t/B,pitch);
+        var w=t/B;
+        col=[p1[0]*(1-w)+p2[0]*w,p1[1]*(1-w)+p2[1]*w,p1[2]*(1-w)+p2[2]*w];
+      }else if(t>1-B&&N>1){
+        var nxt=(i0+1)%N;
+        var p1=pixAt(i0,(1-t)/B,pitch);
+        var p2=pixAt(nxt,(B-(1-t))/B,pitch);
+        var w=(1-t)/B;
+        col=[p1[0]*(1-w)+p2[0]*w,p1[1]*(1-w)+p2[1]*w,p1[2]*(1-w)+p2[2]*w];
+      }else{
+        col=pixAt(i0,t,pitch);
+      }
+      od[di]=col[0];od[di+1]=col[1];od[di+2]=col[2];od[di+3]=255;
+    }
+  }
+  octx.putImageData(oid,0,0);
+  return out;
 }
 
 function loadImage(url){
@@ -160,6 +227,8 @@ async function tbGenerate(){
     }
     status.textContent='✅ تم تحويل '+tbResults.length+' صورة إلى بانوراما 360°';
     document.getElementById('tbActions').style.display='flex';
+    var mb=document.getElementById('tbMerge');
+    if(mb)mb.style.display=(tbFiles.length>1)?'block':'none';
     toast('تم توليد الجولة البانورامية ✓');
   }catch(e){
     status.textContent='❌ '+e.message;
@@ -167,6 +236,30 @@ async function tbGenerate(){
   }
   bar.style.display='none';
   btn.style.display='';
+}
+
+async function tbMergeAll(){
+  if(tbFiles.length<2){toast('أضف صورتين على الأقل للدمج');return}
+  var outW=parseInt(document.getElementById('tbQual').value,10);
+  var btn=document.getElementById('tbMerge');
+  if(btn)btn.disabled=true;
+  try{
+    var imgs=[];
+    for(var i=0;i<tbFiles.length;i++){
+      imgs.push(await loadImage(tbFiles[i].url));
+    }
+    var cv=equirectMulti(imgs,outW);
+    if(!cv)throw new Error('تعذر الدمج');
+    var dataUrl=cv.toDataURL('image/jpeg',0.88);
+    tbResults.unshift({dataUrl:dataUrl,name:'🧩 جولة 360 كاملة ('+imgs.length+' صور)'});
+    var resWrap=document.getElementById('tbResults');
+    resWrap.style.display='block';
+    resWrap.insertAdjacentHTML('afterbegin','<div class="tb-result"><img src="'+dataUrl+'" alt="جولة 360 كاملة"><div class="tb-result-n">🌐 🧩 جولة 360 كاملة ('+imgs.length+' اتجاهات)</div><div class="tb-result-actions"><button onclick="tbPreviewOne(0)">معاينة</button><a download="pano-360-merged.jpg" href="'+dataUrl+'">⬇ تحميل</a></div></div>');
+    toast('تم دمج الصور في جولة 360 كاملة ✓');
+  }catch(e){
+    toast(e.message);
+  }
+  if(btn)btn.disabled=false;
 }
 
 function tbPreviewAll(){
@@ -232,22 +325,48 @@ function addImgAuto360(input){
     preview.appendChild(el);
   }
   var first=null;
-  for(var i2=0;i2<files.length;i2++){if(/^image\//.test(files[i2].type)){first=files[i2];break}}
+  var imgsFiles=[];
+  for(var i2=0;i2<files.length;i2++){if(/^image\//.test(files[i2].type)){imgsFiles.push(files[i2]);if(!first)first=files[i2]}}
   if(!first)return;
   var box=document.getElementById('ap-auto360');
-  if(box){box.style.display='none';box.innerHTML='<div style="font-size:12px;font-weight:800;color:var(--g)">⏳ جاري برمجة الجولة 360 من صورتك...</div>'}
-  fileToEquirect(first,120,1280).then(function(res){
+  if(box){box.style.display='none';box.innerHTML='<div style="font-size:12px;font-weight:800;color:var(--g)">⏳ جاري برمجة الجولة 360 من صورك...</div>'}
+  filesToEquirect(imgsFiles).then(function(res){
     autoPanoDataUrl=res.dataUrl;autoPanoBlob=res.blob;
     if(box){
-      box.innerHTML='<div style="font-size:12px;font-weight:800;color:#4ade80">✅ تم برمجة الجولة 360 من صورتك</div><div style="font-size:11px;color:var(--m);margin-top:4px;line-height:1.8">ستظهر للزوار كجولة تفاعلية قابلة للسحب. يمكنك معاينتها الآن.</div><button class="tb-tour3d-b" onclick="apPreviewTour()">🎬 معاينة الجولة المولّدة</button>';
+      box.innerHTML='<div style="font-size:12px;font-weight:800;color:#4ade80">✅ تم برمجة الجولة 360'+(imgsFiles.length>1?' من '+imgsFiles.length+' صور (تغطي كل الاتجاهات)':' من صورتك')+'</div><div style="font-size:11px;color:var(--m);margin-top:4px;line-height:1.8">ستظهر للزوار كجولة تفاعلية قابلة للسحب 360°. يمكنك معاينتها الآن.</div><button class="tb-tour3d-b" onclick="apPreviewTour()">🎬 معاينة الجولة المولّدة</button>';
       box.style.display='block';
     }
-    toast('تم توليد الجولة من صورتك ✓');
+    toast('تم توليد الجولة 360 ✓');
   }).catch(function(e){
     if(box){
-      box.innerHTML='<div style="font-size:12px;font-weight:800;color:#f87171">⚠️ تعذر توليد الجولة من الصورة</div><div style="font-size:11px;color:var(--m);margin-top:4px">'+e.message+'</div>';
+      box.innerHTML='<div style="font-size:12px;font-weight:800;color:#f87171">⚠️ تعذر توليد الجولة من الصور</div><div style="font-size:11px;color:var(--m);margin-top:4px">'+e.message+'</div>';
       box.style.display='block';
     }
+  });
+}
+function filesToEquirect(files){
+  return new Promise(function(res,rej){
+    var imgs=[];
+    var readers=files.map(function(f){
+      return new Promise(function(r2,rej2){
+        var reader=new FileReader();
+        reader.onload=function(ev){
+          var img=new Image();
+          img.onload=function(){imgs.push(img);r2()};
+          img.onerror=function(){rej2(new Error('صورة غير صالحة'))};
+          img.src=ev.target.result;
+        };
+        reader.onerror=function(){rej2(new Error('تعذر قراءة الصور'))};
+        reader.readAsDataURL(f);
+      });
+    });
+    Promise.all(readers).then(function(){
+      try{
+        var cv=(imgs.length>1)?equirectMulti(imgs,2048):imgToEquirect(imgs[0],130,2048);
+        var dataUrl=cv.toDataURL('image/jpeg',0.88);
+        cv.toBlob(function(b){res({dataUrl:dataUrl,blob:b||null})},'image/jpeg',0.88);
+      }catch(e){rej(e)}
+    }).catch(rej);
   });
 }
 function fileToEquirect(file,hfov,outW){
