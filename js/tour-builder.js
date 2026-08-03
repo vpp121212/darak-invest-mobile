@@ -395,6 +395,46 @@ function apPreviewTour(){
   openVR([autoPanoDataUrl],['جولتي']);
 }
 
+var apVideoUrl=null;
+function apVideoUploaded(input){
+  var st=document.getElementById('ap-video-state');
+  var f=input&&input.files&&input.files[0];
+  if(!f){if(st)st.textContent='';return}
+  if(st)st.textContent='⏳ جاري الرفع والتحويل إلى رابط مباشر...';
+  var fd=new FormData();fd.append('file',f);
+  fetch('https://upload.gofile.io/uploadfile',{method:'POST',body:fd})
+    .then(function(r){return r.json()})
+    .then(function(d){
+      if(!(d&&d.status==='ok'&&d.data))throw new Error('فشل الرفع');
+      return apResolveGofile(d.data).then(function(direct){
+        var url=direct||d.data.downloadPage;
+        apVideoUrl=url;
+        var u=document.getElementById('ap-video-url');
+        if(u)u.value=url;
+        if(st)st.textContent=direct?'✅ تم — رابط مباشر جاهز':'✅ تم الرفع — الرابط أدناه';
+        toast('تم رفع الفيديو وتحويله إلى رابط مباشر ✓');
+      });
+    })
+    .catch(function(){
+      apVideoUrl=null;
+      if(st)st.textContent='⚠️ تعذر الرفع — الصق رابطًا مباشرًا';
+      toast('تعذر رفع الفيديو — الصق رابط يوتيوب/MP4 مباشر');
+    });
+}
+function apResolveGofile(d){
+  if(!d||!d.parentFolderCode||!d.guestToken)return Promise.resolve(null);
+  return fetch('https://api.gofile.io/getContent?contentId='+d.parentFolderCode+'&token='+d.guestToken)
+    .then(function(r){return r.json()})
+    .then(function(j){
+      if(j&&j.status==='ok'&&j.data&&j.data.contents){
+        var c=Object.keys(j.data.contents).map(function(k){return j.data.contents[k]})[0];
+        if(c&&c.link)return c.link;
+      }
+      return null;
+    })
+    .catch(function(){return null});
+}
+
 function tbOpenTour3D(){
   var url=(document.getElementById('tbTourUrl')||{}).value||'';
   url=url.trim();
