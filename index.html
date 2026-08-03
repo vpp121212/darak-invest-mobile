@@ -33,6 +33,7 @@
       <div class="qi-i" onclick="nav('add')"><span class="qi-icon">➕</span><span class="qi-l">إضافة</span></div>
       <div class="qi-i" onclick="nav('sources')"><span class="qi-icon">🔗</span><span class="qi-l">المصادر</span></div>
       <div class="qi-i" onclick="nav('invest');window.investRefresh&&window.investRefresh()"><span class="qi-icon">💰</span><span class="qi-l">الاستثمار</span></div>
+      <div class="qi-i" onclick="openTourBuilder()"><span class="qi-icon">🤖</span><span class="qi-l">جولة 360</span></div>
     </div>
     <div class="srch">
       <input type="text" id="hq" placeholder="ابحث بالاسم أو المنطقة...">
@@ -425,6 +426,41 @@
       </div>
     </div>
   </div>
+  <div class="pg" id="pg-tour">
+    <div class="wrap">
+      <section class="tb-hero">
+        <div class="tb-title">🤖 أتمتة الجولات الافتراضية 360°</div>
+        <div class="tb-sub">حوّل صور الموقع العادية إلى مشاهد بانورامية تفاعلية قابلة للسحب — بدون كاميرا 360 ولا معدات</div>
+      </section>
+      <div class="tb-drop" id="tbDrop" onclick="document.getElementById('tbFile').click()" ondragover="event.preventDefault()" ondragenter="event.preventDefault()" ondrop="tbDrop(event)">
+        <div class="tb-drop-i">📷</div>
+        <div class="tb-drop-t">اضغط أو اسحب الصور هنا</div>
+        <div class="tb-drop-s">صور الغرف · الواجهة · الحديقة · الدور الأرضي… (JPEG/PNG)</div>
+        <input type="file" id="tbFile" accept="image/*" multiple style="display:none" onchange="tbAddFiles(this.files);this.value=''">
+      </div>
+      <div id="tbEmpty"></div>
+      <div id="tbList"></div>
+      <div class="tb-settings">
+        <div class="tb-setting">
+          <div class="tb-setting-l">مجال الرؤية الأفقية <span id="tbHfovLbl" style="color:var(--g)">110°</span></div>
+          <input type="range" id="tbHfov" min="60" max="180" value="110" oninput="document.getElementById('tbHfovLbl').textContent=this.value+'°'">
+        </div>
+        <div class="tb-setting">
+          <div class="tb-setting-l">الجودة</div>
+          <select id="tbQual"><option value="1280">سريع (1280×640)</option><option value="1600" selected>متوسط (1600×800)</option><option value="2048">عالي (2048×1024)</option></select>
+        </div>
+      </div>
+      <button class="tb-gen" id="tbGen" onclick="tbGenerate()" style="display:none">⚙️ توليد الجولة البانورامية 360°</button>
+      <div class="tb-bar-wrap" id="tbBarWrap" style="display:none"><div class="tb-bar" id="tbBar"></div></div>
+      <div class="tb-status" id="tbStatus" style="display:none"></div>
+      <div id="tbResults" style="display:none"></div>
+      <div class="tb-actions" id="tbActions" style="display:none">
+        <button class="tb-preview" onclick="tbPreviewAll()">🎬 معاينة تفاعلية في الجولة 360°</button>
+        <button class="tb-dl" onclick="tbDownloadAll()">⬇ تحميل كل البانورامات</button>
+      </div>
+      <div class="tb-note">يُولّد المحرك لكل صورة بانوراما Equirectangular (نسبة 2:1) تعمل مع عارض Pannellum التفاعلي: اسحب للتنقل، وبدّل بين المشاهد من الأزرار أسفل الجولة.</div>
+    </div>
+  </div>
   <!-- Bottom Nav -->
   <nav class="bn">
     <div class="bi on" onclick="nav('home')" id="nav-home"><div class="bii">🏠</div>الرئيسية</div>
@@ -494,5 +530,6 @@
   <script src="js/auth-legacy.js"></script>
   <script src="js/favs.js"></script>
   <script src="js/invest.js"></script>
+  <script src="js/tour-builder.js"></script>
 </body>
 </html>

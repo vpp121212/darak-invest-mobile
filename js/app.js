@@ -1548,19 +1548,19 @@ function renderAVM(v){
 
 /* 360 VR */
 var vrActive=false,vrAngle=0,vrDragging=false,vrLastX=0,vrImg=null,vrRAF=null,vrAuto=true,vrImages=[],vrCurrentIdx=0;
-var vrPanoViewer=null,vrPanoFailed=false,vrPanoWatchdog=null;
-function openVR(imgs){
+var vrPanoViewer=null,vrPanoFailed=false,vrPanoWatchdog=null,vrForcePano=false;
+function openVR(imgs,labels){
   if(!imgs||!imgs.length){toast('لا توجد صور لهذه الجولة');return}
   if(typeof imgs==='string')imgs=[imgs];
   var prop=currentDetail||{};
-  if(prop.panoramicImage||prop.pano){imgs=[prop.panoramicImage||prop.pano].concat(imgs)}
+  if(!vrForcePano&&(prop.panoramicImage||prop.pano)){imgs=[prop.panoramicImage||prop.pano].concat(imgs)}
   vrImages=imgs;vrCurrentIdx=0;vrPanoFailed=false;
   document.getElementById('vr360').classList.add('on');
   var hint=document.getElementById('vrHint');
   if(hint)hint.style.display='block';
   setTimeout(function(){if(hint)hint.style.display='none'},3000);
   var rooms=document.getElementById('vrRooms');
-  if(rooms)rooms.innerHTML=imgs.map(function(url,i){return'<button class="'+(i===0?'on':'')+'" onclick="vrSwitchRoom('+i+')">غرفة '+(i+1)+'</button>'}).join('');
+  if(rooms)rooms.innerHTML=imgs.map(function(url,i){return'<button class="'+(i===0?'on':'')+'" onclick="vrSwitchRoom('+i+')">'+(labels&&labels[i]?labels[i]:'غرفة '+(i+1))+'</button>'}).join('');
   vrLoadImage(imgs[0]);
 }
 function vrSwitchRoom(idx){
@@ -1628,7 +1628,7 @@ function vrPano2DFallback(){
 }
 function vrLoadImage(url,force2d){
   var prop=currentDetail||{};
-  var isPano=!force2d&&!vrPanoFailed&&((prop.panoramicImage&&url===prop.panoramicImage)||(prop.pano&&url===prop.pano));
+  var isPano=!force2d&&!vrPanoFailed&&(vrForcePano||(prop.panoramicImage&&url===prop.panoramicImage)||(prop.pano&&url===prop.pano));
   var container=document.getElementById('vrPano'),canvas=document.getElementById('vrCanvas');
   if(isPano&&container&&window.pannellum){
     if(vrPanoOpen(url)){
@@ -1682,7 +1682,7 @@ function vrLoadImage(url,force2d){
   img.src=url;
 }
 function closeVR(){
-  vrActive=false;vrImg=null;vrAuto=false;vrImages=[];vrCurrentIdx=0;vrPanoFailed=false;
+  vrActive=false;vrImg=null;vrAuto=false;vrImages=[];vrCurrentIdx=0;vrPanoFailed=false;vrForcePano=false;
   if(vrRAF)cancelAnimationFrame(vrRAF);
   clearInterval(vrPanoWatchdog);
   if(vrPanoViewer){try{vrPanoViewer.destroy()}catch(e){}vrPanoViewer=null}
