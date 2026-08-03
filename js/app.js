@@ -21,7 +21,7 @@ window.__baseNav=nav;
 /* RENDER */
 function cardHTML(p){
   var im=pImg(p),fav=F.indexOf(p.id)>-1;
-  return'<div class="card" onclick="showDetail('+p.id+')"><div class="card-img"><img src="'+im+'" alt="'+p.title+'" loading="lazy" onerror="this.onerror=null;this.src=\''+pFallback(p)+'\'"><div class="badges"><span class="badge '+(p.purpose==='إيجار'?'badge-r':'badge-s')+'">'+p.purpose+'</span>'+(p.status==='حصري'?'<span class="badge badge-x">⭐ حصري</span>':'')+'</div><button class="fav '+(fav?'on':'')+'" onclick="toggleFav('+p.id+',event)">'+(fav?'❤':'🤍')+'</button><span class="trust trust-'+tCls(p.trust)+'">'+tLbl(p.trust)+'</span>'+(p.panoramicImage||p.pano?'<span class="card-360">🌐 360°</span>':'')+(p.tourUrl||p.matterport||p.tour3d?'<span class="card-360">🕶️ 3D</span>':'')+'</div><div class="card-b"><div class="card-t">'+p.title+'</div><div class="card-l">📍 '+pLoc(p)+'</div><div class="card-p">'+pPrice(p)+'</div>'+(p.expectedPrice?'<div class="card-avm">💰 التقدير: '+fmt(p.expectedPrice)+' ر.س</div>':'')+'<div class="card-m"><span>🛏 '+p.rooms+'</span><span>📐 '+fmt(p.area)+' م²</span><span>🚿 '+p.baths+'</span>'+(p.type==='فيلا'&&p.apartments?'<span>🏢 '+p.apartments+' شقق</span>':'')+'</div></div></div>'
+  return'<div class="card" onclick="showDetail('+p.id+')"><div class="card-img"><img src="'+im+'" alt="'+p.title+'" loading="lazy" onerror="this.onerror=null;this.src=\''+pFallback(p)+'\'"><div class="badges"><span class="badge '+(p.purpose==='إيجار'?'badge-r':'badge-s')+'">'+p.purpose+'</span>'+(p.status==='حصري'?'<span class="badge badge-x">⭐ حصري</span>':'')+'</div><button class="fav '+(fav?'on':'')+'" onclick="toggleFav('+p.id+',event)">'+(fav?'❤':'🤍')+'</button><span class="trust trust-'+tCls(p.trust)+'">'+tLbl(p.trust)+'</span>'+(p.panoramicImage||p.pano?'<span class="card-360">🌐 360°</span>':'')+(p.tourUrl||p.matterport||p.tour3d?'<span class="card-360">🕶️ 3D</span>':'')+(p.model3dUrl||p.model3d?'<span class="card-360">🧊 مجسم</span>':'')+'</div><div class="card-b"><div class="card-t">'+p.title+'</div><div class="card-l">📍 '+pLoc(p)+'</div><div class="card-p">'+pPrice(p)+'</div>'+(p.expectedPrice?'<div class="card-avm">💰 التقدير: '+fmt(p.expectedPrice)+' ر.س</div>':'')+'<div class="card-m"><span>🛏 '+p.rooms+'</span><span>📐 '+fmt(p.area)+' م²</span><span>🚿 '+p.baths+'</span>'+(p.type==='فيلا'&&p.apartments?'<span>🏢 '+p.apartments+' شقق</span>':'')+'</div></div></div>'
 }
 function render(f){
   var g=document.getElementById('pg'),list=f||A;
@@ -373,10 +373,13 @@ function showDetail(id){
   if(p.desc){html+='<div class="desc"><h3>الوصف</h3><p>'+p.desc+'</p></div>'}
   var vtTour=p.tourUrl||p.matterport||p.tour3d;
   var vtPano=p.panoramicImage||p.pano;
-  html+='<div class="vt-section"><div class="vt-head"><span class="vt-icon">'+(vtTour?'🕶️':'🌐')+'</span><h3>الجولة الافتراضية</h3></div>';
-  if(vtTour){html+='<div class="vt-body" id="vt-embed"></div>'}
-  else if(vtPano){html+='<div class="vt-body" id="vt-pano"></div>'}
-  else if(imgs.length){html+='<button class="vt-gen" onclick="tbPreload(currentDetail.images)">🤖 توليد جولة 360 من صور العقار</button>'}
+  var vtModel=p.model3dUrl||p.model3d||null;
+  var defMode=vtModel?'doll':'in';
+  html+='<div class="vt-section"><div class="vt-head"><span class="vt-icon">'+(vtModel?'🧊':(vtTour?'🕶️':'🌐'))+'</span><h3>جولة العقار التفاعلية</h3></div>';
+  html+='<div class="vt-tabs"><button class="vt-tab'+(defMode==='doll'?' on':'')+'" data-m="doll" onclick="vtSetMode(\'doll\')">🏡 بيت الدمية</button><button class="vt-tab" data-m="plan" onclick="vtSetMode(\'plan\')">📐 المخطط</button><button class="vt-tab'+(defMode==='in'?' on':'')+'" data-m="in" onclick="vtSetMode(\'in\')">👣 تجول داخلي</button></div>';
+  html+='<div class="vt-body" id="vt-doll"'+(defMode==='doll'?'':' style="display:none"')+'></div>';
+  html+='<div class="vt-body" id="vt-plan" style="display:none"></div>';
+  html+='<div class="vt-body" id="vt-in"'+(defMode==='in'?'':' style="display:none"')+'></div>';
   html+='</div>';
   html+='<div id="pulse-card-'+p.id+'"><div class="load" style="padding:16px">جاري تحميل مؤشر نبض الحي...</div></div>'
   var ph=(p.agent&&p.agent.phone)?p.agent.phone.replace(/[^0-9]/g,''):'';
@@ -405,30 +408,83 @@ function destroyVT(){
   if(f){try{f.src='about:blank'}catch(e){}if(f.parentNode)f.parentNode.removeChild(f)}
   var pc=document.getElementById('vt-pano');
   if(pc)pc.innerHTML='';
+  ['doll','plan'].forEach(function(x){
+    var e=document.getElementById('vt-'+x);
+    if(e)e.innerHTML='';
+  });
 }
 function initVTSection(p){
   var tour=p.tourUrl||p.matterport||p.tour3d;
   var pano=p.panoramicImage||p.pano;
-  var em=document.getElementById('vt-embed');
-  if(em&&tour){
+  var el=document.getElementById('vt-in');
+  if(!el)return;
+  el.innerHTML='';
+  if(tour){
     var f=document.createElement('iframe');
     f.id='vtFrame';f.src=tour;
     f.setAttribute('allow','xr-spatial-tracking;gyroscope;accelerometer;fullscreen;camera');
     f.setAttribute('allowfullscreen','');
     f.setAttribute('referrerpolicy','no-referrer-when-downgrade');
     f.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:0;background:#0a0b10';
-    em.appendChild(f);
-    return;
-  }
-  var pc=document.getElementById('vt-pano');
-  if(pc&&pano&&window.pannellum){
+    el.appendChild(f);
+  }else if(pano&&window.pannellum){
+    var pc=document.createElement('div');
+    pc.id='vt-pano';
+    pc.style.cssText='position:absolute;inset:0;width:100%;height:100%';
+    el.appendChild(pc);
     try{
       vtViewer=pannellum.viewer('vt-pano',{
         type:'equirectangular',panorama:pano,autoLoad:true,autoRotate:-1,
         compass:false,showFullscreenCtrl:true,crossOrigin:'anonymous',hfov:100
       });
     }catch(e){}
+  }else if(p.images&&p.images.length){
+    var b=document.createElement('button');
+    b.className='vt-gen';
+    b.textContent='🤖 توليد جولة 360 من صور العقار';
+    b.onclick=function(){tbPreload(currentDetail.images)};
+    el.appendChild(b);
   }
+  var model=p.model3dUrl||p.model3d||null;
+  if(model){vtModel3D(document.getElementById('vt-doll'),'doll',model);vtModel3D(document.getElementById('vt-plan'),'plan',model);}
+}
+function vtSetMode(mode){
+  var p=currentDetail;if(!p)return;
+  var tabs=document.querySelectorAll('.vt-tab');
+  for(var i=0;i<tabs.length;i++)tabs[i].classList.toggle('on',tabs[i].getAttribute('data-m')===mode);
+  ['doll','plan','in'].forEach(function(x){
+    var e=document.getElementById('vt-'+x);
+    if(e)e.style.display=(x===mode)?'block':'none';
+  });
+  if((mode==='doll'||mode==='plan')&&!p.model3dUrl&&!p.model3d){
+    var el=document.getElementById('vt-'+mode);
+    if(el&&!el.querySelector('model-viewer')){
+      el.innerHTML='<div class="vt-empty"><div class="vt-empty-i">🧊</div><div class="vt-empty-t">لا يوجد نموذج ثلاثي الأبعاد لهذا العقار</div><div class="vt-empty-s">يُعرض بيت الدمية والمخطط من نموذج GLB/GLTF يُضاف عند نشر العقار</div><button class="vt-sample" onclick="vtSampleModel(\''+mode+'\')">🧪 جرّب نموذجًا تجريبيًا</button></div>';
+    }
+  }
+}
+function vtModel3D(el,mode,src){
+  if(!el)return;
+  var mv=el.querySelector('model-viewer');
+  if(!mv){
+    mv=document.createElement('model-viewer');
+    mv.style.cssText='position:absolute;inset:0;width:100%;height:100%;--poster-color:transparent';
+    mv.setAttribute('camera-controls','');
+    mv.setAttribute('shadow-intensity','1');
+    mv.setAttribute('src',src);
+    el.appendChild(mv);
+  }else if(mv.getAttribute('src')!==src){mv.setAttribute('src',src)}
+  if(mode==='plan'){
+    mv.setAttribute('camera-orbit','0deg 89deg 130%');
+    mv.removeAttribute('auto-rotate');
+  }else{
+    mv.setAttribute('camera-orbit','-25deg 72deg 110%');
+    mv.setAttribute('auto-rotate','');
+  }
+  if(mv.jumpCameraToGoal)mv.jumpCameraToGoal();
+}
+function vtSampleModel(mode){
+  vtModel3D(document.getElementById('vt-'+mode),mode,'https://modelviewer.dev/shared-assets/models/Astronaut.glb');
 }
 function renderDetailAVM(p){
   var el=document.getElementById('avm-chip-'+(p&&p.id));
@@ -2436,6 +2492,9 @@ async function submitAddProp(){
   var panoUrlTxt=panoUrlInput?panoUrlInput.value.trim():'';
   if(!panoUrl&&/^https?:\/\//i.test(panoUrlTxt))panoUrl=panoUrlTxt;
   if(!panoUrl)panoUrl=localStorage.getItem('darak_pano_url')||null;
+  var model3dInput=document.getElementById('ap-model3d');
+  var model3dUrl=model3dInput?model3dInput.value.trim():'';
+  if(model3dUrl&&!/^https?:\/\//i.test(model3dUrl))model3dUrl='';
   var autoLocal=null;
   if(!panoUrl&&window.autoPanoBlob){
     try{
@@ -2448,7 +2507,7 @@ async function submitAddProp(){
   var d=await api('/properties',{method:'POST',body:JSON.stringify({
     title:t,type:tp,purpose:pr,price:prc,area:ar,rooms:rm,baths:bt,apartments:ap,
     city:ct,district:di||ct,description:ds,year:new Date().getFullYear(),age:0,
-    facing:'شمالي',features:[],images:images,panoramicImage:panoUrl,
+    facing:'شمالي',features:[],images:images,panoramicImage:panoUrl,model3dUrl:model3dUrl,
     lat:Number(document.getElementById('ap-lat').value)||null,
     lng:Number(document.getElementById('ap-lng').value)||null
   })});
