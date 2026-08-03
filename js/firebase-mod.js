@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// إعدادات البيئة التجريبية الحية لمنصة دارك وهتوك
+// إعدادات البيئة التجريبية الحية لمنصة دارك وحيك
 const firebaseConfig = {
   apiKey: "AIzaSyD-DEMO-KEY-FOR-DARAK-HATTOK",
   authDomain: "darak-hattok.firebaseapp.com",

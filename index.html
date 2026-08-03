@@ -31,6 +31,7 @@
       <div class="qi-i" onclick="nav('tools')"><span class="qi-icon">💰</span><span class="qi-l">العائد</span></div>
       <div class="qi-i" onclick="nav('add')"><span class="qi-icon">➕</span><span class="qi-l">إضافة</span></div>
       <div class="qi-i" onclick="nav('sources')"><span class="qi-icon">🔗</span><span class="qi-l">المصادر</span></div>
+      <div class="qi-i" onclick="nav('invest');window.investRefresh&&window.investRefresh()"><span class="qi-icon">💰</span><span class="qi-l">الاستثمار</span></div>
     </div>
     <div class="srch">
       <input type="text" id="hq" placeholder="ابحث بالاسم أو المنطقة...">
@@ -342,12 +343,94 @@
       </div>
     </div>
   </div>
+  <!-- INVEST PAGE -->
+  <div class="pg" id="pg-invest">
+    <div class="app-container" style="padding:16px 14px 96px">
+      <div id="invest-gate" style="display:none;text-align:center;padding:48px 12px">
+        <div style="font-size:46px;margin-bottom:12px">💰</div>
+        <h3 style="font-size:18px;font-weight:700;color:var(--t);margin-bottom:6px">منصة الاستثمار العقاري</h3>
+        <p style="font-size:12px;color:var(--m);margin-bottom:22px;line-height:1.8">سجّل دخولك لبدء بناء محفظتك الاستثمارية وإدارة رصيدك واستثمار الفرص الواعدة.</p>
+        <a href="auth.html" class="btn-invest-action" style="text-decoration:none">دخول / تسجيل جديد</a>
+      </div>
+      <div id="invest-content" style="display:none">
+        <div class="user-header">
+          <div>
+            <div class="welcome-text">مرحباً بك 👋</div>
+            <h2 id="user-display-name" class="user-name-title">جاري التحميل...</h2>
+          </div>
+          <button id="btn-logout" class="btn-logout-icon" title="تسجيل الخروج">🚪</button>
+        </div>
+        <div class="portfolio-card">
+          <div class="portfolio-label">رصيد المحفظة الاستثمارية</div>
+          <div class="portfolio-amount" id="balance-display">0.00 ر.س</div>
+          <div class="portfolio-footer">
+            <div class="portfolio-growth">⬆ 14.2% نمو متوقع لمحافظ الأحياء</div>
+            <button id="btn-deposit" class="btn-deposit-action">+ إيداع رصيد</button>
+          </div>
+        </div>
+        <div class="section-header">
+          <h3>🌟 رادار الأحياء والفرص الواعدة</h3>
+        </div>
+        <div class="gulf-radar-card">
+          <div class="radar-tag">📊 الأكثر طلباً في الرياض</div>
+          <div class="radar-header">
+            <div>
+              <h4>صندوق حي الملقا الاستثماري</h4>
+              <p class="radar-sub">مجمع تجاري وسكني فاخر</p>
+            </div>
+            <div class="roi-badge">+15.8% <span>عائد سنوياً</span></div>
+          </div>
+          <div class="funding-bar-container">
+            <div class="funding-info">
+              <span>نسبة تغطية الفرصة</span>
+              <strong>75% (3,750,000 ر.س)</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 75%;"></div>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="btn-invest-action" onclick="handleInvest('صندوق حي الملقا', 1000, '15.8%')">استثمر 1,000 ر.س</button>
+          </div>
+        </div>
+        <div class="gulf-radar-card">
+          <div class="radar-tag">📈 حي واعد مرتفع النمو</div>
+          <div class="radar-header">
+            <div>
+              <h4>مخطط دارك - حي النرجس</h4>
+              <p class="radar-sub">تطوير أبراج سكنية ومكاتب</p>
+            </div>
+            <div class="roi-badge">+13.5% <span>عائد سنوياً</span></div>
+          </div>
+          <div class="funding-bar-container">
+            <div class="funding-info">
+              <span>نسبة تغطية الفرصة</span>
+              <strong>45% (2,250,000 ر.س)</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 45%;"></div>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="btn-invest-action" onclick="handleInvest('مخطط دارك - حي النرجس', 500, '13.5%')">استثمر 500 ر.س</button>
+          </div>
+        </div>
+        <div class="section-header" style="margin-top: 25px;">
+          <h3>💼 محفظة استثماراتي القائمة</h3>
+        </div>
+        <div id="my-investments-list" class="investments-list-container">
+          <div class="empty-state">جاري جلب استثماراتك...</div>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- Bottom Nav -->
   <nav class="bn">
     <div class="bi on" onclick="nav('home')" id="nav-home"><div class="bii">🏠</div>الرئيسية</div>
     <div class="bi" onclick="nav('map')" id="nav-map"><div class="bii">🗺️</div>الخريطة</div>
     <div class="bi" onclick="nav('add')" id="nav-add"><div class="bii" style="font-size:20px;border-color:rgba(212,175,55,.65);box-shadow:0 0 14px rgba(212,175,55,.45)">➕</div>إضافة</div>
     <div class="bi" onclick="nav('pulse')" id="nav-pulse"><div class="bii">📊</div>نبض</div>
+    <div class="bi" onclick="nav('invest');window.investRefresh&&window.investRefresh()" id="nav-invest"><div class="bii">💰</div>استثمار</div>
     <div class="bi" onclick="nav('more')" id="nav-more"><div class="bii">⋯</div>المزيد</div>
   </nav>
   <!-- Overlays -->
@@ -408,5 +491,6 @@
   <script src="js/app.js"></script>
   <script src="js/auth-legacy.js"></script>
   <script src="js/favs.js"></script>
+  <script src="js/invest.js"></script>
 </body>
 </html>
