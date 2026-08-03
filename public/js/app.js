@@ -1548,7 +1548,7 @@ function renderAVM(v){
 
 /* 360 VR */
 var vrActive=false,vrAngle=0,vrDragging=false,vrLastX=0,vrImg=null,vrRAF=null,vrAuto=true,vrImages=[],vrCurrentIdx=0;
-var vrPanoViewer=null,vrPanoFailed=false;
+var vrPanoViewer=null,vrPanoFailed=false,vrPanoWatchdog=null;
 function openVR(imgs){
   if(!imgs||!imgs.length){toast('لا توجد صور لهذه الجولة');return}
   if(typeof imgs==='string')imgs=[imgs];
@@ -1583,9 +1583,24 @@ function vrPanoOpen(url){
       compass:false,
       showFullscreenCtrl:true,
       crossOrigin:'anonymous',
-      hfov:100,
-      onError:function(){vrPanoFailed=true;vrPano2DFallback()}
+      hfov:100
     });
+    var watchdog=0,tries=0;
+    clearInterval(vrPanoWatchdog);
+    vrPanoWatchdog=setInterval(function(){
+      tries++;
+      var stillLoading=true;
+      try{stillLoading=vrPanoViewer&&vrPanoViewer.getRenderer()&&vrPanoViewer.getRenderer().isLoading()?vrPanoViewer.getRenderer().isLoading():false}catch(e){}
+      if(!vrPanoViewer||vrPanoFailed){clearInterval(vrPanoWatchdog);return}
+      if(!stillLoading){clearInterval(vrPanoWatchdog);return}
+      if(tries>=14){
+        clearInterval(vrPanoWatchdog);
+        vrPanoFailed=true;
+        try{vrPanoViewer.destroy()}catch(e){}
+        vrPanoViewer=null;
+        vrPano2DFallback();
+      }
+    },500);
     return true;
   }catch(e){
     vrPanoFailed=true;
@@ -1658,6 +1673,7 @@ function vrLoadImage(url,force2d){
 function closeVR(){
   vrActive=false;vrImg=null;vrAuto=false;vrImages=[];vrCurrentIdx=0;vrPanoFailed=false;
   if(vrRAF)cancelAnimationFrame(vrRAF);
+  clearInterval(vrPanoWatchdog);
   if(vrPanoViewer){try{vrPanoViewer.destroy()}catch(e){}vrPanoViewer=null}
   document.getElementById('vr360').classList.remove('on');
 }
