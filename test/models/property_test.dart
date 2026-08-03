@@ -97,6 +97,71 @@ void main() {
     });
   });
 
+  group('Property 360°/3D fields', () {
+    test('parses panoramicImage and its aliases', () {
+      expect(
+        Property.fromJson(const {'panoramicImage': '/uploads/p1.jpg'}).panoramicImage,
+        '/uploads/p1.jpg',
+      );
+      expect(
+        Property.fromJson(const {'panoUrl': '/uploads/p2.jpg'}).panoramicImage,
+        '/uploads/p2.jpg',
+      );
+      expect(
+        Property.fromJson(const {'panorama': 'https://x.example/p.jpg'}).panoramicImage,
+        'https://x.example/p.jpg',
+      );
+    });
+
+    test('parses panoramicImages and the scenes alias', () {
+      final property = Property.fromJson(const {
+        'panoramicImages': ['/r1.jpg', '/r2.jpg', '/r3.jpg'],
+      });
+      expect(property.panoramicImages, hasLength(3));
+      expect(property.panoramicImages, containsAll(['/r1.jpg', '/r3.jpg']));
+
+      final scenes = Property.fromJson(const {
+        'scenes': ['/s1.jpg', '/s2.jpg'],
+      });
+      expect(scenes.panoramicImages, hasLength(2));
+    });
+
+    test('parses model3dUrl and its aliases', () {
+      expect(
+        Property.fromJson(const {'model3dUrl': '/models/villa.glb'}).model3dUrl,
+        '/models/villa.glb',
+      );
+      expect(
+        Property.fromJson(const {'modelUrl': '/m.gltf'}).model3dUrl,
+        '/m.gltf',
+      );
+      expect(
+        Property.fromJson(const {'model3d': '/x.glb'}).model3dUrl,
+        '/x.glb',
+      );
+    });
+
+    test('parses model3dUrls and the models alias', () {
+      final property = Property.fromJson(const {
+        'model3dUrls': ['/r1.glb', '/r2.glb'],
+      });
+      expect(property.model3dUrls, hasLength(2));
+
+      final models = Property.fromJson(const {
+        'models': ['/a.glb'],
+      });
+      expect(models.model3dUrls, ['/a.glb']);
+    });
+
+    test('defaults new tour fields to empty when absent', () {
+      final property = Property.fromJson(const <String, dynamic>{});
+      expect(property.panoramicImage, '');
+      expect(property.panoramicImages, isEmpty);
+      expect(property.model3dUrl, '');
+      expect(property.model3dUrls, isEmpty);
+    });
+  });
+
   group('Property round-trip', () {
     test('toJson preserves the important fields', () {
       final json = <String, dynamic>{
@@ -113,6 +178,34 @@ void main() {
       expect(out['title'], 'دوبلكس');
       expect(out['images'], contains('/uploads/a.jpg'));
       expect(out['features'], contains('حديقة'));
+    });
+
+    test('toJson preserves panoramic and 3D fields', () {
+      final property = Property.fromJson(const {
+        'panoramicImage': '/p.jpg',
+        'panoramicImages': ['/p1.jpg', '/p2.jpg'],
+        'model3dUrl': '/m.glb',
+        'model3dUrls': ['/m1.glb'],
+      });
+      final out = property.toJson();
+      expect(out['panoramicImage'], '/p.jpg');
+      expect(out['panoramicImages'], ['/p1.jpg', '/p2.jpg']);
+      expect(out['model3dUrl'], '/m.glb');
+      expect(out['model3dUrls'], ['/m1.glb']);
+    });
+
+    test('copyWith updates panoramic and 3D fields', () {
+      final property = Property.fromJson(const <String, dynamic>{});
+      final updated = property.copyWith(
+        panoramicImage: '/p.jpg',
+        panoramicImages: const ['/a.jpg'],
+        model3dUrl: '/m.glb',
+        model3dUrls: const ['/m1.glb'],
+      );
+      expect(updated.panoramicImage, '/p.jpg');
+      expect(updated.panoramicImages, ['/a.jpg']);
+      expect(updated.model3dUrl, '/m.glb');
+      expect(updated.model3dUrls, ['/m1.glb']);
     });
   });
 }
