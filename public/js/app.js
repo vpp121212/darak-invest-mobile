@@ -1589,10 +1589,21 @@ function vrPanoOpen(url){
     clearInterval(vrPanoWatchdog);
     vrPanoWatchdog=setInterval(function(){
       tries++;
-      var stillLoading=true;
-      try{stillLoading=vrPanoViewer&&vrPanoViewer.getRenderer()&&vrPanoViewer.getRenderer().isLoading()?vrPanoViewer.getRenderer().isLoading():false}catch(e){}
       if(!vrPanoViewer||vrPanoFailed){clearInterval(vrPanoWatchdog);return}
-      if(!stillLoading){clearInterval(vrPanoWatchdog);return}
+      var colored=false;
+      try{
+        var r=vrPanoViewer.getRenderer();
+        r.render();
+        var cnv=r.getCanvas(),gl=cnv.getContext('webgl');
+        var w=gl.drawingBufferWidth,h=gl.drawingBufferHeight;
+        var buf=new Uint8Array(100),o=0;
+        for(var yy=1;yy<=5;yy++)for(var xx=1;xx<=5;xx++){
+          gl.readPixels(Math.floor(w*xx/6),Math.floor(h*yy/6),1,1,gl.RGBA,gl.UNSIGNED_BYTE,buf.subarray(o));
+          o+=4;
+          if(buf[o-4]+buf[o-3]+buf[o-2]+buf[o-1]>30){colored=true;break}
+        }
+        if(colored){clearInterval(vrPanoWatchdog);return}
+      }catch(e){}
       if(tries>=14){
         clearInterval(vrPanoWatchdog);
         vrPanoFailed=true;
