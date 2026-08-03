@@ -1669,6 +1669,7 @@ function openVR(imgs,labels){
   setTimeout(function(){if(hint)hint.style.display='none'},3000);
   var rooms=document.getElementById('vrRooms');
   if(rooms)rooms.innerHTML=imgs.map(function(url,i){return'<button class="'+(i===0?'on':'')+'" onclick="vrSwitchRoom('+i+')">'+(labels&&labels[i]?labels[i]:'غرفة '+(i+1))+'</button>'}).join('');
+  if(imgs.length>1&&vrPanoOpenMulti(imgs,labels))return;
   vrLoadImage(imgs[0]);
 }
 function vrTourOpen(url){
@@ -1699,6 +1700,9 @@ function vrSwitchRoom(idx){
   vrCurrentIdx=idx;
   var btns=document.querySelectorAll('#vrRooms button');
   btns.forEach(function(b,i){b.classList.toggle('on',i===idx)});
+  if(vrPanoViewer&&typeof vrPanoViewer.loadScene==='function'){
+    try{vrPanoViewer.loadScene('room_'+idx);return}catch(e){}
+  }
   vrLoadImage(vrImages[idx]);
 }
 function vrPanoOpen(url){
@@ -1716,39 +1720,71 @@ function vrPanoOpen(url){
       crossOrigin:'anonymous',
       hfov:100
     });
-    var watchdog=0,tries=0;
-    clearInterval(vrPanoWatchdog);
-    vrPanoWatchdog=setInterval(function(){
-      tries++;
-      if(!vrPanoViewer||vrPanoFailed){clearInterval(vrPanoWatchdog);return}
-      var colored=false;
-      try{
-        var r=vrPanoViewer.getRenderer();
-        r.render();
-        var cnv=r.getCanvas(),gl=cnv.getContext('webgl');
-        var w=gl.drawingBufferWidth,h=gl.drawingBufferHeight;
-        var buf=new Uint8Array(100),o=0;
-        for(var yy=1;yy<=5;yy++)for(var xx=1;xx<=5;xx++){
-          gl.readPixels(Math.floor(w*xx/6),Math.floor(h*yy/6),1,1,gl.RGBA,gl.UNSIGNED_BYTE,buf.subarray(o));
-          o+=4;
-          if(buf[o-4]+buf[o-3]+buf[o-2]+buf[o-1]>30){colored=true;break}
-        }
-        if(colored){clearInterval(vrPanoWatchdog);return}
-      }catch(e){}
-      if(tries>=14){
-        clearInterval(vrPanoWatchdog);
-        vrPanoFailed=true;
-        try{vrPanoViewer.destroy()}catch(e){}
-        vrPanoViewer=null;
-        vrPano2DFallback();
-      }
-    },500);
+    vrWatchdogStart();
     return true;
   }catch(e){
     vrPanoFailed=true;
     if(vrPanoViewer){try{vrPanoViewer.destroy()}catch(_){}}vrPanoViewer=null;
     return false;
   }
+}
+function vrPanoOpenMulti(imgs,labels){
+  var container=document.getElementById('vrPano');
+  if(!container||!window.pannellum)return false;
+  try{
+    if(vrPanoViewer){try{vrPanoViewer.destroy()}catch(e){}vrPanoViewer=null}
+    var scenes={};
+    for(var i=0;i<imgs.length;i++){
+      var hs=[];
+      if(i<imgs.length-1)hs.push({pitch:-12,yaw:0,type:'scene',cssClass:'vr-arrow vr-next',text:'انتقال إلى الغرفة التالية',sceneId:'room_'+(i+1)});
+      if(i>0)hs.push({pitch:-12,yaw:180,type:'scene',cssClass:'vr-arrow vr-prev',text:'الرجوع للغرفة السابقة',sceneId:'room_'+(i-1)});
+      scenes['room_'+i]={title:(labels&&labels[i])||('الغرفة '+(i+1)),type:'equirectangular',panorama:imgs[i],hotSpots:hs};
+    }
+    vrPanoViewer=pannellum.viewer('vrPano',{
+      default:{firstScene:'room_0',sceneFadeDuration:900,autoLoad:true,compass:false,hfov:100},
+      scenes:scenes
+    });
+    if(vrPanoViewer.on)vrPanoViewer.on('scenechange',function(id){
+      vrCurrentIdx=parseInt(String(id).replace('room_',''),10)||0;
+      var btns=document.querySelectorAll('#vrRooms button');
+      btns.forEach(function(b,k){b.classList.toggle('on',k===vrCurrentIdx)});
+    });
+    vrWatchdogStart();
+    return true;
+  }catch(e){
+    vrPanoFailed=true;
+    if(vrPanoViewer){try{vrPanoViewer.destroy()}catch(_){}}vrPanoViewer=null;
+    return false;
+  }
+}
+function vrWatchdogStart(){
+  var watchdog=0,tries=0;
+  clearInterval(vrPanoWatchdog);
+  vrPanoWatchdog=setInterval(function(){
+    tries++;
+    if(!vrPanoViewer||vrPanoFailed){clearInterval(vrPanoWatchdog);return}
+    var colored=false;
+    try{
+      var r=vrPanoViewer.getRenderer();
+      r.render();
+      var cnv=r.getCanvas(),gl=cnv.getContext('webgl');
+      var w=gl.drawingBufferWidth,h=gl.drawingBufferHeight;
+      var buf=new Uint8Array(100),o=0;
+      for(var yy=1;yy<=5;yy++)for(var xx=1;xx<=5;xx++){
+        gl.readPixels(Math.floor(w*xx/6),Math.floor(h*yy/6),1,1,gl.RGBA,gl.UNSIGNED_BYTE,buf.subarray(o));
+        o+=4;
+        if(buf[o-4]+buf[o-3]+buf[o-2]+buf[o-1]>30){colored=true;break}
+      }
+      if(colored){clearInterval(vrPanoWatchdog);return}
+    }catch(e){}
+    if(tries>=14){
+      clearInterval(vrPanoWatchdog);
+      vrPanoFailed=true;
+      try{vrPanoViewer.destroy()}catch(e){}
+      vrPanoViewer=null;
+      vrPano2DFallback();
+    }
+  },500);
 }
 function vrPano2DFallback(){
   var container=document.getElementById('vrPano');
