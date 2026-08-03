@@ -1548,17 +1548,19 @@ function renderAVM(v){
 
 /* 360 VR */
 var vrActive=false,vrAngle=0,vrDragging=false,vrLastX=0,vrImg=null,vrRAF=null,vrAuto=true,vrImages=[],vrCurrentIdx=0;
+var vrPanoViewer=null,vrPanoFailed=false;
 function openVR(imgs){
   if(!imgs||!imgs.length){toast('لا توجد صور لهذه الجولة');return}
   if(typeof imgs==='string')imgs=[imgs];
   var prop=currentDetail||{};
   if(prop.panoramicImage||prop.pano){imgs=[prop.panoramicImage||prop.pano].concat(imgs)}
-  vrImages=imgs;vrCurrentIdx=0;
+  vrImages=imgs;vrCurrentIdx=0;vrPanoFailed=false;
   document.getElementById('vr360').classList.add('on');
-  document.getElementById('vrHint').style.display='block';
-  setTimeout(function(){document.getElementById('vrHint').style.display='none'},3000);
+  var hint=document.getElementById('vrHint');
+  if(hint)hint.style.display='block';
+  setTimeout(function(){if(hint)hint.style.display='none'},3000);
   var rooms=document.getElementById('vrRooms');
-  rooms.innerHTML=imgs.map(function(url,i){return'<button class="'+(i===0?'on':'')+'" onclick="vrSwitchRoom('+i+')">غرفة '+(i+1)+'</button>'}).join('');
+  if(rooms)rooms.innerHTML=imgs.map(function(url,i){return'<button class="'+(i===0?'on':'')+'" onclick="vrSwitchRoom('+i+')">غرفة '+(i+1)+'</button>'}).join('');
   vrLoadImage(imgs[0]);
 }
 function vrSwitchRoom(idx){
@@ -1568,7 +1570,49 @@ function vrSwitchRoom(idx){
   btns.forEach(function(b,i){b.classList.toggle('on',i===idx)});
   vrLoadImage(vrImages[idx]);
 }
-function vrLoadImage(url){
+function vrPanoOpen(url){
+  var container=document.getElementById('vrPano');
+  if(!container||!window.pannellum)return false;
+  try{
+    if(vrPanoViewer){try{vrPanoViewer.destroy()}catch(e){}vrPanoViewer=null}
+    vrPanoViewer=pannellum.viewer('vrPano',{
+      type:'equirectangular',
+      panorama:url,
+      autoLoad:true,
+      autoRotate:-1,
+      compass:false,
+      showFullscreenCtrl:true,
+      crossOrigin:'anonymous',
+      hfov:100,
+      onError:function(){vrPanoFailed=true;vrPano2DFallback()}
+    });
+    return true;
+  }catch(e){
+    vrPanoFailed=true;
+    if(vrPanoViewer){try{vrPanoViewer.destroy()}catch(_){}}vrPanoViewer=null;
+    return false;
+  }
+}
+function vrPano2DFallback(){
+  var container=document.getElementById('vrPano');
+  if(container)container.style.display='none';
+  var canvas=document.getElementById('vrCanvas');
+  if(canvas)canvas.style.display='block';
+  vrLoadImage(vrImages[vrCurrentIdx],true);
+}
+function vrLoadImage(url,force2d){
+  var prop=currentDetail||{};
+  var isPano=!force2d&&!vrPanoFailed&&((prop.panoramicImage&&url===prop.panoramicImage)||(prop.pano&&url===prop.pano));
+  var container=document.getElementById('vrPano'),canvas=document.getElementById('vrCanvas');
+  if(isPano&&container&&window.pannellum){
+    if(vrPanoOpen(url)){
+      container.style.display='block';
+      if(canvas)canvas.style.display='none';
+      return;
+    }
+  }
+  if(container)container.style.display='none';
+  if(canvas)canvas.style.display='block';
   if(!vrActive&&document.getElementById('vr360').classList.contains('on'))vrActive=true;
   var c=document.getElementById('vrCanvas'),ctx=c.getContext('2d');
   c.width=window.innerWidth;c.height=window.innerHeight-100;
@@ -1611,7 +1655,12 @@ function vrLoadImage(url){
   };
   img.src=url;
 }
-function closeVR(){vrActive=false;vrImg=null;vrAuto=false;vrImages=[];vrCurrentIdx=0;if(vrRAF)cancelAnimationFrame(vrRAF);document.getElementById('vr360').classList.remove('on')}
+function closeVR(){
+  vrActive=false;vrImg=null;vrAuto=false;vrImages=[];vrCurrentIdx=0;vrPanoFailed=false;
+  if(vrRAF)cancelAnimationFrame(vrRAF);
+  if(vrPanoViewer){try{vrPanoViewer.destroy()}catch(e){}vrPanoViewer=null}
+  document.getElementById('vr360').classList.remove('on');
+}
 
 /* UPLOAD */
 function openUpload(){document.getElementById('upload').classList.add('on')}
