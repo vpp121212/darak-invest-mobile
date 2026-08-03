@@ -177,6 +177,25 @@ function esc(s){
   return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+async function tbPreload(urls){
+  if(!urls||!urls.length){toast('لا توجد صور');return}
+  if(typeof closeD==='function')closeD();
+  openTourBuilder();
+  var loaded=0;
+  for(var i=0;i<urls.length;i++){
+    try{
+      var r=await fetch(urls[i]);
+      if(!r.ok)continue;
+      var b=await r.blob();
+      if(!/^image\//.test(b.type))continue;
+      tbAddFiles([new File([b],'صورة '+(i+1),{type:b.type})]);
+      loaded++;
+    }catch(e){}
+  }
+  if(!loaded){toast('تعذر جلب الصور تلقائيًا — ارفعها يدويًا');return}
+  toast('تم جلب '+loaded+' صورة — اضغط «توليد الجولة»');
+}
+
 function tbOpenTour3D(){
   var url=(document.getElementById('tbTourUrl')||{}).value||'';
   url=url.trim();
