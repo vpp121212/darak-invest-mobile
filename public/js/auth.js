@@ -44,7 +44,7 @@ btnSubmit.addEventListener("click", () => {
 
 
   const userObj = {
-    name: name || "مستثمر دارك وهتوك",
+    name: name || "مستثمر دارك وحيك",
     email: email,
     balance: 10000,
     investments: []
