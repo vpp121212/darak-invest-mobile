@@ -467,6 +467,55 @@
       </div>
     </div>
   </div>
+  <div class="pg" id="pg-add">
+    <div class="wrap">
+      <section class="tb-hero">
+        <div class="tb-title">➕ نشر إعلان عقار</div>
+        <div class="tb-sub">ارفع أي صور من جوالك (تصوير عادي) — سيتولّى التطبيق تحويلها تلقائيًا إلى جولة 360° تفاعلية بدون معدات</div>
+      </section>
+      <div class="ap-note">📸 ارفع صور العقار وسيقوم التطبيق ببرمجة جولة افتراضية منها آليًا</div>
+      <div class="ap-field"><label>عنوان الإعلان *</label><input type="text" id="ap-title" placeholder="مثال: فيلا فاخرة في حي النرجس"></div>
+      <div class="ap-row">
+        <div class="ap-field"><label>النوع</label><select id="ap-type" onchange="toggleApApartments()"><option>شقة</option><option>فيلا</option><option>أرض</option><option>مكتب</option><option>محل</option><option>بنتهاوس</option><option>قصر</option><option>شاليه</option><option>دوبلكس</option><option>مزرعة</option></select></div>
+        <div class="ap-field"><label>الغرض</label><select id="ap-purpose"><option>بيع</option><option>إيجار</option></select></div>
+      </div>
+      <div class="ap-row">
+        <div class="ap-field"><label>السعر (ر.س)</label><input type="number" id="ap-price" placeholder="مثال: 2500000"></div>
+        <div class="ap-field"><label>المساحة (م²)</label><input type="number" id="ap-area" value="100"></div>
+      </div>
+      <div class="ap-row">
+        <div class="ap-field"><label>الغرف</label><input type="number" id="ap-rooms" value="3" min="0"></div>
+        <div class="ap-field"><label>الحمامات</label><input type="number" id="ap-baths" value="2" min="0"></div>
+      </div>
+      <div class="ap-row" id="ap-apartments-row" style="display:none">
+        <div class="ap-field"><label>عدد الشقق (للفيلا)</label><input type="number" id="ap-apartments" value="0" min="0"></div>
+      </div>
+      <div class="ap-row">
+        <div class="ap-field"><label>المدينة</label><select id="ap-city" onchange="fetchDistricts()"><option>الرياض</option><option>جدة</option><option>الدمام</option><option>مكة</option><option>المدينة</option><option>الخبر</option><option>أبها</option><option>تبوك</option></select></div>
+        <div class="ap-field"><label>الحي</label><input type="text" id="ap-district" list="districts-list" placeholder="اكتب أو اختر"><datalist id="districts-list"></datalist></div>
+      </div>
+      <div class="ap-field"><label>الموقع على الخريطة</label>
+        <div style="display:flex;align-items:center;gap:8px"><input type="hidden" id="ap-lat"><input type="hidden" id="ap-lng"><button class="ap-mapbtn" onclick="openMapPicker()">📍 تحديد الموقع</button><span id="ap-loc-display" style="font-size:11px;color:var(--m)">لم يُحدد</span></div>
+      </div>
+      <div class="ap-field"><label>صور العقار (من جوالك — تصوير عادي) *</label>
+        <div class="tb-drop" style="padding:24px 14px" onclick="document.getElementById('ap-img').click()">
+          <div class="tb-drop-i">📷</div><div class="tb-drop-t">اضغط لإضافة الصور</div><div class="tb-drop-s">أول صورة ستُحوّل تلقائيًا إلى بانوراما الجولة</div>
+        </div>
+        <input type="file" id="ap-img" accept="image/*" multiple style="display:none" onchange="addImgAuto360(this)">
+        <div id="ap-img-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
+        <div id="ap-auto360" style="display:none;margin-top:10px;padding:12px;border-radius:12px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.35)">
+          <div style="font-size:12px;font-weight:800;color:#4ade80">✅ تم برمجة الجولة 360 من صورك</div>
+          <div style="font-size:11px;color:var(--m);margin-top:4px;line-height:1.8">ستظهر للزوار كجولة تفاعلية قابلة للسحب. يمكنك معاينتها الآن.</div>
+          <button class="tb-tour3d-b" onclick="apPreviewTour()">🎬 معاينة الجولة المولّدة</button>
+        </div>
+      </div>
+      <div class="ap-field"><label>وصف العقار</label><textarea id="ap-desc" rows="3" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--b);background:var(--c);color:var(--t);font-size:12px;font-family:inherit;box-sizing:border-box;resize:vertical" placeholder="اكتب تفاصيل العقار..."></textarea></div>
+      <div class="ap-field"><label>رابط جولة 3D جاهزة (اختياري — Matterport / jawla360)</label><input type="text" id="ap-pano-url" placeholder="https://my.matterport.com/show/?m=..." style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--b);background:var(--c);color:var(--t);font-size:12px;font-family:inherit;direction:ltr;text-align:left;box-sizing:border-box"></div>
+      <input type="file" id="ap-pano" accept="image/*" style="display:none">
+      <button class="tb-gen" onclick="submitAddProp()" style="margin-top:6px">🚀 نشر الإعلان</button>
+      <div class="tb-note">الصور تُرفع بأمان · الجولة التفاعلية تُولَّد تلقائيًا من أول صورة · يمكنك لاحقًا استبدالها برابط Matterport/jawla360 إن وُجد</div>
+    </div>
+  </div>
   <!-- Bottom Nav -->
   <nav class="bn">
     <div class="bi on" onclick="nav('home')" id="nav-home"><div class="bii">🏠</div>الرئيسية</div>
@@ -522,6 +571,8 @@
   <div class="v3" id="vr360"><div class="v3h"><div class="v3t">🌐 جولة 360°</div><div class="v3x" onclick="closeVR()">✕</div></div><div class="v3v"><canvas class="v3canvas" id="vrCanvas"></canvas><div id="vrPano"></div><div class="v3hint" id="vrHint"><div class="v3hint-i">👆</div><div class="v3hint-t">اسحب لاستكشاف الغرفة</div></div></div><div class="v3rooms"><div class="v3rb" id="vrRooms"></div></div></div>
 
   <div class="mapo" id="ov3d"><div class="map-hdr"><div class="map-hdr-t">🏗️ العرض ثلاثي الأبعاد</div><div class="map-hdr-x" onclick="close3D()">✕</div></div><div class="map-container" style="position:relative"><div style="position:absolute;top:100px;left:12px;right:12px;z-index:10;display:flex;gap:8px"><input id="map3dSearchInput" type="text" placeholder="🔍 ابحث عن منطقة..." style="flex:1;padding:10px 14px;border-radius:12px;background:#ffffff;border:1px solid rgba(212,175,55,.3);color:var(--t);font-size:13px;font-family:'Cairo',sans-serif;outline:none;direction:rtl;backdrop-filter:blur(12px)" oninput="map3dSearchDebounced()" onkeydown="if(event.key==='Enter')map3dSearchNow()"><div id="map3dSearchResults" style="position:absolute;top:44px;left:0;right:0;background:#ffffff;border:1px solid rgba(212,175,55,.2);border-radius:12px;display:none;max-height:200px;overflow-y:auto;z-index:20;backdrop-filter:blur(12px)"></div><button onclick="map3dLocateMe()" style="width:42px;height:42px;border-radius:12px;background:#ffffff;border:1px solid rgba(212,175,55,.3);color:var(--g);font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)" title="موقعك الحالي">📍</button></div><div id="map3d" style="width:100%;height:100%"></div></div></div>
+
+  <div class="mapo" id="mapPickerOv"><div class="map-hdr"><div class="map-hdr-t">📍 تحديد موقع العقار</div><div class="map-hdr-x" onclick="closeMapPicker()">✕</div></div><div class="map-container" style="position:relative"><div id="mapPickerInfo" style="position:absolute;top:12px;left:12px;right:12px;z-index:10;background:#ffffff;border:1px solid rgba(212,175,55,.3);border-radius:12px;padding:10px 14px;font-size:12px;color:var(--t);box-shadow:0 4px 16px rgba(0,0,0,.12)">اضغط على الخريطة لتحديد موقع العقار</div><div id="mapPicker" style="width:100%;height:100%"></div><div style="position:absolute;bottom:16px;left:12px;right:12px;z-index:10;display:flex;gap:8px"><button onclick="confirmMapPicker()" style="flex:1;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#f5d47b,#d4af37);color:#1c1c1e;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer">✓ تأكيد الموقع</button><button onclick="closeMapPicker()" style="width:52px;border-radius:12px;border:1px solid var(--b);background:var(--c);color:var(--t);font-size:14px;cursor:pointer;font-family:inherit">✕</button></div></div></div>
 
   <div class="tb" id="toasts"></div>
 

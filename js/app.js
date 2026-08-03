@@ -2436,6 +2436,15 @@ async function submitAddProp(){
   var panoUrlTxt=panoUrlInput?panoUrlInput.value.trim():'';
   if(!panoUrl&&/^https?:\/\//i.test(panoUrlTxt))panoUrl=panoUrlTxt;
   if(!panoUrl)panoUrl=localStorage.getItem('darak_pano_url')||null;
+  var autoLocal=null;
+  if(!panoUrl&&window.autoPanoBlob){
+    try{
+      var fd3=new FormData();fd3.append('image',window.autoPanoBlob,'auto360.jpg');
+      var up3=await fetch(API+'/upload/panoramic',{method:'POST',headers:{'Authorization':'Bearer '+authToken},body:fd3}).then(function(r){return r.json()}).catch(function(){return null});
+      if(up3&&up3.success)panoUrl=up3.url;
+      else autoLocal=window.autoPanoDataUrl||null;
+    }catch(e){autoLocal=window.autoPanoDataUrl||null}
+  }
   var d=await api('/properties',{method:'POST',body:JSON.stringify({
     title:t,type:tp,purpose:pr,price:prc,area:ar,rooms:rm,baths:bt,apartments:ap,
     city:ct,district:di||ct,description:ds,year:new Date().getFullYear(),age:0,
@@ -2443,7 +2452,17 @@ async function submitAddProp(){
     lat:Number(document.getElementById('ap-lat').value)||null,
     lng:Number(document.getElementById('ap-lng').value)||null
   })});
-  if(d&&d.success){toast('تم نشر الإعلان بنجاح ✓');await loadProperties();nav('home')}
+  if(d&&d.success){
+    if(autoLocal){
+      var np=d.property||null;
+      try{
+        var lmap=JSON.parse(localStorage.getItem('darak_local_panos')||'{}');
+        lmap[(np&&np.id)||('x'+Date.now())]=autoLocal;
+        localStorage.setItem('darak_local_panos',JSON.stringify(lmap));
+      }catch(e){}
+    }
+    toast('تم نشر الإعلان بنجاح ✓');await loadProperties();nav('home')
+  }
 }
 
 /* SHARE */
@@ -2542,6 +2561,12 @@ async function loadProperties(){
   }else{
     A=normProps(FALLBACK);
   }
+  try{
+    var lmap=JSON.parse(localStorage.getItem('darak_local_panos')||'{}');
+    if(lmap&&Object.keys(lmap).length){
+      A.forEach(function(p){if(p&&lmap[p.id]!==undefined)p.panoramicImage=lmap[p.id]});
+    }
+  }catch(e){}
   if(document.getElementById('pg'))render();
   if(document.getElementById('homeStats'))renderHomeSections();
   var sel=document.getElementById('hc');

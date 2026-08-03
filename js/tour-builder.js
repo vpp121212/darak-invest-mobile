@@ -196,6 +196,66 @@ async function tbPreload(urls){
   toast('تم جلب '+loaded+' صورة — اضغط «توليد الجولة»');
 }
 
+var autoPanoDataUrl=null,autoPanoBlob=null;
+function addImgAuto360(input){
+  var preview=document.getElementById('ap-img-preview');
+  var files=input.files||[];
+  preview.innerHTML='';
+  if(!files.length)return;
+  for(var i=0;i<files.length;i++){
+    var f=files[i];
+    if(!/^image\//.test(f.type))continue;
+    var url=URL.createObjectURL(f);
+    var el=document.createElement('div');
+    el.className='ap-img-thumb';
+    el.innerHTML='<img src="'+url+'">';
+    preview.appendChild(el);
+  }
+  var first=null;
+  for(var i2=0;i2<files.length;i2++){if(/^image\//.test(files[i2].type)){first=files[i2];break}}
+  if(!first)return;
+  var box=document.getElementById('ap-auto360');
+  if(box){box.style.display='none';box.innerHTML='<div style="font-size:12px;font-weight:800;color:var(--g)">⏳ جاري برمجة الجولة 360 من صورتك...</div>'}
+  fileToEquirect(first,110,1280).then(function(res){
+    autoPanoDataUrl=res.dataUrl;autoPanoBlob=res.blob;
+    if(box){
+      box.innerHTML='<div style="font-size:12px;font-weight:800;color:#4ade80">✅ تم برمجة الجولة 360 من صورتك</div><div style="font-size:11px;color:var(--m);margin-top:4px;line-height:1.8">ستظهر للزوار كجولة تفاعلية قابلة للسحب. يمكنك معاينتها الآن.</div><button class="tb-tour3d-b" onclick="apPreviewTour()">🎬 معاينة الجولة المولّدة</button>';
+      box.style.display='block';
+    }
+    toast('تم توليد الجولة من صورتك ✓');
+  }).catch(function(e){
+    if(box){
+      box.innerHTML='<div style="font-size:12px;font-weight:800;color:#f87171">⚠️ تعذر توليد الجولة من الصورة</div><div style="font-size:11px;color:var(--m);margin-top:4px">'+e.message+'</div>';
+      box.style.display='block';
+    }
+  });
+}
+function fileToEquirect(file,hfov,outW){
+  return new Promise(function(res,rej){
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      var img=new Image();
+      img.onload=function(){
+        try{
+          var cv=imgToEquirect(img,hfov,outW);
+          var dataUrl=cv.toDataURL('image/jpeg',0.86);
+          cv.toBlob(function(b){res({dataUrl:dataUrl,blob:b||null})},'image/jpeg',0.86);
+        }catch(e){rej(e)}
+      };
+      img.onerror=function(){rej(new Error('صورة غير صالحة'))};
+      img.src=ev.target.result;
+    };
+    reader.onerror=function(){rej(new Error('تعذر قراءة الملف'))};
+    reader.readAsDataURL(file);
+  });
+}
+function apPreviewTour(){
+  if(!autoPanoDataUrl){toast('ارفع صورة أولًا');return}
+  currentDetail={};
+  window.vrForcePano=true;
+  openVR([autoPanoDataUrl],['جولتي']);
+}
+
 function tbOpenTour3D(){
   var url=(document.getElementById('tbTourUrl')||{}).value||'';
   url=url.trim();
