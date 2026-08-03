@@ -57,6 +57,10 @@ function imgToEquirect(img,hfovDeg,outW){
   var outH=Math.round(outW/2);
   var iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
   var vfovDeg=hfovDeg*(ih/iw);
+  var src=document.createElement('canvas');
+  src.width=iw;src.height=ih;
+  src.getContext('2d').drawImage(img,0,0);
+  var sd=src.getContext('2d').getImageData(0,0,iw,ih).data;
   var cv=document.createElement('canvas');cv.width=outW;cv.height=outH;
   var ctx=cv.getContext('2d');
   var halfH=hfovDeg/2,halfV=vfovDeg/2;
@@ -69,29 +73,45 @@ function imgToEquirect(img,hfovDeg,outW){
   }else{
     ctx.drawImage(img,(outW-w)/2,(outH-h)/2,w,h);
   }
-  ctx.fillStyle='rgba(8,9,12,.35)';
-  ctx.fillRect(0,0,outW,outH);
   var id=ctx.getImageData(0,0,outW,outH),d=id.data;
-  var iX=iw-1,iY=ih-1;
+  var iX=iw-1,iY=ih-1,topY=0,botY=ih-1;
   for(var y=0;y<outH;y++){
     var pitch=90-(y/outH)*180;
-    if(pitch>halfV||pitch<-halfV)continue;
     var fy=(halfV-pitch)/(2*halfV)*ih;
     var fy0=Math.max(0,Math.min(iY,Math.floor(fy)));
     var fy1=Math.min(iY,fy0+1);
     var wy=fy-fy0;
     for(var x=0;x<outW;x++){
       var yaw=(x/outW)*360-180;
-      if(Math.abs(yaw)>halfH)continue;
-      var fx=(yaw+halfH)/(2*halfH)*iw;
-      var fx0=Math.max(0,Math.min(iX,Math.floor(fx)));
-      var fx1=Math.min(iX,fx0+1);
-      var wx=fx-fx0;
-      var s00=(fy0*iw+fx0)*4,s01=(fy0*iw+fx1)*4,s10=(fy1*iw+fx0)*4,s11=(fy1*iw+fx1)*4;
-      var r=(d[s00]*(1-wx)+d[s01]*wx)*(1-wy)+(d[s10]*(1-wx)+d[s11]*wx)*wy;
-      var g=(d[s00+1]*(1-wx)+d[s01+1]*wx)*(1-wy)+(d[s10+1]*(1-wx)+d[s11+1]*wx)*wy;
-      var b=(d[s00+2]*(1-wx)+d[s01+2]*wx)*(1-wy)+(d[s10+2]*(1-wx)+d[s11+2]*wx)*wy;
+      var ax=Math.abs(yaw);
       var di=(y*outW+x)*4;
+      var r=0,g=0,b=0;
+      if(ax<=halfH){
+        var fx=(yaw+halfH)/(2*halfH)*iw;
+        var fx0=Math.max(0,Math.min(iX,Math.floor(fx)));
+        var fx1=Math.min(iX,fx0+1);
+        var wx=fx-fx0;
+        var s00=(fy0*iw+fx0)*4,s01=(fy0*iw+fx1)*4,s10=(fy1*iw+fx0)*4,s11=(fy1*iw+fx1)*4;
+        r=(sd[s00]*(1-wx)+sd[s01]*wx)*(1-wy)+(sd[s10]*(1-wx)+sd[s11]*wx)*wy;
+        g=(sd[s00+1]*(1-wx)+sd[s01+1]*wx)*(1-wy)+(sd[s10+1]*(1-wx)+sd[s11+1]*wx)*wy;
+        b=(sd[s00+2]*(1-wx)+sd[s01+2]*wx)*(1-wy)+(sd[s10+2]*(1-wx)+sd[s11+2]*wx)*wy;
+      }else if(pitch>halfV){
+        var cx1=Math.max(0,Math.min(iX,Math.round((yaw+180)/360*iw)));
+        var s=(topY*iw+cx1)*4;
+        var up=Math.min(1,(pitch-halfV)/(90-halfV));
+        r=sd[s]*(1-up*0.4);g=sd[s+1]*(1-up*0.4);b=sd[s+2]*(1-up*0.4);
+      }else if(pitch<-halfV){
+        var cx2=Math.max(0,Math.min(iX,Math.round((yaw+180)/360*iw)));
+        var s2=(botY*iw+cx2)*4;
+        var dn=Math.min(1,(-pitch-halfV)/(90-halfV));
+        r=sd[s2]*(1-dn*0.6);g=sd[s2+1]*(1-dn*0.6);b=sd[s2+2]*(1-dn*0.6);
+      }else{
+        var ex=(yaw<0)?0:iw-1;
+        var es=(fy0*iw+ex)*4;
+        var fade=Math.min(1,((ax-halfH)/(180-halfH))*1.5+0.25);
+        var k=1-fade*0.8;
+        r=sd[es]*k;g=sd[es+1]*k;b=sd[es+2]*k;
+      }
       d[di]=r;d[di+1]=g;d[di+2]=b;d[di+3]=255;
     }
   }
@@ -216,7 +236,7 @@ function addImgAuto360(input){
   if(!first)return;
   var box=document.getElementById('ap-auto360');
   if(box){box.style.display='none';box.innerHTML='<div style="font-size:12px;font-weight:800;color:var(--g)">⏳ جاري برمجة الجولة 360 من صورتك...</div>'}
-  fileToEquirect(first,110,1280).then(function(res){
+  fileToEquirect(first,120,1280).then(function(res){
     autoPanoDataUrl=res.dataUrl;autoPanoBlob=res.blob;
     if(box){
       box.innerHTML='<div style="font-size:12px;font-weight:800;color:#4ade80">✅ تم برمجة الجولة 360 من صورتك</div><div style="font-size:11px;color:var(--m);margin-top:4px;line-height:1.8">ستظهر للزوار كجولة تفاعلية قابلة للسحب. يمكنك معاينتها الآن.</div><button class="tb-tour3d-b" onclick="apPreviewTour()">🎬 معاينة الجولة المولّدة</button>';
