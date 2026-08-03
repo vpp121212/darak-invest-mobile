@@ -21,7 +21,7 @@ window.__baseNav=nav;
 /* RENDER */
 function cardHTML(p){
   var im=pImg(p),fav=F.indexOf(p.id)>-1;
-  return'<div class="card" onclick="showDetail('+p.id+')"><div class="card-img"><img src="'+im+'" alt="'+p.title+'" loading="lazy" onerror="this.onerror=null;this.src=\''+pFallback(p)+'\'"><div class="badges"><span class="badge '+(p.purpose==='إيجار'?'badge-r':'badge-s')+'">'+p.purpose+'</span>'+(p.status==='حصري'?'<span class="badge badge-x">⭐ حصري</span>':'')+'</div><button class="fav '+(fav?'on':'')+'" onclick="toggleFav('+p.id+',event)">'+(fav?'❤':'🤍')+'</button><span class="trust trust-'+tCls(p.trust)+'">'+tLbl(p.trust)+'</span>'+(p.panoramicImage||p.pano||p.panoUrl?'<span class="card-360">🌐 360°</span>':'')+(p.tourUrl||p.matterport||p.tour3d?'<span class="card-360">🕶️ 3D</span>':'')+(p.model3dUrl||p.model3d?'<span class="card-360">🧊 مجسم</span>':'')+'</div><div class="card-b"><div class="card-t">'+p.title+'</div><div class="card-l">📍 '+pLoc(p)+'</div><div class="card-p">'+pPrice(p)+'</div>'+(p.expectedPrice?'<div class="card-avm">💰 التقدير: '+fmt(p.expectedPrice)+' ر.س</div>':'')+'<div class="card-m"><span>🛏 '+p.rooms+'</span><span>📐 '+fmt(p.area)+' م²</span><span>🚿 '+p.baths+'</span>'+(p.type==='فيلا'&&p.apartments?'<span>🏢 '+p.apartments+' شقق</span>':'')+'</div></div></div>'
+  return'<div class="card" onclick="showDetail('+p.id+')"><div class="card-img"><img src="'+im+'" alt="'+p.title+'" loading="lazy" onerror="this.onerror=null;this.src=\''+pFallback(p)+'\'"><div class="badges"><span class="badge '+(p.purpose==='إيجار'?'badge-r':'badge-s')+'">'+p.purpose+'</span>'+(p.status==='حصري'?'<span class="badge badge-x">⭐ حصري</span>':'')+'</div><button class="fav '+(fav?'on':'')+'" onclick="toggleFav('+p.id+',event)">'+(fav?'❤':'🤍')+'</button><span class="trust trust-'+tCls(p.trust)+'">'+tLbl(p.trust)+'</span>'+(p.panoramicImage||p.pano||p.panoUrl?'<span class="card-360">🌐 360°</span>':'')+(p.tourUrl||p.matterport||p.tour3d?'<span class="card-360">🕶️ 3D</span>':'')+(p.model3dUrl||p.model3d?'<span class="card-360">🧊 مجسم</span>':'')+(p.videoUrl?'<span class="card-360">🎥 فيديو</span>':'')+'</div><div class="card-b"><div class="card-t">'+p.title+'</div><div class="card-l">📍 '+pLoc(p)+'</div><div class="card-p">'+pPrice(p)+'</div>'+(p.expectedPrice?'<div class="card-avm">💰 التقدير: '+fmt(p.expectedPrice)+' ر.س</div>':'')+'<div class="card-m"><span>🛏 '+p.rooms+'</span><span>📐 '+fmt(p.area)+' م²</span><span>🚿 '+p.baths+'</span>'+(p.type==='فيلا'&&p.apartments?'<span>🏢 '+p.apartments+' شقق</span>':'')+'</div></div></div>'
 }
 function render(f){
   var g=document.getElementById('pg'),list=f||A;
@@ -366,6 +366,7 @@ function showDetail(id){
   var html='<button class="cls" onclick="closeD()">×</button>';
   html+='<div class="ov-gal" id="og">'+imgs.map(function(s,i){return'<img src="'+s+'" '+(i===0?'class="on"':'')+' onerror="this.onerror=null;this.src=\''+pFallback(p)+'\'">'}).join('')+(imgs.length>1?'<button class="gal-nav gal-n" onclick="gNav(1)">›</button><button class="gal-nav gal-p" onclick="gNav(-1)">‹</button>':'')+'<div class="gal-c">📷 '+imgs.length+' صور</div>'+tb3d+tb360+'</div>';
   currentDetailImages=imgs;
+  if(p.videoUrl)html+='<div class="vt-video">'+vidEmbed(p.videoUrl)+'</div>';
   html+='<span class="db db-'+tCls(p.trust)+'">'+tLbl(p.trust)+'</span>';
   html+='<div class="dt">'+p.title+'</div><div class="dl">📍 '+pLoc(p)+'</div><div class="dp">'+pPrice(p)+'</div><div id="avm-chip-'+p.id+'"></div>';
   html+='<div class="sp"><div class="si"><div class="si-v">'+fmt(p.area)+' م²</div><div class="si-l">المساحة</div></div><div class="si"><div class="si-v">'+(p.rooms||'—')+'</div><div class="si-l">الغرف</div></div><div class="si"><div class="si-v">'+(p.baths||'—')+'</div><div class="si-l">الحمامات</div></div><div class="si"><div class="si-v">'+(p.cars||'—')+'</div><div class="si-l">مواقف</div></div>'+(p.type==='فيلا'&&p.apartments?'<div class="si"><div class="si-v">'+p.apartments+'</div><div class="si-l">الشقق</div></div>':'')+'<div class="si"><div class="si-v">'+(p.facing||'—')+'</div><div class="si-l">الواجهة</div></div><div class="si"><div class="si-v">'+(p.year||'—')+'</div><div class="si-l">البناء</div></div></div>';
@@ -402,6 +403,13 @@ function showDetail(id){
   if(advId)fetchAdvertiserRating(advId,p.id);
 }
 var vtViewer=null;
+function vidEmbed(url){
+  if(!url)return '';
+  var y=url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/);
+  if(y)return '<iframe src="https://www.youtube.com/embed/'+y[1]+'?rel=0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>';
+  if(/gofile\.io\/d\//.test(url))return '<div class="vt-gofile"><div class="vt-gofile-i">🎬</div><div class="vt-gofile-t">فيديو العقار مرفوع وجاهز</div><button class="vt-sample" onclick="window.open(\''+url.replace(/'/g,'')+'\',\'_blank\')">▶️ مشاهدة الفيديو</button><div class="vt-gofile-u">'+url+'</div></div>';
+  return '<video controls playsinline preload="metadata" style="position:absolute;inset:0;width:100%;height:100%;background:#000" src="'+url+'"></video>';
+}
 function destroyVT(){
   if(vtViewer){try{vtViewer.destroy()}catch(e){}vtViewer=null}
   var f=document.getElementById('vtFrame');
@@ -2540,6 +2548,9 @@ async function submitAddProp(){
   var model3dInput=document.getElementById('ap-model3d');
   var model3dUrl=model3dInput?model3dInput.value.trim():'';
   if(model3dUrl&&!/^https?:\/\//i.test(model3dUrl))model3dUrl='';
+  var videoInput=document.getElementById('ap-video-url');
+  var videoUrl=(videoInput?videoInput.value.trim():'')||apVideoUrl||'';
+  if(videoUrl&&!/^https?:\/\//i.test(videoUrl))videoUrl='';
   var autoLocal=null;
   if(!panoUrl&&window.autoPanoBlob){
     try{
@@ -2552,7 +2563,7 @@ async function submitAddProp(){
   var d=await api('/properties',{method:'POST',body:JSON.stringify({
     title:t,type:tp,purpose:pr,price:prc,area:ar,rooms:rm,baths:bt,apartments:ap,
     city:ct,district:di||ct,description:ds,year:new Date().getFullYear(),age:0,
-    facing:'شمالي',features:[],images:images,panoramicImage:panoUrl,model3dUrl:model3dUrl,
+    facing:'شمالي',features:[],images:images,panoramicImage:panoUrl,model3dUrl:model3dUrl,videoUrl:videoUrl,
     lat:Number(document.getElementById('ap-lat').value)||null,
     lng:Number(document.getElementById('ap-lng').value)||null
   })});
