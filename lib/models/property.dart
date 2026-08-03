@@ -63,6 +63,7 @@ class Property {
   final String model3dUrl;
   final List<String> model3dUrls;
   final int trust;
+  final bool isDemo;
   final AgentInfo? agent;
 
   Property({
@@ -94,6 +95,7 @@ class Property {
     this.model3dUrl = '',
     this.model3dUrls = const [],
     required this.trust,
+    this.isDemo = false,
     this.agent,
   });
 
@@ -114,6 +116,7 @@ class Property {
     List<String>? panoramicImages,
     String? model3dUrl,
     List<String>? model3dUrls,
+    bool? isDemo,
   }) {
     return Property(
       id: id,
@@ -144,6 +147,7 @@ class Property {
       model3dUrl: model3dUrl ?? this.model3dUrl,
       model3dUrls: model3dUrls ?? this.model3dUrls,
       trust: trust,
+      isDemo: isDemo ?? this.isDemo,
       agent: agent,
     );
   }
@@ -182,6 +186,7 @@ class Property {
           (json['models'] as List?)?.map((e) => e.toString()).toList() ??
           [],
       trust: _parseTrust(json['trust']),
+      isDemo: json['isDemo'] == true,
       agent: json['agent'] != null ? AgentInfo.fromJson(json['agent']) : null,
     );
   }
@@ -235,6 +240,7 @@ class Property {
       'model3dUrl': model3dUrl,
       'model3dUrls': model3dUrls,
       'trust': trust,
+      'isDemo': isDemo,
       if (agent != null) 'agent': agent!.toJson(),
     };
   }

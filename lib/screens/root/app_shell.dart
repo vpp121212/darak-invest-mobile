@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../providers/tab_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/bottom_nav.dart';
 import '../dashboard/dashboard_screen.dart';
@@ -17,8 +18,6 @@ class AppShell extends ConsumerStatefulWidget {
 }
 
 class _AppShellState extends ConsumerState<AppShell> {
-  int _currentIndex = 0;
-
   late final List<Widget> _tabs = const [
     HomeScreen(),
     SearchScreen(),
@@ -29,12 +28,13 @@ class _AppShellState extends ConsumerState<AppShell> {
 
   @override
   Widget build(BuildContext context) {
+    final currentIndex = ref.watch(activeTabProvider);
     return Scaffold(
       backgroundColor: bgDark,
-      body: IndexedStack(index: _currentIndex, children: _tabs),
+      body: IndexedStack(index: currentIndex, children: _tabs),
       bottomNavigationBar: BottomNav(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        currentIndex: currentIndex,
+        onTap: (index) => ref.read(activeTabProvider.notifier).state = index,
       ),
     );
   }

@@ -53,6 +53,9 @@ class VirtualTourViewer extends StatefulWidget {
 
 class _VirtualTourViewerState extends State<VirtualTourViewer>
     with SingleTickerProviderStateMixin {
+  // حد أقصى لعرض فك ترميز صور البانوراما (~8× الذاكرة أقل من الصور الخام).
+  static const int _maxTextureWidth = 2560;
+
   late List<String> _scenes;
   ui.Image? _pano;
   bool _loading = true;
@@ -170,7 +173,12 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
   }
 
   Future<ui.Image> _resolveImage(String url) async {
-    final provider = CachedNetworkImageProvider(url);
+    // تقييد أبعاد فك الترميز حتى لا تستهلك صور البانوراما الضخمة
+    // (10k+ بكسل) ذاكرة الجهاز — العرض النهائي لا يتجاوز عرض الشاشة.
+    final provider = ResizeImage(
+      CachedNetworkImageProvider(url),
+      maxWidth: _maxTextureWidth,
+    );
     final stream = provider.resolve(ImageConfiguration.empty);
     final completer = Completer<ui.Image>();
     late final ImageStreamListener listener;

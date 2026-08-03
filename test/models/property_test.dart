@@ -84,6 +84,13 @@ void main() {
       expect(property.images, isEmpty);
       expect(property.features, isEmpty);
       expect(property.agent, isNull);
+      expect(property.isDemo, isFalse);
+    });
+
+    test('parses the isDemo flag', () {
+      expect(Property.fromJson(const {'isDemo': true}).isDemo, isTrue);
+      expect(Property.fromJson(const {'isDemo': 'true'}).isDemo, isFalse);
+      expect(Property.fromJson(const <String, dynamic>{}).isDemo, isFalse);
     });
   });
 
@@ -201,11 +208,13 @@ void main() {
         panoramicImages: const ['/a.jpg'],
         model3dUrl: '/m.glb',
         model3dUrls: const ['/m1.glb'],
+        isDemo: true,
       );
       expect(updated.panoramicImage, '/p.jpg');
       expect(updated.panoramicImages, ['/a.jpg']);
       expect(updated.model3dUrl, '/m.glb');
       expect(updated.model3dUrls, ['/m1.glb']);
+      expect(updated.isDemo, isTrue);
     });
   });
 }

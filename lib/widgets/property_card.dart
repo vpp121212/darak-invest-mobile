@@ -107,6 +107,25 @@ class PropertyCard extends StatelessWidget {
               ),
             ),
           ),
+        if (property.isDemo)
+          Positioned(
+            top: 10,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: gold,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'تجريبي',
+                  style: GoogleFonts.cairo(color: bgDark, fontSize: 11, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ),
         Positioned(
           bottom: 10,
           left: 10,

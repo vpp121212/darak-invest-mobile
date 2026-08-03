@@ -33,6 +33,16 @@ class ApiService {
     return _parseProperties(data);
   }
 
+  /// Publishes a property owned by the logged-in advertiser.
+  ///
+  /// Mirrors the web app's `POST /api/properties` payload so the same links
+  /// (360 panoramas, rooms, GLB dollhouse) reach the backend unchanged.
+  static Future<Map<String, dynamic>> createProperty(
+      Map<String, dynamic> data) async {
+    final res = await _client.post('/api/properties', body: data);
+    return res is Map<String, dynamic> ? res : <String, dynamic>{};
+  }
+
   static Future<Property> getProperty(String id) async {
     final data = await _client.get('/api/properties/$id');
     final map = data is Map<String, dynamic> ? data : data['property'];
