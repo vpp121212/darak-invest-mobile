@@ -20,6 +20,10 @@ class ApiService {
       final property = Property.fromJson(e as Map<String, dynamic>);
       return property.copyWith(
         images: property.images.map(resolveImage).toList(),
+        panoramicImage: resolveImage(property.panoramicImage),
+        panoramicImages: property.panoramicImages.map(resolveImage).toList(),
+        model3dUrl: resolveImage(property.model3dUrl),
+        model3dUrls: property.model3dUrls.map(resolveImage).toList(),
       );
     }).toList();
   }
@@ -33,7 +37,13 @@ class ApiService {
     final data = await _client.get('/api/properties/$id');
     final map = data is Map<String, dynamic> ? data : data['property'];
     final property = Property.fromJson(map);
-    return property.copyWith(images: property.images.map(resolveImage).toList());
+    return property.copyWith(
+      images: property.images.map(resolveImage).toList(),
+      panoramicImage: resolveImage(property.panoramicImage),
+      panoramicImages: property.panoramicImages.map(resolveImage).toList(),
+      model3dUrl: resolveImage(property.model3dUrl),
+      model3dUrls: property.model3dUrls.map(resolveImage).toList(),
+    );
   }
 
   static Future<Map<String, dynamic>> search(Map<String, dynamic> params) async {

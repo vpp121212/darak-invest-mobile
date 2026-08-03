@@ -58,6 +58,10 @@ class Property {
   final String desc;
   final List<String> images;
   final List<String> features;
+  final String panoramicImage;
+  final List<String> panoramicImages;
+  final String model3dUrl;
+  final List<String> model3dUrls;
   final int trust;
   final AgentInfo? agent;
 
@@ -85,6 +89,10 @@ class Property {
     required this.desc,
     required this.images,
     required this.features,
+    this.panoramicImage = '',
+    this.panoramicImages = const [],
+    this.model3dUrl = '',
+    this.model3dUrls = const [],
     required this.trust,
     this.agent,
   });
@@ -100,7 +108,13 @@ class Property {
 
   String get mainImage => images.isNotEmpty ? images.first : '';
 
-  Property copyWith({List<String>? images}) {
+  Property copyWith({
+    List<String>? images,
+    String? panoramicImage,
+    List<String>? panoramicImages,
+    String? model3dUrl,
+    List<String>? model3dUrls,
+  }) {
     return Property(
       id: id,
       title: title,
@@ -125,6 +139,10 @@ class Property {
       desc: desc,
       images: images ?? this.images,
       features: features,
+      panoramicImage: panoramicImage ?? this.panoramicImage,
+      panoramicImages: panoramicImages ?? this.panoramicImages,
+      model3dUrl: model3dUrl ?? this.model3dUrl,
+      model3dUrls: model3dUrls ?? this.model3dUrls,
       trust: trust,
       agent: agent,
     );
@@ -155,6 +173,14 @@ class Property {
       desc: json['desc'] ?? json['description'] ?? '',
       images: (json['images'] as List?)?.map((e) => e.toString()).toList() ?? [],
       features: (json['features'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      panoramicImage: (json['panoramicImage'] ?? json['panoUrl'] ?? json['panorama'] ?? '').toString(),
+      panoramicImages: (json['panoramicImages'] as List?)?.map((e) => e.toString()).toList() ??
+          (json['scenes'] as List?)?.map((e) => e.toString()).toList() ??
+          [],
+      model3dUrl: (json['model3dUrl'] ?? json['modelUrl'] ?? json['model3d'] ?? '').toString(),
+      model3dUrls: (json['model3dUrls'] as List?)?.map((e) => e.toString()).toList() ??
+          (json['models'] as List?)?.map((e) => e.toString()).toList() ??
+          [],
       trust: _parseTrust(json['trust']),
       agent: json['agent'] != null ? AgentInfo.fromJson(json['agent']) : null,
     );
@@ -204,6 +230,10 @@ class Property {
       'desc': desc,
       'images': images,
       'features': features,
+      'panoramicImage': panoramicImage,
+      'panoramicImages': panoramicImages,
+      'model3dUrl': model3dUrl,
+      'model3dUrls': model3dUrls,
       'trust': trust,
       if (agent != null) 'agent': agent!.toJson(),
     };

@@ -11,7 +11,9 @@ import '../../core/utils/formatters.dart';
 import '../../models/property.dart';
 import '../../providers/properties_provider.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/dollhouse_viewer.dart';
 import '../../widgets/property_card.dart';
+import '../../widgets/virtual_tour_viewer.dart';
 
 class PropertyDetailScreen extends ConsumerStatefulWidget {
   final Property property;
@@ -63,6 +65,16 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                   const SizedBox(height: 20),
                   _buildStatsGrid(),
                   const SizedBox(height: 20),
+                  if (_property.panoramicImage.isNotEmpty ||
+                      _property.panoramicImages.isNotEmpty) ...[
+                    _buildVirtualTour(),
+                    const SizedBox(height: 20),
+                  ],
+                  if (_property.model3dUrl.isNotEmpty ||
+                      _property.model3dUrls.isNotEmpty) ...[
+                    _buildDollhouse(),
+                    const SizedBox(height: 20),
+                  ],
                   _buildAiTools(),
                   const SizedBox(height: 20),
                   if (_property.features.isNotEmpty) ...[
@@ -309,6 +321,79 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
           ),
         );
       }).toList(),
+    );
+  }
+
+  Widget _buildVirtualTour() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(Icons.threesixty, color: gold, size: 20),
+            const SizedBox(width: 6),
+            Text(
+              'جولة 360°',
+              style: GoogleFonts.cairo(
+                color: textLight,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Spacer(),
+            Text(
+              'بانوراما تفاعلية',
+              style: GoogleFonts.cairo(color: textMuted, fontSize: 12),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        VirtualTourViewer(
+          imageUrl: _property.panoramicImage,
+          scenes: _property.panoramicImages.isNotEmpty
+              ? _property.panoramicImages
+              : (_property.panoramicImage.isNotEmpty
+                  ? <String>[_property.panoramicImage]
+                  : null),
+          title: _property.title,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDollhouse() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(Icons.view_in_ar, color: gold, size: 20),
+            const SizedBox(width: 6),
+            Text(
+              'بيت الدمية ثلاثي الأبعاد',
+              style: GoogleFonts.cairo(
+                color: textLight,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Spacer(),
+            Text(
+              'نموذج تفاعلي',
+              style: GoogleFonts.cairo(color: textMuted, fontSize: 12),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        DollhouseViewer(
+          modelUrl: _property.model3dUrl,
+          scenes: _property.model3dUrls.isNotEmpty
+              ? _property.model3dUrls
+              : (_property.model3dUrl.isNotEmpty
+                  ? <String>[_property.model3dUrl]
+                  : null),
+        ),
+      ],
     );
   }
 
