@@ -18,6 +18,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <link rel="preload" href="mapbox-gl-rtl-text.js" as="script">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/pannellum.css">
 </head>
 <body>
   <header class="hd"><div class="wrap"><a href="#" onclick="nav('home');return false" class="logo"><span class="logo-i">د</span> دارك وحيك</a><div style="display:flex;gap:8px"><a href="#" onclick="openNotif();return false">🔔</a><a href="auth.html">دخول</a></div></div></header>
@@ -71,7 +72,7 @@
     <button class="aip-analyze" onclick="runAVM()">🧮 احسب القيمة التقديرية</button>
   </div></div>
 
-  <div class="v3" id="vr360"><div class="v3h"><div class="v3t">🌐 جولة 360°</div><div class="v3x" onclick="closeVR()">✕</div></div><div class="v3v"><canvas class="v3canvas" id="vrCanvas"></canvas><div class="v3hint" id="vrHint"><div class="v3hint-i">👆</div><div class="v3hint-t">اسحب لاستكشاف الغرفة</div></div></div><div class="v3rooms"><div class="v3rb" id="vrRooms"></div></div></div>
+  <div class="v3" id="vr360"><div class="v3h"><div class="v3t">🌐 جولة 360°</div><div class="v3x" onclick="closeVR()">✕</div></div><div class="v3v"><canvas class="v3canvas" id="vrCanvas"></canvas><div id="vrPano"></div><div class="v3hint" id="vrHint"><div class="v3hint-i">👆</div><div class="v3hint-t">اسحب لاستكشاف الغرفة</div></div></div><div class="v3rooms"><div class="v3rb" id="vrRooms"></div></div></div>
 
   <div class="mapo" id="ov3d"><div class="map-hdr"><div class="map-hdr-t">🏗️ العرض ثلاثي الأبعاد</div><div class="map-hdr-x" onclick="close3D()">✕</div></div><div class="map-container" style="position:relative"><div style="position:absolute;top:100px;left:12px;right:12px;z-index:10;display:flex;gap:8px"><input id="map3dSearchInput" type="text" placeholder="🔍 ابحث عن منطقة..." style="flex:1;padding:10px 14px;border-radius:12px;background:#ffffff;border:1px solid rgba(212,175,55,.3);color:var(--t);font-size:13px;font-family:'Cairo',sans-serif;outline:none;direction:rtl;backdrop-filter:blur(12px)" oninput="map3dSearchDebounced()" onkeydown="if(event.key==='Enter')map3dSearchNow()"><div id="map3dSearchResults" style="position:absolute;top:44px;left:0;right:0;background:#ffffff;border:1px solid rgba(212,175,55,.2);border-radius:12px;display:none;max-height:200px;overflow-y:auto;z-index:20;backdrop-filter:blur(12px)"></div><button onclick="map3dLocateMe()" style="width:42px;height:42px;border-radius:12px;background:#ffffff;border:1px solid rgba(212,175,55,.3);color:var(--g);font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)" title="موقعك الحالي">📍</button></div><div id="map3d" style="width:100%;height:100%"></div></div></div>
 
@@ -83,6 +84,7 @@
   <footer class="ft"><div class="wrap">دارك وحيك © 2026 — جميع الحقوق محفوظة · بإدارة المهندس / سعد الرويس · <a href="#" onclick="nav('legal');return false" style="color:var(--g)">الصفحة القانونية</a></div></footer>
   <script src="js/firebase-config.js"></script>
   <script src="js/core.js"></script>
+  <script src="js/vendor/pannellum.js"></script>
   <script src="js/app.js"></script>
   <script src="js/auth-legacy.js"></script>
   <script src="js/favs.js"></script>
