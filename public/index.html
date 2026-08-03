@@ -459,6 +459,12 @@
         <button class="tb-dl" onclick="tbDownloadAll()">⬇ تحميل كل البانورامات</button>
       </div>
       <div class="tb-note">يُولّد المحرك لكل صورة بانوراما Equirectangular (نسبة 2:1) تعمل مع عارض Pannellum التفاعلي: اسحب للتنقل، وبدّل بين المشاهد من الأزرار أسفل الجولة.</div>
+      <div class="tb-tour3d">
+        <div class="tb-tour3d-t">🕶️ جولة 3D جاهزة</div>
+        <div class="tb-tour3d-s">لديك رابط جولة افتراضية (Matterport، jawla360.com…؟) الصقه لعرضها فورًا</div>
+        <input type="text" id="tbTourUrl" placeholder="https://my.matterport.com/show/?m=..." style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--b);background:var(--c);color:var(--t);font-size:12px;font-family:inherit;direction:ltr;text-align:left;box-sizing:border-box" onkeydown="if(event.key==='Enter')tbOpenTour3D()">
+        <button class="tb-tour3d-b" onclick="tbOpenTour3D()">▶️ فتح الجولة</button>
+      </div>
     </div>
   </div>
   <!-- Bottom Nav -->
