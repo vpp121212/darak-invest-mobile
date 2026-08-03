@@ -21,7 +21,7 @@ window.__baseNav=nav;
 /* RENDER */
 function cardHTML(p){
   var im=pImg(p),fav=F.indexOf(p.id)>-1;
-  return'<div class="card" onclick="showDetail('+p.id+')"><div class="card-img"><img src="'+im+'" alt="'+p.title+'" loading="lazy" onerror="this.onerror=null;this.src=\''+pFallback(p)+'\'"><div class="badges"><span class="badge '+(p.purpose==='إيجار'?'badge-r':'badge-s')+'">'+p.purpose+'</span>'+(p.status==='حصري'?'<span class="badge badge-x">⭐ حصري</span>':'')+'</div><button class="fav '+(fav?'on':'')+'" onclick="toggleFav('+p.id+',event)">'+(fav?'❤':'🤍')+'</button><span class="trust trust-'+tCls(p.trust)+'">'+tLbl(p.trust)+'</span>'+(p.panoramicImage||p.pano?'<span class="card-360">🌐 360°</span>':'')+'</div><div class="card-b"><div class="card-t">'+p.title+'</div><div class="card-l">📍 '+pLoc(p)+'</div><div class="card-p">'+pPrice(p)+'</div>'+(p.expectedPrice?'<div class="card-avm">💰 التقدير: '+fmt(p.expectedPrice)+' ر.س</div>':'')+'<div class="card-m"><span>🛏 '+p.rooms+'</span><span>📐 '+fmt(p.area)+' م²</span><span>🚿 '+p.baths+'</span>'+(p.type==='فيلا'&&p.apartments?'<span>🏢 '+p.apartments+' شقق</span>':'')+'</div></div></div>'
+  return'<div class="card" onclick="showDetail('+p.id+')"><div class="card-img"><img src="'+im+'" alt="'+p.title+'" loading="lazy" onerror="this.onerror=null;this.src=\''+pFallback(p)+'\'"><div class="badges"><span class="badge '+(p.purpose==='إيجار'?'badge-r':'badge-s')+'">'+p.purpose+'</span>'+(p.status==='حصري'?'<span class="badge badge-x">⭐ حصري</span>':'')+'</div><button class="fav '+(fav?'on':'')+'" onclick="toggleFav('+p.id+',event)">'+(fav?'❤':'🤍')+'</button><span class="trust trust-'+tCls(p.trust)+'">'+tLbl(p.trust)+'</span>'+(p.panoramicImage||p.pano?'<span class="card-360">🌐 360°</span>':'')+(p.tourUrl||p.matterport||p.tour3d?'<span class="card-360">🕶️ 3D</span>':'')+'</div><div class="card-b"><div class="card-t">'+p.title+'</div><div class="card-l">📍 '+pLoc(p)+'</div><div class="card-p">'+pPrice(p)+'</div>'+(p.expectedPrice?'<div class="card-avm">💰 التقدير: '+fmt(p.expectedPrice)+' ر.س</div>':'')+'<div class="card-m"><span>🛏 '+p.rooms+'</span><span>📐 '+fmt(p.area)+' م²</span><span>🚿 '+p.baths+'</span>'+(p.type==='فيلا'&&p.apartments?'<span>🏢 '+p.apartments+' شقق</span>':'')+'</div></div></div>'
 }
 function render(f){
   var g=document.getElementById('pg'),list=f||A;
@@ -361,8 +361,10 @@ var currentDetail=null;
 function showDetail(id){
   var p=A.find(function(x){return x.id===id});if(!p)return;currentDetail=p;
   var imgs=(p.images&&p.images.length)?p.images:[pFallback(p)];
+  var tb3d=(p.tourUrl||p.matterport||p.tour3d)?'<button class="gal-360btn" onclick="openVR(currentDetailImages)">🕶️ جولة 3D</button>':'';
+  var tb360=imgs.length?'<button class="gal-360btn" onclick="openVR(currentDetailImages)">🌐 جولة 360°</button>':'';
   var html='<button class="cls" onclick="closeD()">×</button>';
-  html+='<div class="ov-gal" id="og">'+imgs.map(function(s,i){return'<img src="'+s+'" '+(i===0?'class="on"':'')+' onerror="this.onerror=null;this.src=\''+pFallback(p)+'\'">'}).join('')+(imgs.length>1?'<button class="gal-nav gal-n" onclick="gNav(1)">›</button><button class="gal-nav gal-p" onclick="gNav(-1)">‹</button>':'')+'<div class="gal-c">📷 '+imgs.length+' صور</div>'+(imgs.length?'<button class="gal-360btn" onclick="openVR(currentDetailImages)">🌐 جولة 360°</button>':'')+'</div>';
+  html+='<div class="ov-gal" id="og">'+imgs.map(function(s,i){return'<img src="'+s+'" '+(i===0?'class="on"':'')+' onerror="this.onerror=null;this.src=\''+pFallback(p)+'\'">'}).join('')+(imgs.length>1?'<button class="gal-nav gal-n" onclick="gNav(1)">›</button><button class="gal-nav gal-p" onclick="gNav(-1)">‹</button>':'')+'<div class="gal-c">📷 '+imgs.length+' صور</div>'+tb3d+tb360+'</div>';
   currentDetailImages=imgs;
   html+='<span class="db db-'+tCls(p.trust)+'">'+tLbl(p.trust)+'</span>';
   html+='<div class="dt">'+p.title+'</div><div class="dl">📍 '+pLoc(p)+'</div><div class="dp">'+pPrice(p)+'</div><div id="avm-chip-'+p.id+'"></div>';
@@ -1553,6 +1555,7 @@ function openVR(imgs,labels){
   if(!imgs||!imgs.length){toast('لا توجد صور لهذه الجولة');return}
   if(typeof imgs==='string')imgs=[imgs];
   var prop=currentDetail||{};
+  if(!vrForcePano&&(prop.tourUrl||prop.matterport||prop.tour3d)){vrTourOpen(prop.tourUrl||prop.matterport||prop.tour3d);return}
   if(!vrForcePano&&(prop.panoramicImage||prop.pano)){imgs=[prop.panoramicImage||prop.pano].concat(imgs)}
   vrImages=imgs;vrCurrentIdx=0;vrPanoFailed=false;
   document.getElementById('vr360').classList.add('on');
@@ -1562,6 +1565,27 @@ function openVR(imgs,labels){
   var rooms=document.getElementById('vrRooms');
   if(rooms)rooms.innerHTML=imgs.map(function(url,i){return'<button class="'+(i===0?'on':'')+'" onclick="vrSwitchRoom('+i+')">'+(labels&&labels[i]?labels[i]:'غرفة '+(i+1))+'</button>'}).join('');
   vrLoadImage(imgs[0]);
+}
+function vrTourOpen(url){
+  document.getElementById('vr360').classList.add('on');
+  vrImages=[url];vrCurrentIdx=0;vrPanoFailed=false;vrActive=true;
+  var hint=document.getElementById('vrHint');
+  if(hint){hint.style.display='block';setTimeout(function(){if(hint)hint.style.display='none'},3500)}
+  var rooms=document.getElementById('vrRooms');
+  if(rooms)rooms.innerHTML='<button class="on">🕶️ جولة 3D</button>';
+  var pano=document.getElementById('vrPano'),canvas=document.getElementById('vrCanvas');
+  if(pano){
+    pano.innerHTML='';
+    var f=document.createElement('iframe');
+    f.id='vrIframe';f.src=url;
+    f.setAttribute('allow','xr-spatial-tracking;gyroscope;accelerometer;fullscreen;camera');
+    f.setAttribute('allowfullscreen','');
+    f.setAttribute('referrerpolicy','no-referrer-when-downgrade');
+    f.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:0;background:#0a0b10';
+    pano.style.display='block';
+    pano.appendChild(f);
+  }
+  if(canvas)canvas.style.display='none';
 }
 function vrSwitchRoom(idx){
   if(idx===vrCurrentIdx)return;
@@ -1686,6 +1710,8 @@ function closeVR(){
   if(vrRAF)cancelAnimationFrame(vrRAF);
   clearInterval(vrPanoWatchdog);
   if(vrPanoViewer){try{vrPanoViewer.destroy()}catch(e){}vrPanoViewer=null}
+  var tf=document.getElementById('vrIframe');
+  if(tf){try{tf.src='about:blank'}catch(e){}if(tf.parentNode)tf.parentNode.removeChild(tf)}
   document.getElementById('vr360').classList.remove('on');
 }
 
