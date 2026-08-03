@@ -359,7 +359,7 @@ async function reportAd(id){
 /* DETAIL */
 var currentDetail=null;
 function showDetail(id){
-  var p=A.find(function(x){return x.id===id});if(!p)return;currentDetail=p;
+  var p=A.find(function(x){return x.id===id});if(!p)return;currentDetail=p;destroyVT();
   var imgs=(p.images&&p.images.length)?p.images:[pFallback(p)];
   var tb3d=(p.tourUrl||p.matterport||p.tour3d)?'<button class="gal-360btn" onclick="openVR(currentDetailImages)">🕶️ جولة 3D</button>':'';
   var tb360=imgs.length?'<button class="gal-360btn" onclick="openVR(currentDetailImages)">🌐 جولة 360°</button>':'';
@@ -371,6 +371,13 @@ function showDetail(id){
   html+='<div class="sp"><div class="si"><div class="si-v">'+fmt(p.area)+' م²</div><div class="si-l">المساحة</div></div><div class="si"><div class="si-v">'+(p.rooms||'—')+'</div><div class="si-l">الغرف</div></div><div class="si"><div class="si-v">'+(p.baths||'—')+'</div><div class="si-l">الحمامات</div></div><div class="si"><div class="si-v">'+(p.cars||'—')+'</div><div class="si-l">مواقف</div></div>'+(p.type==='فيلا'&&p.apartments?'<div class="si"><div class="si-v">'+p.apartments+'</div><div class="si-l">الشقق</div></div>':'')+'<div class="si"><div class="si-v">'+(p.facing||'—')+'</div><div class="si-l">الواجهة</div></div><div class="si"><div class="si-v">'+(p.year||'—')+'</div><div class="si-l">البناء</div></div></div>';
   if(p.features&&p.features.length){html+='<div class="fd"><h3>المميزات</h3><div class="fch">'+p.features.map(function(f){return'<span style="padding:6px 12px;border-radius:999px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.15);font-size:11px;color:var(--m)">'+f+'</span>'}).join('')+'</div></div>'}
   if(p.desc){html+='<div class="desc"><h3>الوصف</h3><p>'+p.desc+'</p></div>'}
+  var vtTour=p.tourUrl||p.matterport||p.tour3d;
+  var vtPano=p.panoramicImage||p.pano;
+  html+='<div class="vt-section"><div class="vt-head"><span class="vt-icon">'+(vtTour?'🕶️':'🌐')+'</span><h3>الجولة الافتراضية</h3></div>';
+  if(vtTour){html+='<div class="vt-body" id="vt-embed"></div>'}
+  else if(vtPano){html+='<div class="vt-body" id="vt-pano"></div>'}
+  else if(imgs.length){html+='<button class="vt-gen" onclick="tbPreload(currentDetail.images)">🤖 توليد جولة 360 من صور العقار</button>'}
+  html+='</div>';
   html+='<div id="pulse-card-'+p.id+'"><div class="load" style="padding:16px">جاري تحميل مؤشر نبض الحي...</div></div>'
   var ph=(p.agent&&p.agent.phone)?p.agent.phone.replace(/[^0-9]/g,''):'';
   html+='<div class="ag"><div class="ag-n">'+(p.agent&&p.agent.name||'دارك وحيك')+'</div><div class="ag-r">'+(p.agent&&p.agent.role||'بائع مباشر')+'</div><div id="ag-rating-'+p.id+'"></div><div class="ag-b">'+(ph?'<button class="ag-btn ag-w" onclick="contactAgent(\''+ph+'\',\'wa\')">💬 واتساب</button><button class="ag-btn ag-c" onclick="contactAgent(\''+ph+'\',\'tel\')">📞 اتصال</button>':'')+'</div></div>';
@@ -386,9 +393,42 @@ function showDetail(id){
     document.body.style.overflow='hidden';
   }
   renderDetailAVM(p);
+  initVTSection(p);
   fetchPulse(p);
   var advId=p.agentUserId||(p.agent&&p.agent.id);
   if(advId)fetchAdvertiserRating(advId,p.id);
+}
+var vtViewer=null;
+function destroyVT(){
+  if(vtViewer){try{vtViewer.destroy()}catch(e){}vtViewer=null}
+  var f=document.getElementById('vtFrame');
+  if(f){try{f.src='about:blank'}catch(e){}if(f.parentNode)f.parentNode.removeChild(f)}
+  var pc=document.getElementById('vt-pano');
+  if(pc)pc.innerHTML='';
+}
+function initVTSection(p){
+  var tour=p.tourUrl||p.matterport||p.tour3d;
+  var pano=p.panoramicImage||p.pano;
+  var em=document.getElementById('vt-embed');
+  if(em&&tour){
+    var f=document.createElement('iframe');
+    f.id='vtFrame';f.src=tour;
+    f.setAttribute('allow','xr-spatial-tracking;gyroscope;accelerometer;fullscreen;camera');
+    f.setAttribute('allowfullscreen','');
+    f.setAttribute('referrerpolicy','no-referrer-when-downgrade');
+    f.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:0;background:#0a0b10';
+    em.appendChild(f);
+    return;
+  }
+  var pc=document.getElementById('vt-pano');
+  if(pc&&pano&&window.pannellum){
+    try{
+      vtViewer=pannellum.viewer('vt-pano',{
+        type:'equirectangular',panorama:pano,autoLoad:true,autoRotate:-1,
+        compass:false,showFullscreenCtrl:true,crossOrigin:'anonymous',hfov:100
+      });
+    }catch(e){}
+  }
 }
 function renderDetailAVM(p){
   var el=document.getElementById('avm-chip-'+(p&&p.id));
@@ -492,7 +532,7 @@ function fetchPulse(p){
       sb+cards+metro+projects+'<div style="font-size:9px;color:var(--m);text-align:left;margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,.04)">📊 '+px.data_source+'</div></div></div>';
   }).catch(function(){document.getElementById('pulse-card-'+p.id).innerHTML=''});
 }
-function closeD(){var dp=document.getElementById('detailPage');if(dp&&document.querySelector('#detailPage .detail-page-inner')){if(history.length>1)history.back();else window.location.href='dashboard.html';return}document.getElementById('ov').classList.remove('open');document.body.style.overflow=''}
+function closeD(){destroyVT();var dp=document.getElementById('detailPage');if(dp&&document.querySelector('#detailPage .detail-page-inner')){if(history.length>1)history.back();else window.location.href='dashboard.html';return}document.getElementById('ov').classList.remove('open');document.body.style.overflow=''}
 
 function gNav(d){
   var imgs=document.querySelectorAll('#og img'),cur=0;
