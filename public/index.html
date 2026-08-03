@@ -511,6 +511,7 @@
       </div>
       <div class="ap-field"><label>وصف العقار</label><textarea id="ap-desc" rows="3" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--b);background:var(--c);color:var(--t);font-size:12px;font-family:inherit;box-sizing:border-box;resize:vertical" placeholder="اكتب تفاصيل العقار..."></textarea></div>
       <div class="ap-field"><label>رابط جولة 3D جاهزة (اختياري — Matterport / jawla360)</label><input type="text" id="ap-pano-url" placeholder="https://my.matterport.com/show/?m=..." style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--b);background:var(--c);color:var(--t);font-size:12px;font-family:inherit;direction:ltr;text-align:left;box-sizing:border-box"></div>
+      <div class="ap-field"><label>رابط نموذج ثلاثي الأبعاد (اختياري — GLB/GLTF لعرض بيت الدمية والمخطط)</label><input type="text" id="ap-model3d" placeholder="https://example.com/house.glb" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--b);background:var(--c);color:var(--t);font-size:12px;font-family:inherit;direction:ltr;text-align:left;box-sizing:border-box"></div>
       <input type="file" id="ap-pano" accept="image/*" style="display:none">
       <button class="tb-gen" onclick="submitAddProp()" style="margin-top:6px">🚀 نشر الإعلان</button>
       <div class="tb-note">الصور تُرفع بأمان · الجولة التفاعلية تُولَّد تلقائيًا من أول صورة · يمكنك لاحقًا استبدالها برابط Matterport/jawla360 إن وُجد</div>
@@ -583,6 +584,7 @@
   <script src="js/firebase-config.js"></script>
   <script src="js/core.js"></script>
   <script src="js/vendor/pannellum.js"></script>
+  <script type="module" src="js/vendor/model-viewer.min.js"></script>
   <script src="js/app.js"></script>
   <script src="js/auth-legacy.js"></script>
   <script src="js/favs.js"></script>
