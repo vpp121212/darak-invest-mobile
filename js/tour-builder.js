@@ -176,3 +176,14 @@ function tbDownloadAll(){
 function esc(s){
   return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+function tbOpenTour3D(){
+  var url=(document.getElementById('tbTourUrl')||{}).value||'';
+  url=url.trim();
+  if(!url){toast('الصق رابط الجولة أولًا');return}
+  if(!/^https?:\/\//i.test(url)){
+    toast('رابط غير صالح — يجب أن يبدأ بـ http:// أو https://');
+    return;
+  }
+  vrTourOpen(url);
+}

@@ -1568,6 +1568,8 @@ function openVR(imgs,labels){
 }
 function vrTourOpen(url){
   document.getElementById('vr360').classList.add('on');
+  var t=document.querySelector('#vr360 .v3t');
+  if(t)t.textContent='🕶️ جولة ثلاثية الأبعاد';
   vrImages=[url];vrCurrentIdx=0;vrPanoFailed=false;vrActive=true;
   var hint=document.getElementById('vrHint');
   if(hint){hint.style.display='block';setTimeout(function(){if(hint)hint.style.display='none'},3500)}
@@ -1712,6 +1714,8 @@ function closeVR(){
   if(vrPanoViewer){try{vrPanoViewer.destroy()}catch(e){}vrPanoViewer=null}
   var tf=document.getElementById('vrIframe');
   if(tf){try{tf.src='about:blank'}catch(e){}if(tf.parentNode)tf.parentNode.removeChild(tf)}
+  var t=document.querySelector('#vr360 .v3t');
+  if(t)t.textContent='🌐 جولة 360°';
   document.getElementById('vr360').classList.remove('on');
 }
 
