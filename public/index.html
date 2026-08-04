@@ -180,7 +180,7 @@
       <div style="padding:14px;border-radius:var(--r);background:linear-gradient(135deg,rgba(99,102,241,.06),rgba(168,85,247,.04));border:1px solid rgba(99,102,241,.2);margin-bottom:14px;text-align:center">
         <div style="font-size:14px;font-weight:700;color:var(--g);margin-bottom:4px">🏠 عندك عقار وتبي تعلن؟</div>
         <div style="font-size:11px;color:var(--m);margin-bottom:8px">أضف عقارك مجاناً وآلاف المشترين ينتظرون</div>
-        <button onclick="nav('add');closeLogin()" style="padding:10px 28px;border-radius:999px;border:none;background:linear-gradient(135deg,var(--g),#a855f7);color:#ffffff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer">➕ أضف عقارك الآن</button>
+        <button onclick="nav('add');closeLogin()" style="padding:10px 28px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--g),#a855f7);color:#ffffff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer">➕ أضف عقارك الآن</button>
       </div>
     </section>
     <section class="wrap">
@@ -450,7 +450,7 @@
       </div>
 
       <!-- Selected area badge -->
-      <div id="mapSelectedArea" style="position:absolute;top:235px;left:12px;z-index:10;display:none;padding:6px 14px;border-radius:999px;background:rgba(99,102,241,.2);border:1px solid rgba(99,102,241,.5);color:var(--g);font-size:12px;font-weight:600;font-family:'Cairo',sans-serif;backdrop-filter:blur(10px)">
+      <div id="mapSelectedArea" style="position:absolute;top:235px;left:12px;z-index:10;display:none;padding:6px 14px;border-radius:12px;background:rgba(99,102,241,.2);border:1px solid rgba(99,102,241,.5);color:var(--g);font-size:12px;font-weight:600;font-family:'Cairo',sans-serif;backdrop-filter:blur(10px)">
         📍 <span id="mapSelectedAreaName"></span>
         <span onclick="clearSelectedArea()" style="margin-right:8px;cursor:pointer;opacity:.6">✕</span>
       </div>
@@ -771,7 +771,7 @@
 
   <div class="upl" id="upload"><div class="upl-box"><div class="upl-title">📸 إضافة صور + جولة 360°</div><div class="upl-sub">ارفع صور عالية الدقة لعقارك</div>
     <div class="upl-zone" onclick="document.getElementById('upl-files').click()"><div class="upl-icon">📷</div><div class="upl-text">اضغط لاختيار الصور<br><strong>JPG, PNG, WebP</strong> — حتى 20 صورة</div><input type="file" id="upl-files" multiple accept="image/*" style="display:none"></div>
-    <div class="upl-360"><div class="upl-360-title">🌐 صورة بانورامية 360°</div><div class="upl-360-desc">ارفع صورة بانورامية لعرض جولة افتراضية</div>        <div class="upl-360-zone" onclick="document.getElementById('upl-pano').click()">🌐 ارفع صورة 360° هنا<input type="file" id="upl-pano" accept="image/*" style="display:none"></div><input type="text" id="upl-pano-url" placeholder="أو الصق رابط بانوراما مباشر (https://...)" style="width:100%;margin-top:8px;padding:10px 12px;border-radius:999px;background:var(--c);border:1px solid var(--b);color:var(--t);font-size:12px;font-family:inherit;outline:none;text-align:right" dir="ltr"></div>
+    <div class="upl-360"><div class="upl-360-title">🌐 صورة بانورامية 360°</div><div class="upl-360-desc">ارفع صورة بانورامية لعرض جولة افتراضية</div>        <div class="upl-360-zone" onclick="document.getElementById('upl-pano').click()">🌐 ارفع صورة 360° هنا<input type="file" id="upl-pano" accept="image/*" style="display:none"></div><input type="text" id="upl-pano-url" placeholder="أو الصق رابط بانوراما مباشر (https://...)" style="width:100%;margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--c);border:1px solid var(--b);color:var(--t);font-size:12px;font-family:inherit;outline:none;text-align:right" dir="ltr"></div>
     <div class="upl-actions"><button class="upl-btn s" onclick="closeUpload()">إلغاء</button><button class="upl-btn p" onclick="saveUpload()">💾 حفظ</button></div>
   </div></div>
 
@@ -1077,8 +1077,8 @@
         <p style="margin-bottom:0"><strong style="color:var(--g)">تحت إدارة:</strong> المهندس / سعد الرويس</p>
       </div>
       <div style="display:flex;gap:8px">
-        <button onclick="closeAbout()" style="flex:1;padding:12px;border-radius:999px;border:none;background:linear-gradient(135deg,var(--g),#a855f7);color:#ffffff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">إغلاق</button>
-        <button onclick="closeAbout();nav('about')" style="flex:1;padding:12px;border-radius:999px;border:1px solid rgba(99,102,241,.3);background:rgba(99,102,241,.08);color:var(--g);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">عرض المزيد</button>
+        <button onclick="closeAbout()" style="flex:1;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--g),#a855f7);color:#ffffff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">إغلاق</button>
+        <button onclick="closeAbout();nav('about')" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(99,102,241,.3);background:rgba(99,102,241,.08);color:var(--g);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">عرض المزيد</button>
       </div>
     </div>
   </div>

@@ -790,7 +790,7 @@ function mapFail(cid,retryFn){
   c.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--m);font-size:13px;text-align:center;padding:24px;direction:rtl;gap:10px">'+
     '<div style="font-size:32px">🗺️</div>'+
     '<div>الخرائط غير متاحة حالياً — تعذر الاتصال بخدمة الخرائط.<br>تحقق من اتصالك ثم حاول مرة أخرى.</div>'+
-    (retryFn?'<button id="map-retry" style="padding:10px 22px;border-radius:999px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#ffffff;border:none;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit">🔄 إعادة المحاولة</button>':'')+'</div>';
+    (retryFn?'<button id="map-retry" style="padding:10px 22px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#ffffff;border:none;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit">🔄 إعادة المحاولة</button>':'')+'</div>';
   var b=c.querySelector('#map-retry');
   if(b)b.addEventListener('click',function(){retryFn()});
 }
@@ -2232,8 +2232,8 @@ async function runSkill(){
         '<div>📊 التوكينز: <b style="color:var(--g)">'+m.estimated_tokens_human+'</b></div>'+
         '<div>📑 الفصول المكتشفة: <b style="color:var(--g)">'+m.chapters_detected+'</b></div>'+
         '</div></div>'+
-        '<div style="margin-top:10px"><a href="'+d.downloadUrl+'" download style="display:block;text-align:center;padding:12px;border-radius:999px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#ffffff;font-size:13px;font-weight:700">⬇️ تحميل النص الكامل</a></div>'+
-        (d.skill?'<div style="margin-top:8px"><a href="'+d.skill+'" download style="display:block;text-align:center;padding:12px;border-radius:999px;border:1px solid rgba(74,222,128,.4);background:rgba(74,222,128,.1);color:var(--green);font-size:13px;font-weight:700">🧠 تحميل SKILL.md (المهارة الجاهزة)</a></div>':'')+
+        '<div style="margin-top:10px"><a href="'+d.downloadUrl+'" download style="display:block;text-align:center;padding:12px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#ffffff;font-size:13px;font-weight:700">⬇️ تحميل النص الكامل</a></div>'+
+        (d.skill?'<div style="margin-top:8px"><a href="'+d.skill+'" download style="display:block;text-align:center;padding:12px;border-radius:12px;border:1px solid rgba(74,222,128,.4);background:rgba(74,222,128,.1);color:var(--green);font-size:13px;font-weight:700">🧠 تحميل SKILL.md (المهارة الجاهزة)</a></div>':'')+
         '<div style="margin-top:8px;padding:10px;border-radius:10px;background:rgba(8,9,14,.9);border:1px solid var(--b);font-size:10px;color:var(--m);line-height:1.6">💡 ضع مجلد skill في دليل مشروعك مع وكيلك الذكي ليقرأ الكتاب عند الحاجة فقط</div>';
     }else{
       res.innerHTML='<div style="padding:14px;border-radius:var(--r);background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.3);margin-top:12px;font-size:12px;color:var(--red)">⚠️ '+((d&&d.error)||'فشل التحويل')+'</div>';
