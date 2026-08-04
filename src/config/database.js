@@ -1,17 +1,17 @@
 import postgres from 'postgres';
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL is required');
-}
+const dbUrl = process.env.DATABASE_URL;
+let sql = null;
 
-const sql = postgres(process.env.DATABASE_URL, {
-  ssl: 'require',
-  max: 10,
-  idle_timeout: 30,
-  connect_timeout: 10,
-});
-
-await sql.unsafe(`SET client_min_messages = WARNING;
+if (dbUrl) {
+  try {
+    sql = postgres(dbUrl, {
+      ssl: 'require',
+      max: 10,
+      idle_timeout: 30,
+      connect_timeout: 10,
+    });
+    await sql.unsafe(`SET client_min_messages = WARNING;
 
   CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
@@ -500,5 +500,24 @@ await sql.unsafe(`SET client_min_messages = WARNING;
     "updatedAt" TEXT DEFAULT (NOW())
   );
 `);
+  } catch (err) {
+    console.error('[db] فشل الاتصال بقاعدة البيانات:', err.message);
+    sql = null;
+  }
+}
 
-export default sql;
+function noDbError() {
+  return new Error('DATABASE_URL is required — database not configured');
+}
+
+const dbHandler = {
+  apply() { throw noDbError(); },
+  get(target, prop) {
+    if (prop === 'unsafe' || prop === 'begin' || prop === 'end') {
+      return async () => { throw noDbError(); };
+    }
+    return target[prop];
+  },
+};
+
+export default sql || new Proxy(function(){ throw noDbError(); }, dbHandler);
