@@ -1,6 +1,6 @@
-*{box-sizing:border-box;margin:0;padding:0}:root{--bg:#f6f4ee;--c:#ffffff;--g:#d4af37;--t:#1c1c1e;--m:#6e6e73;--b:rgba(0,0,0,.09);--r:16px;--green:#4ade80;--red:#f87171;--blue:#60a5fa}html{background:var(--bg)}body{font-family:'Cairo',sans-serif;background:radial-gradient(900px 520px at 50% -8%,rgba(212,175,55,.16),transparent 62%) fixed,var(--bg);color:var(--t);min-height:100vh;-webkit-font-smoothing:antialiased}
-[data-theme="dark"]{--bg:#0a0b10;--c:#12141e;--g:#d4af37;--t:#e8e6e3;--m:#8e8e93;--b:rgba(255,255,255,.08)}
-[data-theme="dark"] body{background:radial-gradient(900px 520px at 50% -8%,rgba(212,175,55,.08),transparent 62%) fixed,#0a0b10}
+*{box-sizing:border-box;margin:0;padding:0}:root{--bg:#f6f4ee;--c:#ffffff;--g:#d4af37;--t:#1c1c1e;--m:#6e6e73;--b:rgba(0,0,0,.09);--r:16px;--green:#4ade80;--red:#f87171;--blue:#60a5fa}html{background-color:var(--bg);color-scheme:light}body{font-family:'Cairo',sans-serif;background-color:var(--bg);background-image:radial-gradient(900px 520px at 50% -8%,rgba(212,175,55,.16),transparent 62%);background-attachment:fixed;background-repeat:no-repeat;color:var(--t);min-height:100vh;-webkit-font-smoothing:antialiased}
+[data-theme="dark"]{--bg:#0a0b10;--c:#12141e;--g:#d4af37;--t:#e8e6e3;--m:#8e8e93;--b:rgba(255,255,255,.08)}html[data-theme="dark"]{color-scheme:dark}
+[data-theme="dark"] body{background-color:#0a0b10;background-image:radial-gradient(900px 520px at 50% -8%,rgba(212,175,55,.08),transparent 62%)}
 [data-theme="dark"] .hd{background:rgba(10,11,16,.96);border-bottom-color:rgba(212,175,55,.1)}
 [data-theme="dark"] .card-img{background:#1a1c28}
 [data-theme="dark"] .bn{background:rgba(10,11,16,.98);border-top-color:rgba(212,175,55,.1)}
@@ -493,3 +493,5 @@ body,.hd,.bn,.ov,.login-box,.logino,.aip-box,.upl,.upl-box,.addp,.fin-ov,.mkt-ov
 [data-theme="dark"] .ov .dl{color:var(--m)!important}
 [data-theme="dark"] .ov .dp{color:var(--g)!important}
 [data-theme="dark"] .ov .fch span{background:rgba(212,175,55,.06)!important;border-color:rgba(212,175,55,.15)!important}
+html.theme-anim,html.theme-anim body{transition:background-color .3s ease}
+html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:background-color .3s ease,color .3s ease,border-color .3s ease,box-shadow .3s ease,fill .3s ease,stroke .3s ease!important;transition-delay:0s!important}

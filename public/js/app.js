@@ -7,11 +7,16 @@
   updateThemeIcon(theme);
   function updateThemeIcon(t){var el=document.getElementById('themeToggle');if(el)el.textContent=t==='dark'?'☀️':'🌙'}
   window.toggleTheme=function(){
-    var cur=document.documentElement.getAttribute('data-theme');
+    var root=document.documentElement;
+    var cur=root.getAttribute('data-theme');
     var next=cur==='dark'?'light':'dark';
-    document.documentElement.setAttribute('data-theme',next);
-    localStorage.setItem('darak-theme',next);
-    updateThemeIcon(next);
+    root.classList.add('theme-anim');
+    requestAnimationFrame(function(){requestAnimationFrame(function(){
+      root.setAttribute('data-theme',next);
+      localStorage.setItem('darak-theme',next);
+      updateThemeIcon(next);
+    })});
+    setTimeout(function(){root.classList.remove('theme-anim')},450);
   };
   window.isDarkPref=function(){return document.documentElement.getAttribute('data-theme')==='dark'};
 })();
