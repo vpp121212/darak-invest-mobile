@@ -27,7 +27,7 @@ const sanitizeValue = (v) => {
 };
 
 export const securityMiddleware = (app) => {
-  app.use(helmet({ contentSecurityPolicy: false }));
+  app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 
   app.use((req, res, next) => {
     res.setHeader('X-Frame-Options', 'DENY');
