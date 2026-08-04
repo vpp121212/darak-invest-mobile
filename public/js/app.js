@@ -125,7 +125,7 @@ function openPulseDetail(px){
   var html='<button class="cls" onclick="closeD()">×</button>'+
     '<div class="dt" style="font-size:16px">📊 '+px.district+'</div>'+
     '<div class="dl" style="margin-bottom:12px">📍 '+px.city+'</div>'+
-    '<div style="background:rgba(8,9,14,.95);border:1px solid rgba(212,175,55,.15);border-radius:var(--r);padding:14px;animation:pulseIn .4s ease;margin-bottom:12px">'+sb+
+    '<div style="background:rgba(8,9,14,.95);border:1px solid rgba(99,102,241,.15);border-radius:var(--r);padding:14px;animation:pulseIn .4s ease;margin-bottom:12px">'+sb+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">'+
     '<div style="padding:10px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">العائد الإيجاري</div><div style="font-size:16px;font-weight:700;color:'+roiColor+'">'+(px.roi||'—')+'%</div></div>'+
     '<div style="padding:10px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">النمو المتوقع</div><div style="font-size:16px;font-weight:700;color:'+growthColor+'">'+growth+'</div></div>'+
@@ -221,7 +221,7 @@ function renderOfficialBlock(d){
       '</div>';
   }).join('');
   var src=d.indicators[0];
-  return'<div style="margin-top:10px;padding:10px;border-radius:10px;background:rgba(212,175,55,.05);border:1px solid rgba(212,175,55,.18)">'+
+  return'<div style="margin-top:10px;padding:10px;border-radius:10px;background:rgba(99,102,241,.05);border:1px solid rgba(99,102,241,.18)">'+
     '<div style="font-size:11px;color:var(--g);font-weight:700;margin-bottom:6px">🏛️ متوسط الإيجار الرسمي — '+((src.year||'')+' '+qName(src.quarter))+'</div>'+
     items+
     '<div style="font-size:9px;color:var(--m);padding-top:6px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap">'+
@@ -239,9 +239,9 @@ function loadSources(){
       return'<div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)">'+
         '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">'+
         '<div style="font-size:13px;font-weight:700;color:var(--t)">'+esc(s.name)+'</div>'+
-        '<span style="font-size:9px;padding:2px 8px;border-radius:999px;background:rgba(212,175,55,.12);color:var(--g);font-weight:600;white-space:nowrap">'+esc(s.update)+'</span></div>'+
+        '<span style="font-size:9px;padding:2px 8px;border-radius:999px;background:rgba(99,102,241,.12);color:var(--g);font-weight:600;white-space:nowrap">'+esc(s.update)+'</span></div>'+
         '<div style="font-size:11px;color:var(--m);line-height:1.7;margin-bottom:8px">'+esc(s.description)+'</div>'+
-        '<a href="'+esc(s.url)+'" target="_blank" style="display:inline-block;padding:6px 14px;border-radius:8px;background:linear-gradient(135deg,#d4af37,#b8941f);color:#05060a;font-size:11px;font-weight:700;text-decoration:none">زيارة المصدر 🔗</a></div>';
+        '<a href="'+esc(s.url)+'" target="_blank" style="display:inline-block;padding:6px 14px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#ffffff;font-size:11px;font-weight:700;text-decoration:none">زيارة المصدر 🔗</a></div>';
     }).join('');
   });
 }
@@ -432,7 +432,7 @@ function showDetail(id){
   html+='<span class="db db-'+tCls(p.trust)+'">'+esc(tLbl(p.trust))+'</span>';
   html+='<div class="dt">'+et+'</div><div class="dl">📍 '+el+'</div><div class="dp">'+ep+'</div><div id="avm-chip-'+eid+'"></div>';
   html+='<div class="sp"><div class="si"><div class="si-v">'+esc(fmt(p.area))+' م²</div><div class="si-l">المساحة</div></div><div class="si"><div class="si-v">'+esc(p.rooms||'—')+'</div><div class="si-l">الغرف</div></div><div class="si"><div class="si-v">'+esc(p.baths||'—')+'</div><div class="si-l">الحمامات</div></div><div class="si"><div class="si-v">'+esc(p.cars||'—')+'</div><div class="si-l">مواقف</div></div>'+(p.type==='فيلا'&&p.apartments?'<div class="si"><div class="si-v">'+esc(p.apartments)+'</div><div class="si-l">الشقق</div></div>':'')+'<div class="si"><div class="si-v">'+esc(p.facing||'—')+'</div><div class="si-l">الواجهة</div></div><div class="si"><div class="si-v">'+esc(p.year||'—')+'</div><div class="si-l">البناء</div></div></div>';
-  if(p.features&&p.features.length){html+='<div class="fd"><h3>المميزات</h3><div class="fch">'+p.features.map(function(f){return'<span style="padding:6px 12px;border-radius:999px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.15);font-size:11px;color:var(--m)">'+esc(f)+'</span>'}).join('')+'</div></div>'}
+  if(p.features&&p.features.length){html+='<div class="fd"><h3>المميزات</h3><div class="fch">'+p.features.map(function(f){return'<span style="padding:6px 12px;border-radius:999px;background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.15);font-size:11px;color:var(--m)">'+esc(f)+'</span>'}).join('')+'</div></div>'}
   if(p.desc){html+='<div class="desc"><h3>الوصف</h3><p>'+esc(p.desc)+'</p></div>'}
   var vtTour=p.tourUrl||p.matterport||p.tour3d;
   var vtPano=p.panoramicImage||p.pano||p.panoUrl;
@@ -498,7 +498,7 @@ function vtBuildInside(p){
     f.setAttribute('allow','xr-spatial-tracking;gyroscope;accelerometer;fullscreen;camera');
     f.setAttribute('allowfullscreen','');
     f.setAttribute('referrerpolicy','no-referrer-when-downgrade');
-    f.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:0;background:#0a0b10';
+    f.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:0;background:#060b18';
     el.appendChild(f);
   }else if(pano){
     ensurePannellum().then(function(){
@@ -571,7 +571,7 @@ function renderDetailAVM(p){
   var diff=p.price?Math.round(((p.price-p.expectedPrice)/p.expectedPrice)*100):0;
   var col=diff<=-5?'#4ade80':diff<=10?'var(--g)':'#f87171';
   var fair=diff<=-5?'أقل من التقدير':diff<=10?'قريب من التقدير':'أعلى من التقدير';
-  el.innerHTML='<div onclick="openAVM(currentDetail)" style="cursor:pointer;display:flex;align-items:center;gap:10px;margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(212,175,55,.07);border:1px solid rgba(212,175,55,.25)">'+
+  el.innerHTML='<div onclick="openAVM(currentDetail)" style="cursor:pointer;display:flex;align-items:center;gap:10px;margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.25)">'+
     '<div style="font-size:22px">💰</div>'+
     '<div style="flex:1;min-width:0"><div style="font-size:10px;color:var(--m)">القيمة التقديرية</div><div style="font-size:15px;font-weight:800;color:var(--g)">'+fmt(p.expectedPrice)+' ر.س</div></div>'+
     '<div style="text-align:left"><div style="font-size:11px;color:'+col+';font-weight:700">'+fair+'</div><div style="font-size:9px;color:var(--m)">'+(diff>0?'+':'')+diff+'% عن المطلوب</div></div>'+
@@ -604,7 +604,7 @@ function openRatingOv(advId,propId){
   for(var i=1;i<=5;i++){html+='<span id="rs-'+i+'" onclick="selectRating('+i+')" style="font-size:32px;cursor:pointer;color:var(--m);transition:color .15s">☆</span>'}
   html+='</div>';
   html+='<div style="margin-bottom:12px"><input id="rating-comment" type="text" placeholder="تعليق (اختياري)" maxlength="200" style="width:100%;padding:10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--b);color:var(--t);font-size:13px;font-family:inherit;outline:none;text-align:right"></div>';
-  html+='<button id="rating-submit-btn" onclick="submitRating('+advId+','+propId+')" style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--g),#c9a430);color:#05060a;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer">إرسال التقييم</button>';
+  html+='<button id="rating-submit-btn" onclick="submitRating('+advId+','+propId+')" style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--g),#a855f7);color:#ffffff;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer">إرسال التقييم</button>';
   html+='</div>';
   document.getElementById('ovp').innerHTML=html;
   document.getElementById('ov').classList.add('open');
@@ -649,8 +649,8 @@ function fetchPulse(p){
     );
     pulseScore=Math.min(100,Math.max(0,pulseScore));
     var scoreColor=pulseScore>70?'var(--green)':pulseScore>45?'var(--g)':'var(--red)';
-    var scoreBg=pulseScore>70?'rgba(74,222,128,.12)':pulseScore>45?'rgba(212,175,55,.12)':'rgba(248,113,113,.12)';
-    var scoreBorder=pulseScore>70?'rgba(74,222,128,.3)':pulseScore>45?'rgba(212,175,55,.3)':'rgba(248,113,113,.3)';
+    var scoreBg=pulseScore>70?'rgba(74,222,128,.12)':pulseScore>45?'rgba(99,102,241,.12)':'rgba(248,113,113,.12)';
+    var scoreBorder=pulseScore>70?'rgba(74,222,128,.3)':pulseScore>45?'rgba(99,102,241,.3)':'rgba(248,113,113,.3)';
     var scoreLabel=pulseScore>70?'ممتاز':pulseScore>45?'جيد جداً':'جيد';
     
     var cards='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">'+
@@ -660,8 +660,8 @@ function fetchPulse(p){
       (px.avg_rent?'<div style="padding:10px;border-radius:10px;background:rgba(8,9,14,.95);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">متوسط الإيجار/سنوياً</div><div style="font-size:13px;font-weight:700;color:var(--g)">'+fmt(px.avg_rent)+' ر.س</div></div>':'')+
     '</div>';
     var sb=px.sports_boulevard?'<div style="display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);font-size:11px;color:var(--green);margin-bottom:8px">🏃 يمر بالحي <strong>المسار الرياضي</strong> — جودة حياة أعلى</div>':'';
-    document.getElementById('pulse-card-'+p.id).innerHTML='<div class="fd"><h3>📊 مؤشر نبض الحي الذكي</h3><div style="background:rgba(8,9,14,.95);border:1px solid rgba(212,175,55,.15);border-radius:var(--r);padding:14px;animation:pulseIn .4s ease">'+
-      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;padding:10px;border-radius:10px;background:'+scoreBg+';border:1px solid '+scoreBorder+'"><div style="width:48px;height:48px;border-radius:50%;background:'+scoreColor+';color:#05060a;font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+pulseScore+'</div><div><div style="font-size:14px;font-weight:700;color:'+scoreColor+'">مؤشر نبض الحي: '+scoreLabel+'</div><div style="font-size:10px;color:var(--m);margin-top:2px">تقييم شامل للحي بناءً على العائد، النمو، جودة الحياة</div></div></div>'+
+    document.getElementById('pulse-card-'+p.id).innerHTML='<div class="fd"><h3>📊 مؤشر نبض الحي الذكي</h3><div style="background:rgba(8,9,14,.95);border:1px solid rgba(99,102,241,.15);border-radius:var(--r);padding:14px;animation:pulseIn .4s ease">'+
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;padding:10px;border-radius:10px;background:'+scoreBg+';border:1px solid '+scoreBorder+'"><div style="width:48px;height:48px;border-radius:50%;background:'+scoreColor+';color:#ffffff;font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+pulseScore+'</div><div><div style="font-size:14px;font-weight:700;color:'+scoreColor+'">مؤشر نبض الحي: '+scoreLabel+'</div><div style="font-size:10px;color:var(--m);margin-top:2px">تقييم شامل للحي بناءً على العائد، النمو، جودة الحياة</div></div></div>'+
       sb+cards+metro+projects+'<div style="font-size:9px;color:var(--m);text-align:left;margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,.04)">📊 '+esc(px.data_source)+'</div></div></div>';
   }).catch(function(){document.getElementById('pulse-card-'+p.id).innerHTML=''});
 }
@@ -790,20 +790,20 @@ function mapFail(cid,retryFn){
   c.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--m);font-size:13px;text-align:center;padding:24px;direction:rtl;gap:10px">'+
     '<div style="font-size:32px">🗺️</div>'+
     '<div>الخرائط غير متاحة حالياً — تعذر الاتصال بخدمة الخرائط.<br>تحقق من اتصالك ثم حاول مرة أخرى.</div>'+
-    (retryFn?'<button id="map-retry" style="padding:10px 22px;border-radius:999px;background:linear-gradient(135deg,#d4af37,#c9a430);color:#05060a;border:none;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit">🔄 إعادة المحاولة</button>':'')+'</div>';
+    (retryFn?'<button id="map-retry" style="padding:10px 22px;border-radius:999px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#ffffff;border:none;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit">🔄 إعادة المحاولة</button>':'')+'</div>';
   var b=c.querySelector('#map-retry');
   if(b)b.addEventListener('click',function(){retryFn()});
 }
 
 function createMarkerEl(p){
   var isSale=p.purpose==='بيع';
-  var color=isSale?'#d4af37':'#60a5fa';
-  var glow=isSale?'rgba(212,175,55,.5)':'rgba(96,165,250,.5)';
+  var color=isSale?'#6366f1':'#60a5fa';
+  var glow=isSale?'rgba(99,102,241,.5)':'rgba(96,165,250,.5)';
   var letter=isSale?'ب':'إ';
   var badge=p.status==='حصري'?'⭐':'';
   var el=document.createElement('div');
   el.style.cssText='position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent';
-  el.innerHTML='<div style="width:42px;height:42px;border-radius:50% 50% 50% 0;background:'+color+';transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 3px 15px '+glow+',0 0 20px '+glow+';display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s"><span style="transform:rotate(45deg);font-size:15px;color:#05060a;font-weight:800;font-family:Cairo">'+letter+'</span></div>'+(badge?'<div style="position:absolute;top:-4px;right:-4px;font-size:12px;z-index:2">'+badge+'</div>':'');
+  el.innerHTML='<div style="width:42px;height:42px;border-radius:50% 50% 50% 0;background:'+color+';transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 3px 15px '+glow+',0 0 20px '+glow+';display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s"><span style="transform:rotate(45deg);font-size:15px;color:#ffffff;font-weight:800;font-family:Cairo">'+letter+'</span></div>'+(badge?'<div style="position:absolute;top:-4px;right:-4px;font-size:12px;z-index:2">'+badge+'</div>':'');
   el.addEventListener('mouseenter',function(){this.firstChild.style.transform='rotate(-45deg) scale(1.15)';this.firstChild.style.boxShadow='0 4px 25px '+glow});
   el.addEventListener('mouseleave',function(){this.firstChild.style.transform='rotate(-45deg) scale(1)';this.firstChild.style.boxShadow='0 3px 15px '+glow});
   return el;
@@ -814,16 +814,16 @@ function createPropertyPopup(p){
   var imgHtml=img?'<img src="'+img+'" style="width:100%;height:110px;object-fit:cover;border-radius:10px 10px 0 0;margin:-16px -16px 10px -16px;width:calc(100% + 32px)"><div style="position:absolute;top:8px;right:8px;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:700;background:'+(p.purpose==='بيع'?'rgba(74,222,128,.2)':'rgba(96,165,250,.2)')+';color:'+(p.purpose==='بيع'?'#4ade80':'#60a5fa')+';backdrop-filter:blur(8px)">'+p.purpose+'</div>':'<div style="height:8px"></div>';
   var feat='';
   if(p.features&&p.features.length){
-    feat='<div style="display:flex;flex-wrap:wrap;gap:4px;margin:8px 0">'+p.features.slice(0,4).map(function(f){return'<span style="padding:2px 8px;border-radius:999px;font-size:9px;background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.15);color:#d4af37">'+f+'</span>'}).join('')+'</div>';
+    feat='<div style="display:flex;flex-wrap:wrap;gap:4px;margin:8px 0">'+p.features.slice(0,4).map(function(f){return'<span style="padding:2px 8px;border-radius:999px;font-size:9px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.15);color:var(--g)">'+f+'</span>'}).join('')+'</div>';
   }
   return new mapboxgl.Popup({offset:30,direction:'rtl',className:'map-popup',maxWidth:'280px'}).setHTML(
     '<div style="direction:rtl;font-family:\'Cairo\',sans-serif;min-width:220px;padding:16px;line-height:1.7;position:relative">'+imgHtml+
     '<div style="font-size:15px;font-weight:700;color:var(--t);margin-bottom:4px">'+p.title+'</div>'+
     '<div style="font-size:11px;color:var(--m);margin-bottom:6px">📍 '+pLoc(p)+'</div>'+
-    '<div style="font-size:22px;font-weight:800;color:#d4af37;margin-bottom:6px">'+fmt(p.price)+' ر.س</div>'+
+    '<div style="font-size:22px;font-weight:800;color:var(--g);margin-bottom:6px">'+fmt(p.price)+' ر.س</div>'+
     '<div style="display:flex;gap:10px;margin-bottom:8px;font-size:11px;color:var(--m)"><span>🛏 '+p.rooms+'</span><span>📐 '+fmt(p.area)+' م²</span><span>🚿 '+p.baths+'</span>'+(p.type==='فيلا'&&p.apartments?'<span>🏢 '+p.apartments+' شقق</span>':'')+'</div>'+
     feat+
-    '<button onclick="closeMap();showDetail('+p.id+')" style="width:100%;padding:10px;border-radius:10px;background:linear-gradient(135deg,#d4af37,#b8941f);color:#05060a;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:\'Cairo\',sans-serif;transition:opacity .2s" onmouseover="this.style.opacity=\'.85\'" onmouseout="this.style.opacity=\'1\'">عرض التفاصيل</button></div>'
+    '<button onclick="closeMap();showDetail('+p.id+')" style="width:100%;padding:10px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#ffffff;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:\'Cairo\',sans-serif;transition:opacity .2s" onmouseover="this.style.opacity=\'.85\'" onmouseout="this.style.opacity=\'1\'">عرض التفاصيل</button></div>'
   );
 }
 
@@ -841,7 +841,7 @@ function addLegend(map){
   var saleCount=A.filter(function(p){return p.purpose==='بيع'}).length;
   var rentCount=A.filter(function(p){return p.purpose==='إيجار'}).length;
   legend.innerHTML='<div style="font-size:10px;color:var(--m);margin-bottom:6px">'+(saleCount+rentCount)+' عقار</div>'+
-    '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><div style="width:12px;height:12px;border-radius:50% 50% 50% 0;background:#d4af37;transform:rotate(-45deg)"></div><span style="font-size:11px;color:var(--m)">بيع ('+saleCount+')</span></div>'+
+    '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><div style="width:12px;height:12px;border-radius:50% 50% 50% 0;background:#6366f1;transform:rotate(-45deg)"></div><span style="font-size:11px;color:var(--m)">بيع ('+saleCount+')</span></div>'+
     '<div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50% 50% 50% 0;background:#60a5fa;transform:rotate(-45deg)"></div><span style="font-size:11px;color:var(--m)">إيجار ('+rentCount+')</span></div>';
   map.getContainer().appendChild(legend);
 }
@@ -1059,10 +1059,10 @@ function renderHeatList(){
     if(heatMetric==='price'&&d.ourAvgPriceM2)meta.push('📐 '+fmt(d.ourAvgPriceM2)+' ر.س/م²');
     var rank=i+1;
     var pct=Math.round(heatValue(d)/mx*100);
-    var grad=rank===1?'#ff3232,#d60000':rank<=3?'#ff8c28,#e05d00':'#d4af37,#b8941f';
+    var grad=rank===1?'#ff3232,#d60000':rank<=3?'#ff8c28,#e05d00':'#6366f1,#a855f7';
     return '<div class="card" style="cursor:pointer" onclick="heatFlyTo('+i+')">'+
       '<div style="display:flex;align-items:center;gap:10px">'+
-      '<div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#05060a;background:linear-gradient(135deg,'+grad+')">'+rank+'</div>'+
+      '<div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#ffffff;background:linear-gradient(135deg,'+grad+')">'+rank+'</div>'+
       '<div style="flex:1;min-width:0">'+
       '<div style="font-size:12px;font-weight:700;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📍 '+(d.district||'حي')+'</div>'+
       (meta.length?'<div style="font-size:10px;color:var(--m);margin-top:2px">'+meta.join(' · ')+'</div>':'')+
@@ -1104,7 +1104,7 @@ function open3DBuild(p){
   var plotGeoJSON={type:'Feature',properties:{title:p.title,type:p.type,area:p.area},geometry:{type:'Polygon',coordinates:[[[p.lng-s,p.lat-s],[p.lng+s,p.lat-s],[p.lng+s,p.lat+s],[p.lng-s,p.lat+s],[p.lng-s,p.lat-s]]]}};
   map3dInstance=createMap({container:'map3d',center:[p.lng,p.lat],zoom:17,pitch:60,bearing:-20,_addMarkers:false,_onLoad:function(m){
     m.addSource('plot',{type:'geojson',data:plotGeoJSON});
-    m.addLayer({id:'plot-3d',type:'fill-extrusion',source:'plot',paint:{'fill-extrusion-color':'#d4af37','fill-extrusion-height':15,'fill-extrusion-opacity':0.85}});
+    m.addLayer({id:'plot-3d',type:'fill-extrusion',source:'plot',paint:{'fill-extrusion-color':'#6366f1','fill-extrusion-height':15,'fill-extrusion-opacity':0.85}});
     m.flyTo({center:[p.lng,p.lat],zoom:17,pitch:65,bearing:-30,duration:2000});
   }});
 }
@@ -1128,18 +1128,18 @@ function openMapPicker(){
       var c=e.lngLat;
       if(mapPickerMarker)mapPickerMarker.remove();
       var el=document.createElement('div');
-      el.style.cssText='width:30px;height:30px;border-radius:50% 50% 50% 0;background:#d4af37;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center';
+      el.style.cssText='width:30px;height:30px;border-radius:50% 50% 50% 0;background:#6366f1;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center';
       el.innerHTML='<span style="transform:rotate(45deg);font-size:14px">📍</span>';
       mapPickerMarker=new mapboxgl.Marker({element:el}).setLngLat([c.lng,c.lat]).addTo(mapPickerInstance);
-      document.getElementById('mapPickerInfo').innerHTML='<span style="color:#d4af37;font-weight:700">📍 '+c.lat.toFixed(5)+' , '+c.lng.toFixed(5)+'</span>';
+      document.getElementById('mapPickerInfo').innerHTML='<span style="color:var(--g);font-weight:700">📍 '+c.lat.toFixed(5)+' , '+c.lng.toFixed(5)+'</span>';
       mapPickerMarker._lngLat=c;
     });
     if(parseFloat(document.getElementById('ap-lat').value)){
       var el2=document.createElement('div');
-      el2.style.cssText='width:30px;height:30px;border-radius:50% 50% 50% 0;background:#d4af37;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center';
+      el2.style.cssText='width:30px;height:30px;border-radius:50% 50% 50% 0;background:#6366f1;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center';
       el2.innerHTML='<span style="transform:rotate(45deg);font-size:14px">📍</span>';
       mapPickerMarker=new mapboxgl.Marker({element:el2}).setLngLat([lng,lat]).addTo(mapPickerInstance);
-      document.getElementById('mapPickerInfo').innerHTML='<span style="color:#d4af37;font-weight:700">📍 '+lat.toFixed(5)+' , '+lng.toFixed(5)+'</span>';
+      document.getElementById('mapPickerInfo').innerHTML='<span style="color:var(--g);font-weight:700">📍 '+lat.toFixed(5)+' , '+lng.toFixed(5)+'</span>';
     }
   });
 }
@@ -1174,7 +1174,7 @@ async function doMapSearch(query,resultsId,inputId){
   if(props.length){
     html+='<div style="padding:8px 14px;font-size:10px;color:#999;font-weight:600;border-bottom:1px solid rgba(255,255,255,.06)">🏠 العقارات ('+props.length+')</div>';
     html+=props.slice(0,5).map(function(p){
-      return'<div style="padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s" onmouseover="this.style.background=\'rgba(212,175,55,.08)\'" onmouseout="this.style.background=\'transparent\'" onclick="mapSelectProp('+p.id+',\''+resultsId+'\')"><div style="font-size:12px;font-weight:600;color:#fff">🏠 '+p.title+'</div><div style="font-size:10px;color:#999;margin-top:2px">📍 '+pLoc(p)+' — <span style="color:#d4af37;font-weight:700">'+fmt(p.price)+' ر.س</span></div></div>';
+      return'<div style="padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s" onmouseover="this.style.background=\'rgba(99,102,241,.08)\'" onmouseout="this.style.background=\'transparent\'" onclick="mapSelectProp('+p.id+',\''+resultsId+'\')"><div style="font-size:12px;font-weight:600;color:#fff">🏠 '+p.title+'</div><div style="font-size:10px;color:#999;margin-top:2px">📍 '+pLoc(p)+' — <span style="color:var(--g);font-weight:700">'+fmt(p.price)+' ر.س</span></div></div>';
     }).join('');
   }
 
@@ -1434,8 +1434,8 @@ function showPulseOnUI(px){
     ((px.roi||0)*0.25)+((px.future_value_growth||0)*0.20)+((px.walk_score||0)*0.15)+((px.walk_score||0)*0.15)+((px.walk_score||0)*0.15)+(Math.min(100,((px.avg_rent||0)/50000)*100)*0.10)
   );
   pulseScore=Math.min(100,Math.max(0,pulseScore));
-  var color=pulseScore>70?'#4ade80':pulseScore>45?'#d4af37':'#f87171';
-  var bg=pulseScore>70?'rgba(74,222,128,.15)':pulseScore>45?'rgba(212,175,55,.15)':'rgba(248,113,113,.15)';
+  var color=pulseScore>70?'#4ade80':pulseScore>45?'#6366f1':'#f87171';
+  var bg=pulseScore>70?'rgba(74,222,128,.15)':pulseScore>45?'rgba(99,102,241,.15)':'rgba(248,113,113,.15)';
   var label=pulseScore>70?'ممتاز':pulseScore>45?'جيد جداً':'جيد';
   document.getElementById('mapPulseScore').style.background=bg;
   document.getElementById('mapPulseScore').style.color=color;
@@ -1476,17 +1476,17 @@ function renderMapMarkers(ads){
   map3dMarkers2.forEach(function(m){m.remove()});map3dMarkers2=[];
   ads.forEach(function(p){
     if(!p.lat||!p.lng)return;
-    var isSale=p.purpose==='بيع';var color=isSale?'#d4af37':'#60a5fa';var letter=isSale?'ب':'إ';
+    var isSale=p.purpose==='بيع';var color=isSale?'#6366f1':'#60a5fa';var letter=isSale?'ب':'إ';
     var el=document.createElement('div');
     el.style.cssText='position:relative;cursor:pointer';
-    el.innerHTML='<div style="width:36px;height:36px;border-radius:50% 50% 50% 0;background:'+color+';transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 3px 10px '+color+';display:flex;align-items:center;justify-content:center"><span style="transform:rotate(45deg);font-size:13px;color:#05060a;font-weight:800;font-family:Cairo">'+letter+'</span></div>';
+    el.innerHTML='<div style="width:36px;height:36px;border-radius:50% 50% 50% 0;background:'+color+';transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 3px 10px '+color+';display:flex;align-items:center;justify-content:center"><span style="transform:rotate(45deg);font-size:13px;color:#ffffff;font-weight:800;font-family:Cairo">'+letter+'</span></div>';
     var popup=new mapboxgl.Popup({offset:25,direction:'rtl'}).setHTML(
       '<div style="direction:rtl;font-family:Cairo,sans-serif;min-width:200px;padding:14px;line-height:1.6">'+
       '<div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:2px">'+p.title+'</div>'+
       '<div style="font-size:10px;color:#999;margin-bottom:4px">📍 '+(p.district||'')+'، '+(p.city||'')+'</div>'+
-      '<div style="font-size:18px;font-weight:800;color:#d4af37;margin-bottom:4px">'+fmt(p.price)+' ر.س</div>'+
+      '<div style="font-size:18px;font-weight:800;color:var(--g);margin-bottom:4px">'+fmt(p.price)+' ر.س</div>'+
       '<div style="display:flex;gap:8px;font-size:10px;color:#aaa;margin-bottom:6px">'+(p.rooms?'<span>🛏 '+p.rooms+'</span>':'')+(p.area?'<span>📐 '+fmt(p.area)+' م²</span>':'')+(p.baths?'<span>🚿 '+p.baths+'</span>':'')+'</div>'+
-      '<button onclick="closeMap3d();showDetail('+p.id+')" style="width:100%;padding:8px;border-radius:8px;background:linear-gradient(135deg,#d4af37,#b8941f);color:#05060a;border:none;font-weight:700;font-size:12px;cursor:pointer;font-family:Cairo">عرض التفاصيل</button></div>'
+      '<button onclick="closeMap3d();showDetail('+p.id+')" style="width:100%;padding:8px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#ffffff;border:none;font-weight:700;font-size:12px;cursor:pointer;font-family:Cairo">عرض التفاصيل</button></div>'
     );
     var marker=new mapboxgl.Marker({element:el,anchor:'bottom'}).setLngLat([p.lng,p.lat]).setPopup(popup).addTo(map3dInstance2);
     map3dMarkers2.push(marker);
@@ -1496,8 +1496,8 @@ function renderMapSidebar(ads){
   var html='';
   if(!ads.length){html='<div style="color:var(--m);text-align:center;padding:30px;font-size:12px">لا توجد عقارات في هذا النطاق</div>'}
   ads.forEach(function(p){
-    var bg=p.purpose==='بيع'?'rgba(212,175,55,.12)':'rgba(96,165,250,.12)';var cl=p.purpose==='بيع'?'var(--g)':'#60a5fa';
-    html+='<div onclick="showDetail('+p.id+')" style="padding:10px;border-radius:10px;background:rgba(18,20,30,.6);border:1px solid rgba(255,255,255,.04);margin-bottom:6px;cursor:pointer">'+
+    var bg=p.purpose==='بيع'?'rgba(99,102,241,.12)':'rgba(96,165,250,.12)';var cl=p.purpose==='بيع'?'var(--g)':'#60a5fa';
+    html+='<div onclick="showDetail('+p.id+')" style="padding:10px;border-radius:10px;background:rgba(20,28,46,.6);border:1px solid rgba(255,255,255,.04);margin-bottom:6px;cursor:pointer">'+
       '<div style="font-size:12px;font-weight:600;color:var(--t);margin-bottom:2px">'+(p.images&&p.images[0]?'<span style="font-size:10px">🏠</span> ':'')+p.title+'</div>'+
       '<div style="font-size:10px;color:var(--m);margin-bottom:2px">'+(p.district||'')+'، '+(p.city||'')+'</div>'+
       '<div style="display:flex;gap:6px;align-items:center"><span style="font-size:12px;font-weight:700;color:var(--g)">'+fmt(p.price)+' ر.س</span>'+
@@ -1535,7 +1535,7 @@ async function doSendOtp(){
   btn.disabled=true;btn.textContent='جاري الإرسال...';
   try{
     var d=await api('/auth/send-otp',{method:'POST',body:JSON.stringify({phone:ph})});
-    if(d&&!d.code){toast('تم إرسال الكود');document.getElementById('otp-code-group').style.display='block';document.getElementById('otp-verify-btn').style.display='block';startOtpTimer();if(d.otp){document.getElementById('otp-code').value=d.otp;var el=document.createElement('div');el.style.cssText='text-align:center;font-size:16px;color:var(--g);font-weight:700;margin-top:8px;padding:8px;border-radius:8px;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.3)';el.textContent='🔑 الكود التجريبي: '+d.otp;document.getElementById('otp-code-group').appendChild(el)}}
+    if(d&&!d.code){toast('تم إرسال الكود');document.getElementById('otp-code-group').style.display='block';document.getElementById('otp-verify-btn').style.display='block';startOtpTimer();if(d.otp){document.getElementById('otp-code').value=d.otp;var el=document.createElement('div');el.style.cssText='text-align:center;font-size:16px;color:var(--g);font-weight:700;margin-top:8px;padding:8px;border-radius:8px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3)';el.textContent='🔑 الكود التجريبي: '+d.otp;document.getElementById('otp-code-group').appendChild(el)}}
     else{toast(d.message||'فشل الإرسال');btn.disabled=false;btn.textContent='إرسال كود التحقق'}
   }catch(e){toast('فشل الإرسال');btn.disabled=false;btn.textContent='إرسال كود التحقق'}
 }
@@ -1598,7 +1598,7 @@ function updateUserUI(){
   function setTxt(id,txt){var el=document.getElementById(id);if(el)el.textContent=txt}
   function setHtml(id,html){var el=document.getElementById(id);if(el)el.innerHTML=html}
   function setDisp(id,val){var el=document.getElementById(id);if(el)el.style.display=val}
-  if(user){h.innerHTML='<a href="#" onclick="nav(\'home\');return false" class="logo"><span class="logo-i">د</span> دارك وحيك</a><div style="display:flex;gap:8px"><a href="#" onclick="openNotif();return false">🔔</a><a href="#" onclick="nav(\'profile\');return false" style="background:rgba(212,175,55,.15);border-color:rgba(212,175,55,.4);color:var(--g)">👤 '+user.name+'</a></div>';
+  if(user){h.innerHTML='<a href="#" onclick="nav(\'home\');return false" class="logo"><span class="logo-i">د</span> دارك وحيك</a><div style="display:flex;gap:8px"><a href="#" onclick="openNotif();return false">🔔</a><a href="#" onclick="nav(\'profile\');return false" style="background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.4);color:var(--g)">👤 '+user.name+'</a></div>';
     setTxt('prof-avatar',user.name.charAt(0));
     setTxt('prof-name',user.name);
     setTxt('prof-email',user.email||'—');
@@ -1751,7 +1751,7 @@ function vrTourOpen(url){
     f.setAttribute('allow','xr-spatial-tracking;gyroscope;accelerometer;fullscreen;camera');
     f.setAttribute('allowfullscreen','');
     f.setAttribute('referrerpolicy','no-referrer-when-downgrade');
-    f.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:0;background:#0a0b10';
+    f.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:0;background:#060b18';
     pano.style.display='block';
     pano.appendChild(f);
   }
@@ -1908,8 +1908,8 @@ function vrLoadImage(url,force2d){
     animate();
   };
   img.onerror=function(){
-    ctx.fillStyle='#0a0b10';ctx.fillRect(0,0,c.width,c.height);
-    ctx.fillStyle='#d4af37';ctx.font='16px Cairo';ctx.textAlign='center';
+    ctx.fillStyle='#060b18';ctx.fillRect(0,0,c.width,c.height);
+    ctx.fillStyle='#6366f1';ctx.font='16px Cairo';ctx.textAlign='center';
     ctx.fillText('صورة غير متوفرة',c.width/2,c.height/2);
   };
   img.src=url;
@@ -2159,7 +2159,7 @@ async function runCompare(){
   var d=await api('/finance/compare',{method:'POST',body:JSON.stringify({properties:ids})});
   if(d&&d.success&&d.comparison.length){
     var el=document.getElementById('finCompareResult');el.style.display='block';
-    el.innerHTML='<div class="fin-card"><div class="fin-h">⚖️ نتائج المقارنة</div>'+d.comparison.map(function(p,i){return'<div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:rgba(8,9,14,.95);border:1px solid '+(i===0?'rgba(212,175,55,.4)':'var(--b)')+';margin-bottom:6px"><div style="font-size:14px;font-weight:700;color:'+(i===0?'var(--g)':'var(--m)')+'">'+(i+1)+'</div><div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--t)">'+p.title+'</div><div style="font-size:10px;color:var(--m)">'+p.city+' · '+fmt(p.price)+' ر.س</div></div><div style="text-align:center"><div style="font-size:14px;font-weight:700;color:var(--g)">'+p.roi+'%</div><div style="font-size:9px;color:var(--m)">ROI</div></div></div>'}).join('')+'</div>';
+    el.innerHTML='<div class="fin-card"><div class="fin-h">⚖️ نتائج المقارنة</div>'+d.comparison.map(function(p,i){return'<div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:rgba(8,9,14,.95);border:1px solid '+(i===0?'rgba(99,102,241,.4)':'var(--b)')+';margin-bottom:6px"><div style="font-size:14px;font-weight:700;color:'+(i===0?'var(--g)':'var(--m)')+'">'+(i+1)+'</div><div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--t)">'+p.title+'</div><div style="font-size:10px;color:var(--m)">'+p.city+' · '+fmt(p.price)+' ر.س</div></div><div style="text-align:center"><div style="font-size:14px;font-weight:700;color:var(--g)">'+p.roi+'%</div><div style="font-size:9px;color:var(--m)">ROI</div></div></div>'}).join('')+'</div>';
   }
 }
 
@@ -2194,7 +2194,7 @@ async function runSeo(){
   if(d&&d.success){
     var s=d.seo;var scoreColor=s.score>=70?'var(--green)':s.score>=40?'var(--g)':'var(--red)';
     var el=document.getElementById('mktSeoResult');el.style.display='block';
-    el.innerHTML='<div class="mkt-seo-score">'+s.score+'/100</div><div class="mkt-seo-bar"><div class="mkt-seo-bar-fill" style="width:'+s.score+'%;background:'+scoreColor+'"></div></div><div style="font-size:12px;color:var(--m);margin-bottom:12px">'+s.keywords.join(' · ')+'</div><div style="font-size:11px;font-weight:600;color:var(--g);margin-bottom:6px">💡 نصائح التحسين:</div>'+s.tips.map(function(t){return'<div class="mkt-tip"><div class="mkt-tip-icon">💡</div><div>'+t+'</div></div>'}).join('')+'<div style="margin-top:10px;padding:10px;border-radius:8px;background:rgba(212,175,55,.05);border:1px solid rgba(212,175,55,.2);font-size:11px;color:var(--m)">'+s.hashtags+'</div>';
+    el.innerHTML='<div class="mkt-seo-score">'+s.score+'/100</div><div class="mkt-seo-bar"><div class="mkt-seo-bar-fill" style="width:'+s.score+'%;background:'+scoreColor+'"></div></div><div style="font-size:12px;color:var(--m);margin-bottom:12px">'+s.keywords.join(' · ')+'</div><div style="font-size:11px;font-weight:600;color:var(--g);margin-bottom:6px">💡 نصائح التحسين:</div>'+s.tips.map(function(t){return'<div class="mkt-tip"><div class="mkt-tip-icon">💡</div><div>'+t+'</div></div>'}).join('')+'<div style="margin-top:10px;padding:10px;border-radius:8px;background:rgba(99,102,241,.05);border:1px solid rgba(99,102,241,.2);font-size:11px;color:var(--m)">'+s.hashtags+'</div>';
   }
 }
 
@@ -2232,7 +2232,7 @@ async function runSkill(){
         '<div>📊 التوكينز: <b style="color:var(--g)">'+m.estimated_tokens_human+'</b></div>'+
         '<div>📑 الفصول المكتشفة: <b style="color:var(--g)">'+m.chapters_detected+'</b></div>'+
         '</div></div>'+
-        '<div style="margin-top:10px"><a href="'+d.downloadUrl+'" download style="display:block;text-align:center;padding:12px;border-radius:999px;background:linear-gradient(135deg,#d4af37,#c9a430);color:#05060a;font-size:13px;font-weight:700">⬇️ تحميل النص الكامل</a></div>'+
+        '<div style="margin-top:10px"><a href="'+d.downloadUrl+'" download style="display:block;text-align:center;padding:12px;border-radius:999px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#ffffff;font-size:13px;font-weight:700">⬇️ تحميل النص الكامل</a></div>'+
         (d.skill?'<div style="margin-top:8px"><a href="'+d.skill+'" download style="display:block;text-align:center;padding:12px;border-radius:999px;border:1px solid rgba(74,222,128,.4);background:rgba(74,222,128,.1);color:var(--green);font-size:13px;font-weight:700">🧠 تحميل SKILL.md (المهارة الجاهزة)</a></div>':'')+
         '<div style="margin-top:8px;padding:10px;border-radius:10px;background:rgba(8,9,14,.9);border:1px solid var(--b);font-size:10px;color:var(--m);line-height:1.6">💡 ضع مجلد skill في دليل مشروعك مع وكيلك الذكي ليقرأ الكتاب عند الحاجة فقط</div>';
     }else{
@@ -2255,7 +2255,7 @@ async function runContract(){
   if(d&&d.success){
     var el=document.getElementById('legContractResult');el.style.display='block';
     el.innerHTML='<div class="leg-result">'+(d.review||'لم يتم التحليل')+'</div>';
-    if(d.template){el.innerHTML+='<div style="margin-top:12px;padding:14px;border-radius:var(--r);background:rgba(212,175,55,.04);border:1px solid rgba(212,175,55,.2)"><div style="font-size:12px;font-weight:600;color:var(--g);margin-bottom:8px">📋 نموذج العقد المرجعي:</div><div style="font-size:11px;color:var(--m);line-height:1.8;white-space:pre-wrap">'+d.template+'</div></div>'}
+    if(d.template){el.innerHTML+='<div style="margin-top:12px;padding:14px;border-radius:var(--r);background:rgba(99,102,241,.04);border:1px solid rgba(99,102,241,.2)"><div style="font-size:12px;font-weight:600;color:var(--g);margin-bottom:8px">📋 نموذج العقد المرجعي:</div><div style="font-size:11px;color:var(--m);line-height:1.8;white-space:pre-wrap">'+d.template+'</div></div>'}
   }
 }
 async function runCompliance(){
@@ -2286,7 +2286,7 @@ async function loadBizData(){
       var statusCls={مدفوعة:'paid',معلقة:'pending',متأخرة:'overdue'};
       var icons={بيع:'🏠',إيجار:'🔑',عمولة:'💰',صيانة:'🔧',أخرى:'📄'};
       document.getElementById('bizInvList').innerHTML=d.invoices.map(function(inv){
-        return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(212,175,55,.12)">'+(icons[inv.type]||'📄')+'</div><div class="biz-item-info"><div class="biz-item-title">'+(inv.description||inv.type)+'</div><div class="biz-item-sub">'+(inv.clientName||'—')+' · '+inv.createdAt.split(' ')[0]+'</div><span class="biz-status '+(statusCls[inv.status]||'pending')+'">'+inv.status+'</span></div><div class="biz-item-amount">'+fmt(inv.amount)+' ر.س</div></div>';
+        return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(99,102,241,.12)">'+(icons[inv.type]||'📄')+'</div><div class="biz-item-info"><div class="biz-item-title">'+(inv.description||inv.type)+'</div><div class="biz-item-sub">'+(inv.clientName||'—')+' · '+inv.createdAt.split(' ')[0]+'</div><span class="biz-status '+(statusCls[inv.status]||'pending')+'">'+inv.status+'</span></div><div class="biz-item-amount">'+fmt(inv.amount)+' ر.س</div></div>';
       }).join('');
     }else{document.getElementById('bizInvList').innerHTML='<div style="color:var(--m);text-align:center;padding:30px">لا توجد فواتير</div>'}
   }
@@ -2367,7 +2367,7 @@ async function loadDocData(){
   }else{document.getElementById('docCertList').innerHTML='<div style="color:var(--m);text-align:center;padding:24px">لا توجد شهادات فرز</div>'}
   if(deeds&&deeds.success&&deeds.deeds.length){
     document.getElementById('docDeedList').innerHTML=deeds.deeds.map(function(dd){
-      return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(212,175,55,.12)">📜</div><div class="biz-item-info"><div class="biz-item-title">'+(dd.deed_number||'')+' — '+dd.owner_name+'</div><div class="biz-item-sub">'+(dd.property_desc||'')+(dd.area?' · '+dd.area+' م²':'')+'</div><span class="biz-status '+(dd.is_verified?'paid':'pending')+'">'+(dd.is_verified?'موثق ✓':'غير موثق')+'</span></div></div>';
+      return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(99,102,241,.12)">📜</div><div class="biz-item-info"><div class="biz-item-title">'+(dd.deed_number||'')+' — '+dd.owner_name+'</div><div class="biz-item-sub">'+(dd.property_desc||'')+(dd.area?' · '+dd.area+' م²':'')+'</div><span class="biz-status '+(dd.is_verified?'paid':'pending')+'">'+(dd.is_verified?'موثق ✓':'غير موثق')+'</span></div></div>';
     }).join('');
   }else{document.getElementById('docDeedList').innerHTML='<div style="color:var(--m);text-align:center;padding:24px">لا توجد صكوك مسجلة</div>'}
 }
@@ -2463,7 +2463,7 @@ async function loadMarketData(){
   html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">';
   html+='<span class="mkt-source-badge sama">🏦 ساما</span>';
   html+='<span class="mkt-source-badge tasi">📈 تداول</span>';
-  if(g.source)html+='<span class="mkt-source-badge" style="background:#d4af3733;color:#d4af37">🥇 ذهب</span>';
+  if(g.source)html+='<span class="mkt-source-badge" style="background:#6366f133;color:var(--g)">🥇 ذهب</span>';
   if(o.source)html+='<span class="mkt-source-badge" style="background:#33415533;color:#94a3b8">🛢️ نفط</span>';
   if(ix.source)html+='<span class="mkt-source-badge" style="background:#10b98122;color:#10b981">🌍 عالمي</span>';
   if(c.source)html+='<span class="mkt-source-badge cma">🏛️ هيئة السوق المالية</span>';

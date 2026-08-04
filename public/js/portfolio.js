@@ -9,7 +9,7 @@ function toast(msg){
   if(!t){t=document.createElement('div');t.id='toasts';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:8px;align-items:center';document.body.appendChild(t)}
   const x=document.createElement('div');
   x.textContent=msg;
-  x.style.cssText='background:var(--c);color:var(--t);border:1px solid rgba(212,175,55,.4);border-radius:12px;padding:10px 16px;font-size:13px;box-shadow:0 10px 30px rgba(0,0,0,.5)';
+  x.style.cssText='background:var(--c);color:var(--t);border:1px solid rgba(99,102,241,.4);border-radius:12px;padding:10px 16px;font-size:13px;box-shadow:0 10px 30px rgba(0,0,0,.5)';
   t.appendChild(x);
   setTimeout(()=>x.remove(),3200);
 }

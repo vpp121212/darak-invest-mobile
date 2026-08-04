@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
   <title>دارك وحيك</title>
   <meta name="description" content="منصة عقارية للبيع والإيجار في المملكة العربية السعودية">
-  <meta name="theme-color" content="#d4af37">
+  <meta name="theme-color" content="#6366f1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="دارك وحيك">
@@ -177,10 +177,10 @@
         <div style="font-size:13px;font-weight:700;color:var(--g);margin-bottom:8px">⭐ عقارات مميزة</div>
         <div id="homeFeatGrid" style="display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px"></div>
       </div>
-      <div style="padding:14px;border-radius:var(--r);background:linear-gradient(135deg,rgba(212,175,55,.06),rgba(180,140,40,.04));border:1px solid rgba(212,175,55,.2);margin-bottom:14px;text-align:center">
+      <div style="padding:14px;border-radius:var(--r);background:linear-gradient(135deg,rgba(99,102,241,.06),rgba(168,85,247,.04));border:1px solid rgba(99,102,241,.2);margin-bottom:14px;text-align:center">
         <div style="font-size:14px;font-weight:700;color:var(--g);margin-bottom:4px">🏠 عندك عقار وتبي تعلن؟</div>
         <div style="font-size:11px;color:var(--m);margin-bottom:8px">أضف عقارك مجاناً وآلاف المشترين ينتظرون</div>
-        <button onclick="nav('add');closeLogin()" style="padding:10px 28px;border-radius:999px;border:none;background:linear-gradient(135deg,var(--g),#c9a430);color:#05060a;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer">➕ أضف عقارك الآن</button>
+        <button onclick="nav('add');closeLogin()" style="padding:10px 28px;border-radius:999px;border:none;background:linear-gradient(135deg,var(--g),#a855f7);color:#ffffff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer">➕ أضف عقارك الآن</button>
       </div>
     </section>
     <section class="wrap">
@@ -366,7 +366,7 @@
         </select>
       </div>
       <div id="pulseGrid" style="display:flex;flex-direction:column;gap:8px"><div class="load" id="pulseLd">جاري تحميل بيانات الأحياء...</div></div>
-      <div style="margin-top:16px;padding:12px;border-radius:12px;background:rgba(212,175,55,.05);border:1px solid rgba(212,175,55,.2);font-size:11px;color:var(--m);line-height:1.8">
+      <div style="margin-top:16px;padding:12px;border-radius:12px;background:rgba(99,102,241,.05);border:1px solid rgba(99,102,241,.2);font-size:11px;color:var(--m);line-height:1.8">
         <strong style="color:var(--g)">🛡️ الشفافية:</strong> المؤشرات المعروضة في نبض الحي مبنية على إعلانات منصة دارك وحيك الفعلية، وتُعرض الأرقام الرسمية الحكومية (متوسط الإيجار لكل متر) من البيانات المفتوحة للهيئة العامة للعقار مع إسناد المصدر الكامل.
       </div>
       <div style="text-align:center;margin:12px 0"><a href="#" onclick="nav('sources');return false" style="color:var(--g);font-size:12px;font-weight:600;text-decoration:none">🔗 المصادر الرسمية للبيانات ←</a></div>
@@ -390,7 +390,7 @@
       <div id="heatMap" style="width:100%;height:340px;border-radius:16px;overflow:hidden;position:relative;background:var(--bg)"></div>
       <div id="heatLegend" style="margin-top:8px"></div>
       <div id="heatList" style="display:flex;flex-direction:column;gap:8px;margin-top:14px"><div class="load" id="heatLd">جاري تحميل بيانات الأحياء...</div></div>
-      <div style="margin-top:16px;padding:12px;border-radius:12px;background:rgba(212,175,55,.05);border:1px solid rgba(212,175,55,.2);font-size:11px;color:var(--m);line-height:1.8">
+      <div style="margin-top:16px;padding:12px;border-radius:12px;background:rgba(99,102,241,.05);border:1px solid rgba(99,102,241,.2);font-size:11px;color:var(--m);line-height:1.8">
         <strong style="color:var(--g)">🛡️ المصدر:</strong> متوسط الأسعار وعدد العقود من بيانات الهيئة العامة للعقار (منصة البيانات المفتوحة) ومن عقارات دارك. مؤشر "الطلب" مبني على عدد العقود الرسمية المسجلة في كل حي.
       </div>
     </div>
@@ -419,14 +419,14 @@
 
       <!-- Search -->
       <div style="position:absolute;top:100px;left:12px;right:12px;z-index:10;display:flex;gap:8px">
-        <input id="mapSearchInput" type="text" placeholder="🔍 ابحث عن منطقة، حي، أو شارع..." style="flex:1;padding:12px 16px;border-radius:14px;background:var(--c);border:1px solid rgba(212,175,55,.3);color:var(--t);font-size:13px;font-family:'Cairo',sans-serif;outline:none;direction:rtl;backdrop-filter:blur(12px)" oninput="mapSearchDebounced()" onkeydown="if(event.key==='Enter')mapSearchNow()">
-        <div id="mapSearchResults" style="position:absolute;top:48px;left:0;right:0;background:var(--c);border:1px solid rgba(212,175,55,.2);border-radius:12px;display:none;max-height:200px;overflow-y:auto;z-index:20;backdrop-filter:blur(12px)"></div>
-        <button onclick="mapLocateMe()" style="width:46px;height:46px;border-radius:14px;background:var(--c);border:1px solid rgba(212,175,55,.3);color:var(--g);font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)" title="موقعك الحالي">📍</button>
+        <input id="mapSearchInput" type="text" placeholder="🔍 ابحث عن منطقة، حي، أو شارع..." style="flex:1;padding:12px 16px;border-radius:14px;background:var(--c);border:1px solid rgba(99,102,241,.3);color:var(--t);font-size:13px;font-family:'Cairo',sans-serif;outline:none;direction:rtl;backdrop-filter:blur(12px)" oninput="mapSearchDebounced()" onkeydown="if(event.key==='Enter')mapSearchNow()">
+        <div id="mapSearchResults" style="position:absolute;top:48px;left:0;right:0;background:var(--c);border:1px solid rgba(99,102,241,.2);border-radius:12px;display:none;max-height:200px;overflow-y:auto;z-index:20;backdrop-filter:blur(12px)"></div>
+        <button onclick="mapLocateMe()" style="width:46px;height:46px;border-radius:14px;background:var(--c);border:1px solid rgba(99,102,241,.3);color:var(--g);font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)" title="موقعك الحالي">📍</button>
       </div>
 
       <!-- Filters -->
       <div id="mapFilters" style="position:absolute;top:170px;left:12px;z-index:10;display:flex;gap:6px;flex-wrap:wrap">
-        <select id="mapTypeFilter" onchange="mapFilterChanged()" style="padding:8px 12px;border-radius:10px;background:var(--c);border:1px solid rgba(212,175,55,.3);color:var(--t);font-size:11px;font-family:'Cairo',sans-serif;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer">
+        <select id="mapTypeFilter" onchange="mapFilterChanged()" style="padding:8px 12px;border-radius:10px;background:var(--c);border:1px solid rgba(99,102,241,.3);color:var(--t);font-size:11px;font-family:'Cairo',sans-serif;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer">
           <option value="">الكل</option>
           <option value="شقة">شقة</option>
           <option value="فيلا">فيلا</option>
@@ -435,12 +435,12 @@
           <option value="قصر">قصر</option>
           <option value="مكتب">مكتب</option>
         </select>
-        <select id="mapPurposeFilter" onchange="mapFilterChanged()" style="padding:8px 12px;border-radius:10px;background:var(--c);border:1px solid rgba(212,175,55,.3);color:var(--t);font-size:11px;font-family:'Cairo',sans-serif;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer">
+        <select id="mapPurposeFilter" onchange="mapFilterChanged()" style="padding:8px 12px;border-radius:10px;background:var(--c);border:1px solid rgba(99,102,241,.3);color:var(--t);font-size:11px;font-family:'Cairo',sans-serif;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer">
           <option value="">بيع/إيجار</option>
           <option value="بيع">بيع</option>
           <option value="إيجار">إيجار</option>
         </select>
-        <select id="mapPriceFilter" onchange="mapFilterChanged()" style="padding:8px 12px;border-radius:10px;background:var(--c);border:1px solid rgba(212,175,55,.3);color:var(--t);font-size:11px;font-family:'Cairo',sans-serif;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer">
+        <select id="mapPriceFilter" onchange="mapFilterChanged()" style="padding:8px 12px;border-radius:10px;background:var(--c);border:1px solid rgba(99,102,241,.3);color:var(--t);font-size:11px;font-family:'Cairo',sans-serif;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer">
           <option value="">أي سعر</option>
           <option value="0-500000">أقل من 500 ألف</option>
           <option value="500000-1500000">500 ألف - 1.5 مليون</option>
@@ -450,7 +450,7 @@
       </div>
 
       <!-- Selected area badge -->
-      <div id="mapSelectedArea" style="position:absolute;top:235px;left:12px;z-index:10;display:none;padding:6px 14px;border-radius:999px;background:rgba(212,175,55,.2);border:1px solid rgba(212,175,55,.5);color:var(--g);font-size:12px;font-weight:600;font-family:'Cairo',sans-serif;backdrop-filter:blur(10px)">
+      <div id="mapSelectedArea" style="position:absolute;top:235px;left:12px;z-index:10;display:none;padding:6px 14px;border-radius:999px;background:rgba(99,102,241,.2);border:1px solid rgba(99,102,241,.5);color:var(--g);font-size:12px;font-weight:600;font-family:'Cairo',sans-serif;backdrop-filter:blur(10px)">
         📍 <span id="mapSelectedAreaName"></span>
         <span onclick="clearSelectedArea()" style="margin-right:8px;cursor:pointer;opacity:.6">✕</span>
       </div>
@@ -465,11 +465,11 @@
       </div>
 
       <!-- Toggle sidebar button -->
-      <button id="mapSidebarToggle" onclick="toggleSidebar()" style="position:absolute;bottom:120px;right:12px;z-index:10;width:42px;height:42px;border-radius:50%;background:var(--c);border:1px solid rgba(212,175,55,.3);color:var(--g);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px)" title="القائمة الجانبية">📋</button>
+      <button id="mapSidebarToggle" onclick="toggleSidebar()" style="position:absolute;bottom:120px;right:12px;z-index:10;width:42px;height:42px;border-radius:50%;background:var(--c);border:1px solid rgba(99,102,241,.3);color:var(--g);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px)" title="القائمة الجانبية">📋</button>
       <!-- Pulse display -->
-      <div id="mapPulseCard" style="position:absolute;bottom:70px;left:12px;right:12px;z-index:10;display:none;background:var(--c);border:1px solid rgba(212,175,55,.3);border-radius:14px;padding:14px;backdrop-filter:blur(16px);direction:rtl">
+      <div id="mapPulseCard" style="position:absolute;bottom:70px;left:12px;right:12px;z-index:10;display:none;background:var(--c);border:1px solid rgba(99,102,241,.3);border-radius:14px;padding:14px;backdrop-filter:blur(16px);direction:rtl">
         <div style="display:flex;align-items:center;gap:12px">
-          <div id="mapPulseScore" style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#05060a;flex-shrink:0"></div>
+          <div id="mapPulseScore" style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#ffffff;flex-shrink:0"></div>
           <div style="flex:1">
             <div id="mapPulseLabel" style="font-size:14px;font-weight:700;color:var(--g)"></div>
             <div id="mapPulseDetails" style="font-size:10px;color:var(--m);margin-top:2px;line-height:1.6"></div>
@@ -715,7 +715,7 @@
   <nav class="bn">
     <div class="bi on" onclick="nav('home')" id="nav-home"><div class="bii">🏠</div>الرئيسية</div>
     <div class="bi" onclick="nav('map')" id="nav-map"><div class="bii">🗺️</div>الخريطة</div>
-    <div class="bi" onclick="nav('add')" id="nav-add"><div class="bii" style="font-size:20px;border-color:rgba(212,175,55,.65);box-shadow:0 0 14px rgba(212,175,55,.45)">➕</div>إضافة</div>
+    <div class="bi" onclick="nav('add')" id="nav-add"><div class="bii" style="font-size:20px;border-color:rgba(99,102,241,.65);box-shadow:0 0 14px rgba(99,102,241,.45)">➕</div>إضافة</div>
     <div class="bi" onclick="nav('pulse')" id="nav-pulse"><div class="bii">📊</div>نبض</div>
     <div class="bi" onclick="nav('invest');window.investRefresh&&window.investRefresh()" id="nav-invest"><div class="bii">💰</div>استثمار</div>
     <div class="bi" onclick="nav('more')" id="nav-more"><div class="bii">⋯</div>المزيد</div>
@@ -754,10 +754,10 @@
       </div>
       <div style="margin:10px 0">
         <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--m);margin-bottom:4px"><span>دقة التقدير</span><span id="avm-conf-label">—</span></div>
-        <div style="height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden"><div id="avm-conf-bar" style="height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,#d4af37,#f0d878);transition:width .5s"></div></div>
+        <div style="height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden"><div id="avm-conf-bar" style="height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,#6366f1,#a855f7);transition:width .5s"></div></div>
       </div>
       <div id="avm-factors" style="margin:10px 0"></div>
-      <div id="avm-pricecheck" style="display:none;margin:10px 0;padding:10px;border-radius:12px;background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.2);font-size:12px;color:var(--t)"></div>
+      <div id="avm-pricecheck" style="display:none;margin:10px 0;padding:10px;border-radius:12px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);font-size:12px;color:var(--t)"></div>
       <div style="font-size:10px;color:var(--m);line-height:1.6;margin-top:8px" id="avm-note"></div>
     </div>
     <button class="aip-analyze" onclick="runAVM()">🧮 احسب القيمة التقديرية</button>
@@ -765,9 +765,9 @@
 
   <div class="v3" id="vr360"><div class="v3h"><div class="v3t">🌐 جولة 360°</div><div class="v3x" onclick="closeVR()">✕</div></div><div class="v3v"><canvas class="v3canvas" id="vrCanvas"></canvas><div id="vrPano"></div><div class="v3hint" id="vrHint"><div class="v3hint-i">👆</div><div class="v3hint-t">اسحب لاستكشاف الغرفة</div></div></div><div class="v3rooms"><div class="v3rb" id="vrRooms"></div></div></div>
 
-  <div class="mapo" id="ov3d"><div class="map-hdr"><div class="map-hdr-t">🏗️ العرض ثلاثي الأبعاد</div><div class="map-hdr-x" onclick="close3D()">✕</div></div><div class="map-container" style="position:relative"><div style="position:absolute;top:100px;left:12px;right:12px;z-index:10;display:flex;gap:8px"><input id="map3dSearchInput" type="text" placeholder="🔍 ابحث عن منطقة..." style="flex:1;padding:10px 14px;border-radius:12px;background:var(--c);border:1px solid rgba(212,175,55,.3);color:var(--t);font-size:13px;font-family:'Cairo',sans-serif;outline:none;direction:rtl;backdrop-filter:blur(12px)" oninput="map3dSearchDebounced()" onkeydown="if(event.key==='Enter')map3dSearchNow()"><div id="map3dSearchResults" style="position:absolute;top:44px;left:0;right:0;background:var(--c);border:1px solid rgba(212,175,55,.2);border-radius:12px;display:none;max-height:200px;overflow-y:auto;z-index:20;backdrop-filter:blur(12px)"></div><button onclick="map3dLocateMe()" style="width:42px;height:42px;border-radius:12px;background:var(--c);border:1px solid rgba(212,175,55,.3);color:var(--g);font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)" title="موقعك الحالي">📍</button></div><div id="map3d" style="width:100%;height:100%"></div></div></div>
+  <div class="mapo" id="ov3d"><div class="map-hdr"><div class="map-hdr-t">🏗️ العرض ثلاثي الأبعاد</div><div class="map-hdr-x" onclick="close3D()">✕</div></div><div class="map-container" style="position:relative"><div style="position:absolute;top:100px;left:12px;right:12px;z-index:10;display:flex;gap:8px"><input id="map3dSearchInput" type="text" placeholder="🔍 ابحث عن منطقة..." style="flex:1;padding:10px 14px;border-radius:12px;background:var(--c);border:1px solid rgba(99,102,241,.3);color:var(--t);font-size:13px;font-family:'Cairo',sans-serif;outline:none;direction:rtl;backdrop-filter:blur(12px)" oninput="map3dSearchDebounced()" onkeydown="if(event.key==='Enter')map3dSearchNow()"><div id="map3dSearchResults" style="position:absolute;top:44px;left:0;right:0;background:var(--c);border:1px solid rgba(99,102,241,.2);border-radius:12px;display:none;max-height:200px;overflow-y:auto;z-index:20;backdrop-filter:blur(12px)"></div><button onclick="map3dLocateMe()" style="width:42px;height:42px;border-radius:12px;background:var(--c);border:1px solid rgba(99,102,241,.3);color:var(--g);font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)" title="موقعك الحالي">📍</button></div><div id="map3d" style="width:100%;height:100%"></div></div></div>
 
-  <div class="mapo" id="mapPickerOv"><div class="map-hdr"><div class="map-hdr-t">📍 تحديد موقع العقار</div><div class="map-hdr-x" onclick="closeMapPicker()">✕</div></div><div class="map-container" style="position:relative"><div id="mapPickerInfo" style="position:absolute;top:12px;left:12px;right:12px;z-index:10;background:var(--c);border:1px solid rgba(212,175,55,.3);border-radius:12px;padding:10px 14px;font-size:12px;color:var(--t);box-shadow:0 4px 16px rgba(0,0,0,.12)">اضغط على الخريطة لتحديد موقع العقار</div><div id="mapPicker" style="width:100%;height:100%"></div><div style="position:absolute;bottom:16px;left:12px;right:12px;z-index:10;display:flex;gap:8px"><button onclick="confirmMapPicker()" style="flex:1;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#f5d47b,#d4af37);color:#1c1c1e;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer">✓ تأكيد الموقع</button><button onclick="closeMapPicker()" style="width:52px;border-radius:12px;border:1px solid var(--b);background:var(--c);color:var(--t);font-size:14px;cursor:pointer;font-family:inherit">✕</button></div></div></div>
+  <div class="mapo" id="mapPickerOv"><div class="map-hdr"><div class="map-hdr-t">📍 تحديد موقع العقار</div><div class="map-hdr-x" onclick="closeMapPicker()">✕</div></div><div class="map-container" style="position:relative"><div id="mapPickerInfo" style="position:absolute;top:12px;left:12px;right:12px;z-index:10;background:var(--c);border:1px solid rgba(99,102,241,.3);border-radius:12px;padding:10px 14px;font-size:12px;color:var(--t);box-shadow:0 4px 16px rgba(0,0,0,.12)">اضغط على الخريطة لتحديد موقع العقار</div><div id="mapPicker" style="width:100%;height:100%"></div><div style="position:absolute;bottom:16px;left:12px;right:12px;z-index:10;display:flex;gap:8px"><button onclick="confirmMapPicker()" style="flex:1;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#6366f1,#a855f7);color:#0f172a;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer">✓ تأكيد الموقع</button><button onclick="closeMapPicker()" style="width:52px;border-radius:12px;border:1px solid var(--b);background:var(--c);color:var(--t);font-size:14px;cursor:pointer;font-family:inherit">✕</button></div></div></div>
 
   <div class="upl" id="upload"><div class="upl-box"><div class="upl-title">📸 إضافة صور + جولة 360°</div><div class="upl-sub">ارفع صور عالية الدقة لعقارك</div>
     <div class="upl-zone" onclick="document.getElementById('upl-files').click()"><div class="upl-icon">📷</div><div class="upl-text">اضغط لاختيار الصور<br><strong>JPG, PNG, WebP</strong> — حتى 20 صورة</div><input type="file" id="upl-files" multiple accept="image/*" style="display:none"></div>
@@ -844,9 +844,9 @@
       <button class="cls" onclick="closeSkills()">✕</button>
       <div style="font-size:16px;font-weight:700;color:var(--g);margin-bottom:6px">📚 كتاب إلى مهارة (AI Skill)</div>
       <div style="font-size:11px;color:var(--m);margin-bottom:16px">حوّل كتابك أو مستندك إلى نص منظم جاهز للوكيل الذكي (Claude Code · Copilot CLI · Amp)</div>
-      <div style="padding:16px;border-radius:var(--r);background:rgba(8,9,14,.95);border:1px solid rgba(212,175,55,.2);margin-bottom:12px">
+      <div style="padding:16px;border-radius:var(--r);background:rgba(8,9,14,.95);border:1px solid rgba(99,102,241,.2);margin-bottom:12px">
         <div style="font-size:12px;color:var(--m);margin-bottom:8px">الصيغ المدعومة: PDF · EPUB · DOCX · RTF · TXT · MD · HTML · MOBI</div>
-        <div id="skillDropZone" onclick="document.getElementById('skillFile').click()" style="border:2px dashed rgba(212,175,55,.3);border-radius:var(--r);padding:30px 16px;text-align:center;cursor:pointer;background:rgba(212,175,55,.03)">
+        <div id="skillDropZone" onclick="document.getElementById('skillFile').click()" style="border:2px dashed rgba(99,102,241,.3);border-radius:var(--r);padding:30px 16px;text-align:center;cursor:pointer;background:rgba(99,102,241,.03)">
           <div style="font-size:36px;margin-bottom:8px">📕</div>
           <div style="font-size:13px;color:var(--m)">اضغط لاختيار ملف الكتاب</div>
           <div id="skillFileName" style="font-size:11px;color:var(--g);margin-top:6px"></div>
@@ -1064,9 +1064,9 @@
   <!-- ABOUT OVERLAY -->
 
   <div id="aboutOv" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:2501;justify-content:center;align-items:center;backdrop-filter:blur(20px);overflow-y:auto" onclick="closeAbout()">
-    <div style="background:var(--c);padding:32px 24px;width:88%;max-width:480px;border-radius:var(--r);line-height:1.8;border:1px solid rgba(212,175,55,.2);text-align:center;position:relative;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
+    <div style="background:var(--c);padding:32px 24px;width:88%;max-width:480px;border-radius:var(--r);line-height:1.8;border:1px solid rgba(99,102,241,.2);text-align:center;position:relative;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
       <button onclick="closeAbout()" style="position:absolute;top:14px;left:14px;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:var(--t);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
-      <div style="width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 30% 0%,#f5d47b,#d4af37 35%,#7b5a1f);display:flex;align-items:center;justify-content:center;color:#05060a;font-size:24px;font-weight:800;margin:0 auto 12px">د</div>
+      <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:26px;font-weight:800;margin:0 auto 12px;box-shadow:0 8px 24px rgba(99,102,241,.35)">د</div>
       <h2 style="font-size:20px;font-weight:700;color:var(--g);margin-bottom:4px">دارك وحيك</h2>
       <p style="font-size:12px;color:var(--m);margin-bottom:16px">منصة عقارية رقمية موثوقة</p>
       <div style="text-align:right;font-size:13px;color:var(--m);line-height:1.9;padding:14px;border-radius:var(--r);background:rgba(8,9,14,.9);border:1px solid rgba(255,255,255,.06);margin-bottom:12px">
@@ -1077,8 +1077,8 @@
         <p style="margin-bottom:0"><strong style="color:var(--g)">تحت إدارة:</strong> المهندس / سعد الرويس</p>
       </div>
       <div style="display:flex;gap:8px">
-        <button onclick="closeAbout()" style="flex:1;padding:12px;border-radius:999px;border:none;background:linear-gradient(135deg,var(--g),#c9a430);color:#05060a;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">إغلاق</button>
-        <button onclick="closeAbout();nav('about')" style="flex:1;padding:12px;border-radius:999px;border:1px solid rgba(212,175,55,.3);background:rgba(212,175,55,.08);color:var(--g);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">عرض المزيد</button>
+        <button onclick="closeAbout()" style="flex:1;padding:12px;border-radius:999px;border:none;background:linear-gradient(135deg,var(--g),#a855f7);color:#ffffff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">إغلاق</button>
+        <button onclick="closeAbout();nav('about')" style="flex:1;padding:12px;border-radius:999px;border:1px solid rgba(99,102,241,.3);background:rgba(99,102,241,.08);color:var(--g);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">عرض المزيد</button>
       </div>
     </div>
   </div>
@@ -1173,8 +1173,8 @@
         <div class="pay-field"><label>رمز CVV</label><input id="pay-cvc" placeholder="123" maxlength="4" inputmode="numeric"></div>
       </div>
       <div id="payQuickFill" style="display:none;margin-top:10px;gap:6px;flex-wrap:wrap;justify-content:center" class="pay-logos">
-        <span onclick="fillTestCard('4111111111111111','12/28','123')" style="cursor:pointer;border-color:rgba(212,175,55,.3);color:var(--g);font-weight:600;font-size:11px">🔹 فيزا تجريبية</span>
-        <span onclick="fillTestCard('5123456789012346','12/28','123')" style="cursor:pointer;border-color:rgba(212,175,55,.3);color:var(--g);font-weight:600;font-size:11px">🔸 مدى تجريبية</span>
+        <span onclick="fillTestCard('4111111111111111','12/28','123')" style="cursor:pointer;border-color:rgba(99,102,241,.3);color:var(--g);font-weight:600;font-size:11px">🔹 فيزا تجريبية</span>
+        <span onclick="fillTestCard('5123456789012346','12/28','123')" style="cursor:pointer;border-color:rgba(99,102,241,.3);color:var(--g);font-weight:600;font-size:11px">🔸 مدى تجريبية</span>
       </div>
     </div>
     <div id="payMoyasarForm" style="display:none"></div>
@@ -1236,10 +1236,10 @@
 
   <!-- TOAST -->
 
-  <div class="mapo" id="mapOverlay"><div class="map-hdr"><div class="map-hdr-t">🗺️ العقارات على الخريطة</div><div class="map-hdr-x" onclick="closeMap()">✕</div></div><div class="map-container" style="position:relative"><div style="position:absolute;top:100px;left:12px;right:12px;z-index:10;display:flex;gap:8px"><input id="mapFullSearchInput" type="text" placeholder="🔍 ابحث عن منطقة..." style="flex:1;padding:10px 14px;border-radius:12px;background:var(--c);border:1px solid rgba(212,175,55,.3);color:var(--t);font-size:13px;font-family:'Cairo',sans-serif;outline:none;direction:rtl;backdrop-filter:blur(12px)" oninput="mapFullSearchDebounced()" onkeydown="if(event.key==='Enter')mapFullSearchNow()"><div id="mapFullSearchResults" style="position:absolute;top:44px;left:0;right:0;background:var(--c);border:1px solid rgba(212,175,55,.2);border-radius:12px;display:none;max-height:200px;overflow-y:auto;z-index:20;backdrop-filter:blur(12px)"></div><button onclick="mapFullLocateMe()" style="width:42px;height:42px;border-radius:12px;background:var(--c);border:1px solid rgba(212,175,55,.3);color:var(--g);font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)" title="موقعك الحالي">📍</button></div><div id="mapViewFull"></div></div><div class="map-card" id="mapCard"><img class="map-card-img" id="mapCardImg" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" onerror="if(window.pFallback)this.src=pFallback({id:0,type:'عقار',title:''})"><div class="map-card-info"><div class="map-card-title" id="mapCardTitle"></div><div class="map-card-loc" id="mapCardLoc"></div><div class="map-card-price" id="mapCardPrice"></div><button class="map-card-btn" onclick="closeMap();showDetail(mapPropertyId)">عرض التفاصيل</button></div></div></div>
+  <div class="mapo" id="mapOverlay"><div class="map-hdr"><div class="map-hdr-t">🗺️ العقارات على الخريطة</div><div class="map-hdr-x" onclick="closeMap()">✕</div></div><div class="map-container" style="position:relative"><div style="position:absolute;top:100px;left:12px;right:12px;z-index:10;display:flex;gap:8px"><input id="mapFullSearchInput" type="text" placeholder="🔍 ابحث عن منطقة..." style="flex:1;padding:10px 14px;border-radius:12px;background:var(--c);border:1px solid rgba(99,102,241,.3);color:var(--t);font-size:13px;font-family:'Cairo',sans-serif;outline:none;direction:rtl;backdrop-filter:blur(12px)" oninput="mapFullSearchDebounced()" onkeydown="if(event.key==='Enter')mapFullSearchNow()"><div id="mapFullSearchResults" style="position:absolute;top:44px;left:0;right:0;background:var(--c);border:1px solid rgba(99,102,241,.2);border-radius:12px;display:none;max-height:200px;overflow-y:auto;z-index:20;backdrop-filter:blur(12px)"></div><button onclick="mapFullLocateMe()" style="width:42px;height:42px;border-radius:12px;background:var(--c);border:1px solid rgba(99,102,241,.3);color:var(--g);font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)" title="موقعك الحالي">📍</button></div><div id="mapViewFull"></div></div><div class="map-card" id="mapCard"><img class="map-card-img" id="mapCardImg" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" onerror="if(window.pFallback)this.src=pFallback({id:0,type:'عقار',title:''})"><div class="map-card-info"><div class="map-card-title" id="mapCardTitle"></div><div class="map-card-loc" id="mapCardLoc"></div><div class="map-card-price" id="mapCardPrice"></div><button class="map-card-btn" onclick="closeMap();showDetail(mapPropertyId)">عرض التفاصيل</button></div></div></div>
 
   <!-- 3D VIEW OVERLAY -->
-  <div class="mapo" id="ov3d"><div class="map-hdr"><div class="map-hdr-t">🏗️ العرض ثلاثي الأبعاد</div><div class="map-hdr-x" onclick="close3D()">✕</div></div><div class="map-container" style="position:relative"><div style="position:absolute;top:100px;left:12px;right:12px;z-index:10;display:flex;gap:8px"><input id="map3dSearchInput" type="text" placeholder="🔍 ابحث عن منطقة..." style="flex:1;padding:10px 14px;border-radius:12px;background:var(--c);border:1px solid rgba(212,175,55,.3);color:var(--t);font-size:13px;font-family:'Cairo',sans-serif;outline:none;direction:rtl;backdrop-filter:blur(12px)" oninput="map3dSearchDebounced()" onkeydown="if(event.key==='Enter')map3dSearchNow()"><div id="map3dSearchResults" style="position:absolute;top:44px;left:0;right:0;background:var(--c);border:1px solid rgba(212,175,55,.2);border-radius:12px;display:none;max-height:200px;overflow-y:auto;z-index:20;backdrop-filter:blur(12px)"></div><button onclick="map3dLocateMe()" style="width:42px;height:42px;border-radius:12px;background:var(--c);border:1px solid rgba(212,175,55,.3);color:var(--g);font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)" title="موقعك الحالي">📍</button></div><div id="map3d" style="width:100%;height:100%"></div></div></div>
+  <div class="mapo" id="ov3d"><div class="map-hdr"><div class="map-hdr-t">🏗️ العرض ثلاثي الأبعاد</div><div class="map-hdr-x" onclick="close3D()">✕</div></div><div class="map-container" style="position:relative"><div style="position:absolute;top:100px;left:12px;right:12px;z-index:10;display:flex;gap:8px"><input id="map3dSearchInput" type="text" placeholder="🔍 ابحث عن منطقة..." style="flex:1;padding:10px 14px;border-radius:12px;background:var(--c);border:1px solid rgba(99,102,241,.3);color:var(--t);font-size:13px;font-family:'Cairo',sans-serif;outline:none;direction:rtl;backdrop-filter:blur(12px)" oninput="map3dSearchDebounced()" onkeydown="if(event.key==='Enter')map3dSearchNow()"><div id="map3dSearchResults" style="position:absolute;top:44px;left:0;right:0;background:var(--c);border:1px solid rgba(99,102,241,.2);border-radius:12px;display:none;max-height:200px;overflow-y:auto;z-index:20;backdrop-filter:blur(12px)"></div><button onclick="map3dLocateMe()" style="width:42px;height:42px;border-radius:12px;background:var(--c);border:1px solid rgba(99,102,241,.3);color:var(--g);font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)" title="موقعك الحالي">📍</button></div><div id="map3d" style="width:100%;height:100%"></div></div></div>
 
   <div class="tb" id="toasts"></div>
 
