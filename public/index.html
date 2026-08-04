@@ -14,14 +14,11 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.svg">
   <link rel="icon" type="image/svg+xml" href="icons/icon-192.svg">
-  <link href="mapbox-gl.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-  <link rel="preload" href="mapbox-gl-rtl-text.js" as="script">
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/pannellum.css">
 </head>
 <body>
-  <header class="hd"><div class="wrap"><a href="#" onclick="nav('home');return false" class="logo"><span class="logo-i">د</span> دارك وحيك</a><div style="display:flex;gap:8px"><a href="#" onclick="openNotif();return false">🔔</a><a href="#" onclick="openLogin();return false">دخول</a></div></div></header>
+  <header class="hd"><div class="wrap"><a href="#" onclick="nav('home');return false" class="logo"><span class="logo-i">د</span> دارك وحيك</a><div style="display:flex;gap:8px"><a href="#" onclick="toggleTheme();return false" id="themeToggle" style="font-size:16px;line-height:1">🌙</a><a href="#" onclick="openNotif();return false">🔔</a><a href="#" onclick="openLogin();return false">دخول</a></div></div></header>
   <!-- HOME PAGE -->
   <div class="pg on" id="pg-home">
     <section class="hero"><div class="wrap"><h1>ابحث عن <span>عقارك</span></h1><p>منصة عقارية سعودية موثوقة</p>
@@ -1245,12 +1242,9 @@
   <footer class="ft"><div class="wrap">دارك وحيك © 2026 — جميع الحقوق محفوظة · بإدارة المهندس / سعد الرويس · <a href="#" onclick="nav('legal');return false" style="color:var(--g)">الصفحة القانونية</a></div></footer>
   <script src="js/firebase-config.js"></script>
   <script src="js/core.js"></script>
-  <script src="js/vendor/pannellum.js"></script>
-  <script type="module" src="js/vendor/model-viewer.min.js"></script>
   <script src="js/app.js"></script>
   <script src="js/auth-legacy.js"></script>
   <script src="js/favs.js"></script>
   <script src="js/invest.js"></script>
-  <script src="js/tour-builder.js"></script>
 </body>
 </html>

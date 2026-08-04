@@ -1,3 +1,28 @@
+/* Dark Mode */
+(function(){
+  var saved=localStorage.getItem('darak-theme');
+  var preferDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;
+  var theme=saved||(preferDark?'dark':'light');
+  document.documentElement.setAttribute('data-theme',theme);
+  updateThemeIcon(theme);
+  function updateThemeIcon(t){var el=document.getElementById('themeToggle');if(el)el.textContent=t==='dark'?'☀️':'🌙'}
+  window.toggleTheme=function(){
+    var cur=document.documentElement.getAttribute('data-theme');
+    var next=cur==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',next);
+    localStorage.setItem('darak-theme',next);
+    updateThemeIcon(next);
+  };
+  window.isDarkPref=function(){return document.documentElement.getAttribute('data-theme')==='dark'};
+})();
+
+var _lazyLoaded={};
+function lazyScript(src,id){if(_lazyLoaded[id])return Promise.resolve();return new Promise(function(r){var s=document.createElement('script');s.src=src;s.async=true;s.onload=function(){_lazyLoaded[id]=1;r()};s.onerror=r;document.head.appendChild(s)})}
+function lazyLink(href,id){if(_lazyLoaded[id])return;_lazyLoaded[id]=1;var l=document.createElement('link');l.rel='stylesheet';l.href=href;document.head.appendChild(l)}
+function ensurePannellum(){lazyLink('css/pannellum.css','pannellum-css');return window.pannellum?Promise.resolve():lazyScript('js/vendor/pannellum.js','pannellum')}
+function ensureModelViewer(){return window.ModelViewer||document.querySelector('model-viewer')?Promise.resolve():lazyScript('js/vendor/model-viewer.min.js','model-viewer')}
+function debounce(fn,ms){var t;return function(){clearTimeout(t);var a=arguments,c=this;t=setTimeout(function(){fn.apply(c,a)},ms)}}
+function throttleRAF(fn){var pending=false;return function(){if(pending)return;pending=true;requestAnimationFrame(function(){fn();pending=false})}}
 
 function nav(page){
   var pg=document.getElementById('pg-'+page);
@@ -42,17 +67,24 @@ function filt(el,purpose){
 function renderHomeSections(){
   var statsEl=document.getElementById('homeStats');
   var cities=['الرياض','جدة','مكة','الدمام','الخبر','حائل'];
-  var counts={};cities.forEach(function(c){counts[c]=A.filter(function(p){return p.city===c}).length});
+  var counts={};cities.forEach(function(c){counts[c]=0});
+  var saleCount=0,rentCount=0,feat=[];
+  A.forEach(function(p){
+    if(counts[p.city]!==undefined)counts[p.city]++;
+    if(p.purpose==='بيع')saleCount++;
+    else if(p.purpose==='إيجار')rentCount++;
+    if((p.isFeatured||p.status==='حصري')&&feat.length<8)feat.push(p);
+  });
+  var activeCities=cities.filter(function(c){return counts[c]>0}).length;
   statsEl.innerHTML='<div class="hs"><div class="hs-v">'+A.length+'</div><div class="hs-l">إجمالي العقارات</div></div>'+
-    '<div class="hs"><div class="hs-v">'+cities.filter(function(c){return counts[c]>0}).length+'</div><div class="hs-l">المدن المتاحة</div></div>'+
-    '<div class="hs"><div class="hs-v">'+A.filter(function(p){return p.purpose==='بيع'}).length+'</div><div class="hs-l">للبيع</div></div>'+
-    '<div class="hs"><div class="hs-v">'+A.filter(function(p){return p.purpose==='إيجار'}).length+'</div><div class="hs-l">للإيجار</div></div>';
+    '<div class="hs"><div class="hs-v">'+activeCities+'</div><div class="hs-l">المدن المتاحة</div></div>'+
+    '<div class="hs"><div class="hs-v">'+saleCount+'</div><div class="hs-l">للبيع</div></div>'+
+    '<div class="hs"><div class="hs-v">'+rentCount+'</div><div class="hs-l">للإيجار</div></div>';
 
   var cityEl=document.getElementById('homeCities');
   cityEl.innerHTML='<div class="hc on" onclick="cityFilter(this,\'\')">الكل</div>'+
     cities.filter(function(c){return counts[c]>0}).map(function(c){return'<div class="hc" onclick="cityFilter(this,\''+c+'\')">📍 '+c+' ('+counts[c]+')</div>'}).join('');
 
-  var feat=A.filter(function(p){return p.isFeatured||p.status==='حصري'}).slice(0,8);
   if(feat.length){
     document.getElementById('homeFeatured').style.display='block';
     document.getElementById('homeFeatGrid').innerHTML=feat.map(function(p){var et=esc(p.title);return'<div class="hf" onclick="showDetail('+esc(p.id)+')"><img src="'+esc(pImg(p))+'" alt="'+et+'" loading="lazy" onerror="this.onerror=null;this.src=\''+esc(pFallback(p))+'\'"><div class="hf-b"><div class="hf-t">'+et+'</div><div class="hf-l">📍 '+esc(pLoc(p))+'</div><div class="hf-p">'+esc(pPrice(p))+'</div></div></div>'}).join('');
@@ -441,17 +473,20 @@ function vtBuildInside(p){
     f.setAttribute('referrerpolicy','no-referrer-when-downgrade');
     f.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:0;background:#0a0b10';
     el.appendChild(f);
-  }else if(pano&&window.pannellum){
-    var pc=document.createElement('div');
-    pc.id='vt-pano';
-    pc.style.cssText='position:absolute;inset:0;width:100%;height:100%';
-    el.appendChild(pc);
-    try{
-      vtViewer=pannellum.viewer('vt-pano',{
-        type:'equirectangular',panorama:pano,autoLoad:true,autoRotate:-1,
-        compass:false,showFullscreenCtrl:true,crossOrigin:'anonymous',hfov:100
-      });
-    }catch(e){}
+  }else if(pano){
+    ensurePannellum().then(function(){
+      if(!window.pannellum)return;
+      var pc=document.createElement('div');
+      pc.id='vt-pano';
+      pc.style.cssText='position:absolute;inset:0;width:100%;height:100%';
+      el.appendChild(pc);
+      try{
+        vtViewer=pannellum.viewer('vt-pano',{
+          type:'equirectangular',panorama:pano,autoLoad:true,autoRotate:-1,
+          compass:false,showFullscreenCtrl:true,crossOrigin:'anonymous',hfov:100
+        });
+      }catch(e){}
+    });
   }else if(p.images&&p.images.length){
     var b=document.createElement('button');
     b.className='vt-gen';
@@ -478,23 +513,25 @@ function vtSetMode(mode){
 }
 function vtModel3D(el,mode,src){
   if(!el)return;
-  var mv=el.querySelector('model-viewer');
-  if(!mv){
-    mv=document.createElement('model-viewer');
-    mv.style.cssText='position:absolute;inset:0;width:100%;height:100%;--poster-color:transparent';
-    mv.setAttribute('camera-controls','');
-    mv.setAttribute('shadow-intensity','1');
-    mv.setAttribute('src',src);
-    el.appendChild(mv);
-  }else if(mv.getAttribute('src')!==src){mv.setAttribute('src',src)}
-  if(mode==='plan'){
-    mv.setAttribute('camera-orbit','0deg 89deg 130%');
-    mv.removeAttribute('auto-rotate');
-  }else{
-    mv.setAttribute('camera-orbit','-25deg 72deg 110%');
-    mv.setAttribute('auto-rotate','');
-  }
-  if(mv.jumpCameraToGoal)mv.jumpCameraToGoal();
+  ensureModelViewer().then(function(){
+    var mv=el.querySelector('model-viewer');
+    if(!mv){
+      mv=document.createElement('model-viewer');
+      mv.style.cssText='position:absolute;inset:0;width:100%;height:100%;--poster-color:transparent';
+      mv.setAttribute('camera-controls','');
+      mv.setAttribute('shadow-intensity','1');
+      mv.setAttribute('src',src);
+      el.appendChild(mv);
+    }else if(mv.getAttribute('src')!==src){mv.setAttribute('src',src)}
+    if(mode==='plan'){
+      mv.setAttribute('camera-orbit','0deg 89deg 130%');
+      mv.removeAttribute('auto-rotate');
+    }else{
+      mv.setAttribute('camera-orbit','-25deg 72deg 110%');
+      mv.setAttribute('auto-rotate','');
+    }
+    if(mv.jumpCameraToGoal)mv.jumpCameraToGoal();
+  });
 }
 function vtSampleModel(mode){
   vtModel3D(document.getElementById('vt-'+mode),mode,'https://modelviewer.dev/shared-assets/models/Astronaut.glb');
@@ -623,7 +660,6 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){try{closeD(
 var mapPropertyId=null,mapFullMap=null,map3dInstance=null,MB_TOKEN='',_tokenPromise=null,_tokenReady=false,_mapboxLoadPromise=null,_mbProbePromise=null;
 
 function isNight(){var h=new Date().getHours();return h<6||h>=18}
-function isDarkPref(){try{if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)return true}catch(e){}return isNight()}
 function fallbackStyle(dark){
   var tiles=dark
     ?['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png','https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png','https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png']
@@ -658,6 +694,7 @@ function loadMapboxLib(){
   if(window.mapboxgl)return Promise.resolve(true);
   if(_mapboxLoadPromise)return _mapboxLoadPromise;
   _mapboxLoadPromise=new Promise(function(resolve){
+    if(!document.querySelector('link[href*="mapbox-gl.css"]')){var lnk=document.createElement('link');lnk.rel='stylesheet';lnk.href='mapbox-gl.css';document.head.appendChild(lnk)}
     var i=0;
     function attempt(){
       if(window.mapboxgl){resolve(true);return}
@@ -681,17 +718,7 @@ function loadMapboxLib(){
   return _mapboxLoadPromise;
 }
 
-function warmMapboxLib(){
-  if(document.getElementById('mbwarm'))return;
-  var w=document.createElement('div');w.id='mbwarm';w.style.display='none';document.body.appendChild(w);
-  ensureToken();
-}
-(function(){
-  function warm(){warmMapboxLib();window.removeEventListener('touchstart',warm,true);window.removeEventListener('mousemove',warm,true)}
-  window.addEventListener('touchstart',warm,{passive:true});
-  window.addEventListener('mousemove',warm,{passive:true});
-  setTimeout(warm,300);
-})();
+
 
 function withMap(cid,readyFn){
   var c=document.getElementById(cid);if(!c)return;
@@ -839,9 +866,10 @@ function initHeatMap(){
   withMap('heatMap',function(){
     if(heatMapInstance)return;
     heatMapInstance=createMap({container:'heatMap',_addMarkers:false,_onLoad:function(m){renderHeatLayer(m)}});
-    heatMapInstance.on('moveend',drawHeatOverlay);
-    heatMapInstance.on('zoomend',drawHeatOverlay);
-    heatMapInstance.on('resize',drawHeatOverlay);
+    var throttledHeat=throttleRAF(drawHeatOverlay);
+    heatMapInstance.on('moveend',throttledHeat);
+    heatMapInstance.on('zoomend',throttledHeat);
+    heatMapInstance.on('resize',throttledHeat);
   });
 }
 function heatDistrictMap(){
@@ -1341,7 +1369,8 @@ function initMap3d(){
       if(!window._mbBlocked){try{map3dInstance2.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512});map3dInstance2.setTerrain({source:'mapbox-dem',exaggeration:1})}catch(e){};try{map3dInstance2.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',type:'fill-extrusion',minzoom:15,paint:{'fill-extrusion-color':isDarkPref()?'#2a2d35':'#c8c6c0','fill-extrusion-height':['get','height'],'fill-extrusion-base':['get','min_height'],'fill-extrusion-opacity':0.6}})}catch(e){}}
       addNeighborhoodsLayer();
     });
-    map3dInstance2.on('moveend',loadMapAdsByBounds);
+    var debouncedMapAds=debounce(loadMapAdsByBounds,600);
+    map3dInstance2.on('moveend',debouncedMapAds);
     map3dInstance2.on('zoom',function(){var z=map3dInstance2.getZoom();map3dInstance2.setLayoutProperty('neighborhoods-fill','visibility',z>=11?'visible':'none');map3dInstance2.setLayoutProperty('neighborhoods-outline','visibility',z>=11?'visible':'none');map3dInstance2.setLayoutProperty('neighborhoods-labels','visibility',z>=11?'visible':'none')});
     setTimeout(loadMapAdsByBounds,1000);
     setTimeout(function(){
@@ -1713,31 +1742,35 @@ function vrSwitchRoom(idx){
 }
 function vrPanoOpen(url){
   var container=document.getElementById('vrPano');
-  if(!container||!window.pannellum)return false;
-  try{
-    if(vrPanoViewer){try{vrPanoViewer.destroy()}catch(e){}vrPanoViewer=null}
-    vrPanoViewer=pannellum.viewer('vrPano',{
-      type:'equirectangular',
-      panorama:url,
-      autoLoad:true,
-      autoRotate:-1,
-      compass:false,
-      showFullscreenCtrl:true,
-      crossOrigin:'anonymous',
-      hfov:100
-    });
-    vrWatchdogStart();
-    return true;
-  }catch(e){
-    vrPanoFailed=true;
-    if(vrPanoViewer){try{vrPanoViewer.destroy()}catch(_){}}vrPanoViewer=null;
-    return false;
-  }
+  if(!container)return false;
+  ensurePannellum().then(function(){
+    if(!window.pannellum)return;
+    try{
+      if(vrPanoViewer){try{vrPanoViewer.destroy()}catch(e){}vrPanoViewer=null}
+      vrPanoViewer=pannellum.viewer('vrPano',{
+        type:'equirectangular',
+        panorama:url,
+        autoLoad:true,
+        autoRotate:-1,
+        compass:false,
+        showFullscreenCtrl:true,
+        crossOrigin:'anonymous',
+        hfov:100
+      });
+      vrWatchdogStart();
+    }catch(e){
+      vrPanoFailed=true;
+      if(vrPanoViewer){try{vrPanoViewer.destroy()}catch(_){}}vrPanoViewer=null;
+    }
+  });
+  return true;
 }
 function vrPanoOpenMulti(imgs,labels){
   var container=document.getElementById('vrPano');
-  if(!container||!window.pannellum)return false;
-  try{
+  if(!container)return false;
+  ensurePannellum().then(function(){
+    if(!window.pannellum)return;
+    try{
     if(vrPanoViewer){try{vrPanoViewer.destroy()}catch(e){}vrPanoViewer=null}
     var scenes={};
     for(var i=0;i<imgs.length;i++){
@@ -1755,13 +1788,13 @@ function vrPanoOpenMulti(imgs,labels){
       var btns=document.querySelectorAll('#vrRooms button');
       btns.forEach(function(b,k){b.classList.toggle('on',k===vrCurrentIdx)});
     });
-    vrWatchdogStart();
-    return true;
-  }catch(e){
-    vrPanoFailed=true;
-    if(vrPanoViewer){try{vrPanoViewer.destroy()}catch(_){}}vrPanoViewer=null;
-    return false;
-  }
+      vrWatchdogStart();
+    }catch(e){
+      vrPanoFailed=true;
+      if(vrPanoViewer){try{vrPanoViewer.destroy()}catch(_){}}vrPanoViewer=null;
+    }
+  });
+  return true;
 }
 function vrWatchdogStart(){
   var watchdog=0,tries=0;
@@ -2268,7 +2301,8 @@ function closeSubOv(id){document.getElementById(id).classList.remove('on')}
 function showDocTab(el,id){document.querySelectorAll('#docOv .mkt-tab').forEach(function(t){t.classList.remove('on')});el.classList.add('on');['doc-licenses','doc-contracts','doc-delivery','doc-rental-inv','doc-certificates','doc-deeds'].forEach(function(s){document.getElementById(s).style.display=s===id?'block':'none'})}
 async function loadDocData(){
   if(!authToken)return;
-  var l=await api('/realestate/licenses');
+  var results=await Promise.all([api('/realestate/licenses'),api('/realestate/contracts'),api('/realestate/delivery-forms'),api('/realestate/rental-invoices'),api('/realestate/certificates'),api('/realestate/deeds')]);
+  var l=results[0],c=results[1],d=results[2],ri=results[3],cert=results[4],deeds=results[5];
   if(l&&l.success&&l.licenses.length){
     var badge={فال:'📜', 'وسيط عقاري':'🤝','مكتب هندسي':'📐','وساطة':'⚖️','إيجار':'🔑'};
     var statusCls={active:'paid',expired:'overdue',suspended:'pending',pending:'pending'};
@@ -2276,20 +2310,17 @@ async function loadDocData(){
       return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(76,175,80,.12)">'+(badge[lic.license_type]||'📜')+'</div><div class="biz-item-info"><div class="biz-item-title">'+(badge[lic.license_type]||'')+' '+lic.holder_name+'</div><div class="biz-item-sub">'+(lic.license_number||'')+' · '+lic.license_type+'</div><span class="biz-status '+(statusCls[lic.status]||'pending')+'">'+statusText(lic.status)+'</span></div><div style="font-size:11px;color:var(--m)">'+(lic.city||'')+ (lic.expiry_date?' · حتى '+lic.expiry_date:'')+'</div></div>';
     }).join('');
   }else{document.getElementById('docLicList').innerHTML='<div style="color:var(--m);text-align:center;padding:24px">لا توجد تراخيص حالياً</div>'}
-  var c=await api('/realestate/contracts');
   if(c&&c.success&&c.contracts.length){
     document.getElementById('docConList').innerHTML=c.contracts.map(function(con){
       return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(33,150,243,.12)">📝</div><div class="biz-item-info"><div class="biz-item-title">'+con.contract_type+' · '+(con.contract_number||'')+'</div><div class="biz-item-sub">'+(con.first_party||'')+' ← '+(con.second_party||'')+'</div><span class="biz-status '+(con.is_authenticated?'paid':'pending')+'">'+(con.is_authenticated?'موثق ✓':'غير موثق')+'</span></div><div style="font-size:11px;color:var(--m)">'+(con.amount?fmt(con.amount)+' ر.س':'')+'</div></div>';
     }).join('');
   }else{document.getElementById('docConList').innerHTML='<div style="color:var(--m);text-align:center;padding:24px">لا توجد عقود حالياً</div>'}
-  var d=await api('/realestate/delivery-forms');
   if(d&&d.success&&d.forms.length){
     var fCls={pending:'pending',signed:'paid',completed:'paid'};
     document.getElementById('docDelList').innerHTML=d.forms.map(function(f){
       return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(255,152,0,.12)">📦</div><div class="biz-item-info"><div class="biz-item-title">'+(f.form_type==='تسليم'?'🔑 تسليم':'📥 استلام')+' — '+f.unit_desc+'</div><div class="biz-item-sub">'+(f.lessor_name||'')+' → '+(f.lessee_name||'')+'</div><span class="biz-status '+(fCls[f.status]||'pending')+'">'+statusText(f.status)+'</span></div></div>';
     }).join('');
   }else{document.getElementById('docDelList').innerHTML='<div style="color:var(--m);text-align:center;padding:24px">لا توجد نماذج حالياً</div>'}
-  var ri=await api('/realestate/rental-invoices');
   if(ri&&ri.success&&ri.stats){
     document.getElementById('rentInvPaid').innerText=fmt(ri.stats.paid_total);
     document.getElementById('rentInvPending').innerText=fmt(ri.stats.pending_total);
@@ -2301,14 +2332,12 @@ async function loadDocData(){
       return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(76,175,80,.12)">🧾</div><div class="biz-item-info"><div class="biz-item-title">'+(inv.invoice_number||'')+' — '+inv.tenant_name+'</div><div class="biz-item-sub">'+(inv.period_from||'')+' → '+(inv.period_to||'')+'</div><span class="biz-status '+(riCls[inv.status]||'pending')+'">'+statusText(inv.status)+'</span></div><div style="font-size:12px;font-weight:700;color:var(--g)">'+fmt(inv.total_amount)+' ر.س</div></div>';
     }).join('');
   }else{document.getElementById('docRentInvList').innerHTML='<div style="color:var(--m);text-align:center;padding:24px">لا توجد فواتير إيجارية</div>'}
-  var cert=await api('/realestate/certificates');
   if(cert&&cert.success&&cert.certificates.length){
     var cCls={pending:'pending',approved:'paid',rejected:'overdue'};
     document.getElementById('docCertList').innerHTML=cert.certificates.map(function(ct){
       return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(156,39,176,.12)">📋</div><div class="biz-item-info"><div class="biz-item-title">'+ct.certificate_type+' — '+(ct.certificate_number||'')+'</div><div class="biz-item-sub">'+(ct.property_desc||'')+(ct.engineer_name?' · '+ct.engineer_name:'')+'</div><span class="biz-status '+(cCls[ct.status]||'pending')+'">'+statusText(ct.status)+'</span></div></div>';
     }).join('');
   }else{document.getElementById('docCertList').innerHTML='<div style="color:var(--m);text-align:center;padding:24px">لا توجد شهادات فرز</div>'}
-  var deeds=await api('/realestate/deeds');
   if(deeds&&deeds.success&&deeds.deeds.length){
     document.getElementById('docDeedList').innerHTML=deeds.deeds.map(function(dd){
       return'<div class="biz-item"><div class="biz-item-icon" style="background:rgba(212,175,55,.12)">📜</div><div class="biz-item-info"><div class="biz-item-title">'+(dd.deed_number||'')+' — '+dd.owner_name+'</div><div class="biz-item-sub">'+(dd.property_desc||'')+(dd.area?' · '+dd.area+' م²':'')+'</div><span class="biz-status '+(dd.is_verified?'paid':'pending')+'">'+(dd.is_verified?'موثق ✓':'غير موثق')+'</span></div></div>';
