@@ -400,7 +400,7 @@ async function reportAd(id){
 var currentDetail=null;
 function showDetail(id){
   var p=A.find(function(x){return x.id===id});if(!p)return;currentDetail=p;destroyVT();
-  var imgs=(p.images&&p.images.length)?p.images:[pFallback(p)];
+  var imgs=pGallery(p);
   var tb3d=(p.tourUrl||p.matterport||p.tour3d)?'<button class="gal-360btn" onclick="openVR(currentDetailImages)">🕶️ جولة 3D</button>':'';
   var tb360=imgs.length?'<button class="gal-360btn" onclick="openVR(currentDetailImages)">🌐 جولة 360°</button>':'';
   var eid=esc(p.id),et=esc(p.title),el=esc(pLoc(p)),ep=esc(pPrice(p)),efb=esc(pFallback(p));
@@ -788,7 +788,7 @@ function createMarkerEl(p){
 }
 
 function createPropertyPopup(p){
-  var img=(p.images&&p.images[0])||'';
+  var img=pImg(p);
   var imgHtml=img?'<img src="'+img+'" style="width:100%;height:110px;object-fit:cover;border-radius:10px 10px 0 0;margin:-16px -16px 10px -16px;width:calc(100% + 32px)"><div style="position:absolute;top:8px;right:8px;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:700;background:'+(p.purpose==='بيع'?'rgba(74,222,128,.2)':'rgba(96,165,250,.2)')+';color:'+(p.purpose==='بيع'?'#4ade80':'#60a5fa')+';backdrop-filter:blur(8px)">'+p.purpose+'</div>':'<div style="height:8px"></div>';
   var feat='';
   if(p.features&&p.features.length){
@@ -2694,11 +2694,21 @@ var FALLBACK=[
 ];
 
 async function loadProperties(){
-  applyProps(normProps(FALLBACK));
+  applyProps(sampleProps(normProps(FALLBACK),30));
   var got=await fetchProps();
   if(!got)schedulePropsPoll();
   if(authToken){api('/auth/me').then(function(r){if(r&&r.success){user=r.user;updateUserUI()}}).catch(function(){})}
   api('/market/overview').then(function(d){if(d&&d.success&&d.sama&&d.sama.repoRate){window._samaRate=d.sama.repoRate;updateFinRate()}}).catch(function(){});
+}
+function sampleProps(list,n){
+  n=n||30;
+  if(!list)return[];
+  if(list.length<=n)return list;
+  var byCity={};
+  list.forEach(function(p){var c=p.city||'أخرى';(byCity[c]=byCity[c]||[]).push(p)});
+  var cities=Object.keys(byCity),per=Math.max(1,Math.ceil(n/cities.length)),out=[];
+  cities.forEach(function(c){out=out.concat(byCity[c].slice(0,per))});
+  return out.slice(0,n);
 }
 function schedulePropsPoll(){
   var polls=0;
@@ -2722,7 +2732,7 @@ async function fetchProps(){
     if(attempt<1)await new Promise(function(r){setTimeout(r,500)});
   }
   if(d&&Array.isArray(d)&&d.length){
-    applyProps(normProps(d).map(function(p){return Object.assign({},p,{loc:p.loc||(p.district+'، '+p.city),status:p.isFeatured?'حصري':'متاح',agent:p.agent||{name:p.agentName||'مكتب الديار العقارية',role:'وسيط مرخص',phone:p.agentPhone||'+966501234567'}})}));
+    applyProps(sampleProps(normProps(d).map(function(p){return Object.assign({},p,{loc:p.loc||(p.district+'، '+p.city),status:p.isFeatured?'حصري':'متاح',agent:p.agent||{name:p.agentName||'مكتب الديار العقارية',role:'وسيط مرخص',phone:p.agentPhone||'+966501234567'}})}),30));
     try{
       var lmap=JSON.parse(localStorage.getItem('darak_local_panos')||'{}');
       if(lmap&&Object.keys(lmap).length){
