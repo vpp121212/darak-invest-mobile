@@ -1,6 +1,6 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/network/app_exception.dart';
@@ -345,9 +345,9 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: gold.withOpacity(0.08),
+        color: gold.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: gold.withOpacity(0.25)),
+        border: Border.all(color: gold.withValues(alpha: 0.25)),
       ),
       child: Row(
         children: [
@@ -377,11 +377,11 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
         decoration: BoxDecoration(
           color: cardDark,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: textMuted.withOpacity(0.25)),
+          border: Border.all(color: textMuted.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
-            Icon(Icons.arrow_drop_down, color: gold, size: 22),
+            const Icon(Icons.arrow_drop_down, color: gold, size: 22),
             const SizedBox(width: 6),
             Expanded(
               child: Column(
@@ -471,11 +471,11 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: textMuted.withOpacity(0.25)),
+          borderSide: BorderSide(color: textMuted.withValues(alpha: 0.25)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: textMuted.withOpacity(0.25)),
+          borderSide: BorderSide(color: textMuted.withValues(alpha: 0.25)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -483,11 +483,11 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.red.withOpacity(0.6)),
+          borderSide: BorderSide(color: Colors.red.withValues(alpha: 0.6)),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.red.withOpacity(0.6)),
+          borderSide: BorderSide(color: Colors.red.withValues(alpha: 0.6)),
         ),
         errorStyle: GoogleFonts.cairo(color: Colors.red, fontSize: 12),
       ),

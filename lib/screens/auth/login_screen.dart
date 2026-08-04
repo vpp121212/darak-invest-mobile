@@ -1,11 +1,13 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/router/app_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_theme.dart';
 
+@RoutePage()
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -34,7 +36,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           _passwordController.text,
         );
     if (success && mounted) {
-      context.go('/dashboard');
+      context.router.replaceAll([const AppShellRoute()]);
     }
   }
 
@@ -84,9 +86,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: gold.withOpacity(0.15),
+            color: gold.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: gold.withOpacity(0.3)),
+            border: Border.all(color: gold.withValues(alpha: 0.3)),
           ),
           child: const Icon(Icons.home_work_outlined, size: 40, color: gold),
         ),
@@ -153,11 +155,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       fillColor: cardDark,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: textMuted.withOpacity(0.2)),
+        borderSide: BorderSide(color: textMuted.withValues(alpha: 0.2)),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: textMuted.withOpacity(0.2)),
+        borderSide: BorderSide(color: textMuted.withValues(alpha: 0.2)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
@@ -180,9 +182,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
+        color: Colors.red.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -219,7 +221,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isLoading ? gold.withOpacity(0.5) : gold,
+          color: isLoading ? gold.withValues(alpha: 0.5) : gold,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Center(
@@ -244,7 +246,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       children: [
         Text('ليس لديك حساب؟ ', style: GoogleFonts.cairo(color: textMuted, fontSize: 14)),
         GestureDetector(
-          onTap: () => context.push('/register'),
+          onTap: () => context.pushRoute(const RegisterRoute()),
           child: Text('سجل الآن', style: GoogleFonts.cairo(color: gold, fontSize: 14, fontWeight: FontWeight.bold)),
         ),
       ],

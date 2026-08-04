@@ -343,7 +343,7 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
           decoration: BoxDecoration(
             color: bgDark,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: gold.withOpacity(0.25)),
+            border: Border.all(color: gold.withValues(alpha: 0.25)),
           ),
           child: Stack(
             children: [
@@ -490,9 +490,9 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
         width: 34,
         height: 34,
         decoration: BoxDecoration(
-          color: bgDark.withOpacity(0.75),
+          color: bgDark.withValues(alpha: 0.75),
           shape: BoxShape.circle,
-          border: Border.all(color: gold.withOpacity(0.4)),
+          border: Border.all(color: gold.withValues(alpha: 0.4)),
         ),
         child: Icon(icon, size: 17, color: gold),
       ),
@@ -521,7 +521,7 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
               decoration: BoxDecoration(
                 color: gold,
                 shape: BoxShape.circle,
-                border: Border.all(color: textLight.withOpacity(0.6)),
+                border: Border.all(color: textLight.withValues(alpha: 0.6)),
                 boxShadow: const [
                   BoxShadow(color: Colors.black45, blurRadius: 10),
                 ],
@@ -532,7 +532,7 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
               decoration: BoxDecoration(
-                color: bgDark.withOpacity(0.7),
+                color: bgDark.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -550,9 +550,9 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: bgDark.withOpacity(0.75),
+        color: bgDark.withValues(alpha: 0.75),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: gold.withOpacity(0.4)),
+        border: Border.all(color: gold.withValues(alpha: 0.4)),
       ),
       child: Text(
         text,
@@ -569,7 +569,7 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: bgDark.withOpacity(0.65),
+        color: bgDark.withValues(alpha: 0.65),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -663,7 +663,7 @@ class _SpherePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     const nYaw = 90;
     const nPitch = 30;
-    final vertCount = (nYaw + 1) * (nPitch + 1);
+    const vertCount = (nYaw + 1) * (nPitch + 1);
 
     final positions = List<Offset>.filled(vertCount, Offset.zero, growable: false);
     final uv = List<Offset>.filled(vertCount, Offset.zero, growable: false);
@@ -712,7 +712,8 @@ class _SpherePainter extends CustomPainter {
             cy - focal * y2 / depth,
           );
         } else {
-          positions[vi] = Offset(-100000, -100000);
+          const hidden = Offset(-100000, -100000);
+          positions[vi] = hidden;
         }
 
         // شفافية ناعمة عند الأفق لإخفاء النصف الخلفي.

@@ -1,13 +1,14 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/router/app_router.dart';
 import '../../core/utils/formatters.dart';
 import '../../models/property.dart';
 import '../../providers/properties_provider.dart';
@@ -16,6 +17,7 @@ import '../../widgets/dollhouse_viewer.dart';
 import '../../widgets/property_card.dart';
 import '../../widgets/virtual_tour_viewer.dart';
 
+@RoutePage()
 class PropertyDetailScreen extends ConsumerStatefulWidget {
   final Property property;
 
@@ -114,7 +116,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
         child: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: bgDark.withOpacity(0.7),
+            color: bgDark.withValues(alpha: 0.7),
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.arrow_forward, color: textLight),
@@ -127,7 +129,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
             margin: const EdgeInsets.all(8),
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: bgDark.withOpacity(0.7),
+              color: bgDark.withValues(alpha: 0.7),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -142,7 +144,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
             margin: const EdgeInsets.all(8),
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: bgDark.withOpacity(0.7),
+              color: bgDark.withValues(alpha: 0.7),
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.share, color: textLight),
@@ -180,7 +182,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                     width: _currentImage == index ? 24 : 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: _currentImage == index ? gold : textMuted.withOpacity(0.5),
+                      color: _currentImage == index ? gold : textMuted.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   );
@@ -193,7 +195,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: bgDark.withOpacity(0.8),
+                  color: bgDark.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -302,7 +304,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
           decoration: BoxDecoration(
             color: cardDark,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: textMuted.withOpacity(0.1)),
+            border: Border.all(color: textMuted.withValues(alpha: 0.1)),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -404,7 +406,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
       decoration: BoxDecoration(
         color: cardDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: gold.withOpacity(0.25)),
+        border: Border.all(color: gold.withValues(alpha: 0.25)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -423,7 +425,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 child: _buildAiToolButton(
                   icon: Icons.calculate_outlined,
                   label: 'تقدير السعر',
-                  onTap: () => context.push('/estimate', extra: _property),
+                  onTap: () => context.pushRoute(EstimateRoute(property: _property)),
                 ),
               ),
               const SizedBox(width: 8),
@@ -431,7 +433,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 child: _buildAiToolButton(
                   icon: Icons.location_city,
                   label: 'نبض الحي',
-                  onTap: () => context.push('/pulse', extra: _property.district),
+                  onTap: () => context.pushRoute(PulseRoute(district: _property.district)),
                 ),
               ),
               const SizedBox(width: 8),
@@ -439,7 +441,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 child: _buildAiToolButton(
                   icon: Icons.trending_up,
                   label: 'حاسبة ROI',
-                  onTap: () => context.push('/roi', extra: _property),
+                  onTap: () => context.pushRoute(RoiRoute(property: _property)),
                 ),
               ),
             ],
@@ -459,9 +461,9 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: gold.withOpacity(0.12),
+          color: gold.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: gold.withOpacity(0.3)),
+          border: Border.all(color: gold.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
@@ -488,7 +490,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 decoration: BoxDecoration(
                   color: cardDark,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: gold.withOpacity(0.3)),
+                  border: Border.all(color: gold.withValues(alpha: 0.3)),
                 ),
                 child: Text(f, style: GoogleFonts.cairo(color: gold, fontSize: 13)),
               )).toList(),
@@ -557,7 +559,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
       decoration: BoxDecoration(
         color: cardDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: gold.withOpacity(0.2)),
+        border: Border.all(color: gold.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -568,7 +570,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
             children: [
               CircleAvatar(
                 radius: 28,
-                backgroundColor: gold.withOpacity(0.2),
+                backgroundColor: gold.withValues(alpha: 0.2),
                 child: Text(
                   agent.name.isNotEmpty ? agent.name.substring(0, 1) : '؟',
                   style: GoogleFonts.cairo(color: gold, fontSize: 22, fontWeight: FontWeight.bold),
@@ -645,9 +647,9 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.15),
+          color: color.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
@@ -689,7 +691,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: cardDark,
-        border: Border(top: BorderSide(color: textMuted.withOpacity(0.1))),
+        border: Border(top: BorderSide(color: textMuted.withValues(alpha: 0.1))),
       ),
       child: SafeArea(
         child: Row(
@@ -727,7 +729,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                   decoration: BoxDecoration(
                     color: cardDark,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFF25D366).withOpacity(0.4)),
+                    border: Border.all(color: const Color(0xFF25D366).withValues(alpha: 0.4)),
                   ),
                   child: const Icon(Icons.chat, color: Color(0xFF25D366), size: 24),
                 ),
@@ -740,7 +742,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
   }
 
   void _openSimilar(Property p) {
-    context.push('/property', extra: p);
+    context.pushRoute(PropertyDetailRoute(property: p));
   }
 
   Future<void> _share() async {

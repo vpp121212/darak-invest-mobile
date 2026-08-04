@@ -1,13 +1,15 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/router/app_router.dart';
 import '../../models/property.dart';
 import '../../providers/search_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/property_card.dart';
 
+@RoutePage()
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
@@ -133,7 +135,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               decoration: BoxDecoration(
                 color: cardDark,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: textMuted.withOpacity(0.2)),
+                border: Border.all(color: textMuted.withValues(alpha: 0.2)),
               ),
               child: TextField(
                 controller: _searchController,
@@ -165,7 +167,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               decoration: BoxDecoration(
                 color: _showAdvanced ? gold : cardDark,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: gold.withOpacity(0.3)),
+                border: Border.all(color: gold.withValues(alpha: 0.3)),
               ),
               child: Icon(
                 Icons.tune,
@@ -201,7 +203,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               decoration: BoxDecoration(
                 color: cardDark,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: textMuted.withOpacity(0.2)),
+                border: Border.all(color: textMuted.withValues(alpha: 0.2)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -237,7 +239,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       decoration: BoxDecoration(
         color: cardDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: gold.withOpacity(0.2)),
+        border: Border.all(color: gold.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -268,7 +270,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             max: 5000000,
             divisions: 100,
             activeColor: gold,
-            inactiveColor: textMuted.withOpacity(0.3),
+            inactiveColor: textMuted.withValues(alpha: 0.3),
             labels: RangeLabels(
               '${_formatNumber(_priceRange.start.round())} ر.س',
               '${_formatNumber(_priceRange.end.round())} ر.س',
@@ -283,7 +285,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             max: 1000,
             divisions: 100,
             activeColor: gold,
-            inactiveColor: textMuted.withOpacity(0.3),
+            inactiveColor: textMuted.withValues(alpha: 0.3),
             labels: RangeLabels('${_areaRange.start.round()}', '${_areaRange.end.round()}'),
             onChanged: (val) => setState(() => _areaRange = val),
           ),
@@ -304,7 +306,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     decoration: BoxDecoration(
                       color: isSelected ? gold : bgDark,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: isSelected ? gold : textMuted.withOpacity(0.2)),
+                      border: Border.all(color: isSelected ? gold : textMuted.withValues(alpha: 0.2)),
                     ),
                     child: Center(
                       child: Text(
@@ -349,7 +351,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         decoration: BoxDecoration(
           color: bgDark,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: textMuted.withOpacity(0.2)),
+          border: Border.all(color: textMuted.withValues(alpha: 0.2)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -413,7 +415,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             color: cardDark,
             borderRadius: BorderRadius.circular(16),
           ),
-          child: Center(child: CircularProgressIndicator(color: gold.withOpacity(0.3), strokeWidth: 2)),
+          child: Center(child: CircularProgressIndicator(color: gold.withValues(alpha: 0.3), strokeWidth: 2)),
         ),
       );
     }
@@ -464,7 +466,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   void _openDetail(Property property) {
-    context.push('/property', extra: property);
+    context.pushRoute(PropertyDetailRoute(property: property));
   }
 
   String _formatNumber(num value) {

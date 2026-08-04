@@ -1,8 +1,9 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/router/app_router.dart';
 import '../../core/utils/formatters.dart';
 import '../../models/property.dart';
 import '../../providers/properties_provider.dart';
@@ -87,7 +88,7 @@ class _DashboardContent extends StatelessWidget {
         const SizedBox(height: 12),
         ...cheapestTop.map((p) => PropertyCard(
               property: p,
-              onTap: () => context.push('/property', extra: p),
+              onTap: () => context.pushRoute(PropertyDetailRoute(property: p)),
             )),
         const SizedBox(height: 24),
       ],
@@ -144,7 +145,7 @@ class _DashboardContent extends StatelessWidget {
           decoration: BoxDecoration(
             color: cardDark,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: textMuted.withOpacity(0.1)),
+            border: Border.all(color: textMuted.withValues(alpha: 0.1)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,7 +156,7 @@ class _DashboardContent extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: kpi.$4.withOpacity(0.15),
+                      color: kpi.$4.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(kpi.$1, color: kpi.$4, size: 20),
@@ -188,7 +189,7 @@ class _DashboardContent extends StatelessWidget {
           decoration: BoxDecoration(
             color: cardDark,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: textMuted.withOpacity(0.1)),
+            border: Border.all(color: textMuted.withValues(alpha: 0.1)),
           ),
           child: Column(
             children: cityStats.map((stat) {

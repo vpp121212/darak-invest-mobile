@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,6 +11,7 @@ import '../profile/add_property_screen.dart';
 import '../profile/profile_screen.dart';
 import '../search/search_screen.dart';
 
+@RoutePage(name: 'AppShellRoute')
 class AppShell extends ConsumerStatefulWidget {
   const AppShell({super.key});
 

@@ -1,8 +1,9 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/router/app_router.dart';
 import '../../models/property.dart';
 import '../../providers/properties_provider.dart';
 import '../../theme/app_theme.dart';
@@ -91,7 +92,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _openDetail(Property property) {
-    context.push('/property', extra: property);
+    context.pushRoute(PropertyDetailRoute(property: property));
   }
 
   void _showComingSoon(String feature) {
@@ -102,13 +103,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildSearchBar() {
     return GestureDetector(
-      onTap: () => context.push('/search'),
+      onTap: () => context.pushRoute(const SearchRoute()),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
           color: cardDark,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: gold.withOpacity(0.3)),
+          border: Border.all(color: gold.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
@@ -119,7 +120,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: gold.withOpacity(0.15),
+                color: gold.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text('بحث', style: GoogleFonts.cairo(color: gold, fontSize: 12, fontWeight: FontWeight.bold)),
@@ -144,7 +145,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               decoration: BoxDecoration(
                 color: isSelected ? gold : cardDark,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: isSelected ? gold : textMuted.withOpacity(0.2)),
+                border: Border.all(color: isSelected ? gold : textMuted.withValues(alpha: 0.2)),
               ),
               child: Center(
                 child: Text(
@@ -200,7 +201,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         decoration: BoxDecoration(
           color: cardDark,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: textMuted.withOpacity(0.2)),
+          border: Border.all(color: textMuted.withValues(alpha: 0.2)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -225,9 +226,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.red.withOpacity(0.12),
+          color: Colors.red.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.red.withOpacity(0.4)),
+          border: Border.all(color: Colors.red.withValues(alpha: 0.4)),
         ),
         child: Text('مسح الفلاتر', style: GoogleFonts.cairo(color: Colors.red, fontSize: 13)),
       ),
@@ -271,23 +272,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildAiToolsRow() {
-    final tools = [
-      ('تقدير السعر', Icons.calculate_outlined, '/estimate'),
-      ('نبض الحي', Icons.location_city, '/pulse'),
-      ('حاسبة ROI', Icons.trending_up, '/roi'),
+    final tools = <(String, IconData, VoidCallback)>[
+      ('تقدير السعر', Icons.calculate_outlined, () => context.pushRoute(EstimateRoute())),
+      ('نبض الحي', Icons.location_city, () => context.pushRoute(PulseRoute())),
+      ('حاسبة ROI', Icons.trending_up, () => context.pushRoute(RoiRoute())),
     ];
     return Row(
       children: tools.map((tool) {
         return Expanded(
           child: GestureDetector(
-            onTap: () => context.push(tool.$3),
+            onTap: tool.$3,
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 4),
               padding: const EdgeInsets.symmetric(vertical: 14),
               decoration: BoxDecoration(
                 color: cardDark,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: gold.withOpacity(0.25)),
+                border: Border.all(color: gold.withValues(alpha: 0.25)),
               ),
               child: Column(
                 children: [
@@ -331,7 +332,7 @@ class _HomeSkeleton extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Center(
-              child: CircularProgressIndicator(color: gold.withOpacity(0.4), strokeWidth: 2),
+              child: CircularProgressIndicator(color: gold.withValues(alpha: 0.4), strokeWidth: 2),
             ),
           ),
       ],

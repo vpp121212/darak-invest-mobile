@@ -1,5 +1,5 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../theme/app_theme.dart';
@@ -18,7 +18,7 @@ class AiField extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardDark,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: gold.withOpacity(0.25)),
+        border: Border.all(color: gold.withValues(alpha: 0.25)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,8 +44,8 @@ InputDecoration aiInputDecoration({String? hint, IconData? icon}) {
     filled: true,
     fillColor: bgDark,
     contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-    border: border(textMuted.withOpacity(0.15)),
-    enabledBorder: border(textMuted.withOpacity(0.15)),
+    border: border(textMuted.withValues(alpha: 0.15)),
+    enabledBorder: border(textMuted.withValues(alpha: 0.15)),
     focusedBorder: border(gold),
     errorBorder: border(Colors.red),
     focusedErrorBorder: border(Colors.red),
@@ -75,7 +75,7 @@ class AiDropdown extends StatelessWidget {
         decoration: BoxDecoration(
           color: bgDark,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: textMuted.withOpacity(0.15)),
+          border: Border.all(color: textMuted.withValues(alpha: 0.15)),
         ),
         child: Row(
           children: [

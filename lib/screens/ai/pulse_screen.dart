@@ -1,6 +1,6 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/utils/formatters.dart';
@@ -11,8 +11,11 @@ import '../../theme/app_theme.dart';
 import '../../widgets/ai_field.dart';
 import '../../widgets/neighborhood_radar_card.dart';
 
+@RoutePage()
 class PulseScreen extends ConsumerStatefulWidget {
-  const PulseScreen({super.key});
+  final String? district;
+
+  const PulseScreen({super.key, this.district});
 
   @override
   ConsumerState<PulseScreen> createState() => _PulseScreenState();
@@ -30,9 +33,9 @@ class _PulseScreenState extends ConsumerState<PulseScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)?.settings.arguments;
-    if (args is String && _district.text.isEmpty) {
-      _district.text = args;
+    final district = widget.district;
+    if (district != null && district.isNotEmpty && _district.text.isEmpty) {
+      _district.text = district;
     }
   }
 
@@ -55,7 +58,7 @@ class _PulseScreenState extends ConsumerState<PulseScreen> {
           'نبض الحي',
           style: GoogleFonts.cairo(color: gold, fontSize: 17, fontWeight: FontWeight.bold),
         ),
-        leading: IconButton(
+          leading: IconButton(
           icon: const Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
@@ -109,14 +112,14 @@ class _PulseScreenState extends ConsumerState<PulseScreen> {
       decoration: BoxDecoration(
         color: cardDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: gold.withOpacity(0.25)),
+        border: Border.all(color: gold.withValues(alpha: 0.25)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: gold.withOpacity(0.15),
+              color: gold.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.sensors, color: gold),
@@ -183,9 +186,9 @@ class _PulseScreenState extends ConsumerState<PulseScreen> {
       error: (e, _) => Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.red.withOpacity(0.1),
+          color: Colors.red.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.red.withOpacity(0.3)),
+          border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
@@ -291,7 +294,7 @@ class _PulseResultView extends StatelessWidget {
           end: Alignment.bottomLeft,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: gold.withOpacity(0.3)),
+        border: Border.all(color: gold.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -316,7 +319,7 @@ class _PulseResultView extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardDark,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: textMuted.withOpacity(0.1)),
+        border: Border.all(color: textMuted.withValues(alpha: 0.1)),
       ),
       child: Column(
         children: [
@@ -342,7 +345,7 @@ class _PulseResultView extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardDark,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: textMuted.withOpacity(0.1)),
+        border: Border.all(color: textMuted.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

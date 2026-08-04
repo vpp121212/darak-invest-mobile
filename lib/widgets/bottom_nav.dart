@@ -27,11 +27,11 @@ class BottomNav extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardDark,
         border: Border(
-          top: BorderSide(color: textMuted.withOpacity(0.1), width: 1),
+          top: BorderSide(color: textMuted.withValues(alpha: 0.1), width: 1),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -61,7 +61,7 @@ class BottomNav extends StatelessWidget {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: gold.withOpacity(0.4),
+                              color: gold.withValues(alpha: 0.4),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                             ),
@@ -99,7 +99,7 @@ class BottomNav extends StatelessWidget {
                         duration: const Duration(milliseconds: 200),
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                         decoration: BoxDecoration(
-                          color: isActive ? gold.withOpacity(0.15) : Colors.transparent,
+                          color: isActive ? gold.withValues(alpha: 0.15) : Colors.transparent,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(

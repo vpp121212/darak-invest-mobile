@@ -1,5 +1,5 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/utils/formatters.dart';
@@ -7,8 +7,11 @@ import '../../models/property.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/ai_field.dart';
 
+@RoutePage()
 class RoiScreen extends StatefulWidget {
-  const RoiScreen({super.key});
+  final Property? property;
+
+  const RoiScreen({super.key, this.property});
 
   @override
   State<RoiScreen> createState() => _RoiScreenState();
@@ -38,8 +41,7 @@ class _RoiScreenState extends State<RoiScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_prefilled) return;
-    final args = ModalRoute.of(context)?.settings.arguments;
-    final property = args is Property ? args : null;
+    final property = widget.property;
     _prefilled = true;
     _price.text =
         property != null && property.purpose != 'إيجار' ? '${property.price.round()}' : '';
@@ -68,7 +70,7 @@ class _RoiScreenState extends State<RoiScreen> {
           'حاسبة العائد على الاستثمار',
           style: GoogleFonts.cairo(color: gold, fontSize: 17, fontWeight: FontWeight.bold),
         ),
-        leading: IconButton(
+          leading: IconButton(
           icon: const Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
@@ -152,14 +154,14 @@ class _RoiScreenState extends State<RoiScreen> {
       decoration: BoxDecoration(
         color: cardDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: gold.withOpacity(0.25)),
+        border: Border.all(color: gold.withValues(alpha: 0.25)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: gold.withOpacity(0.15),
+              color: gold.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.trending_up, color: gold),
@@ -211,7 +213,7 @@ class _RoiScreenState extends State<RoiScreen> {
       decoration: BoxDecoration(
         color: cardDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: (isGood ? green : gold).withOpacity(0.4)),
+        border: Border.all(color: (isGood ? green : gold).withValues(alpha: 0.4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

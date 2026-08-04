@@ -1,6 +1,6 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/utils/formatters.dart';
@@ -10,8 +10,11 @@ import '../../providers/estimate_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/ai_field.dart';
 
+@RoutePage()
 class EstimateScreen extends ConsumerStatefulWidget {
-  const EstimateScreen({super.key});
+  final Property? property;
+
+  const EstimateScreen({super.key, this.property});
 
   @override
   ConsumerState<EstimateScreen> createState() => _EstimateScreenState();
@@ -45,8 +48,7 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_prefilled) return;
-    final args = ModalRoute.of(context)?.settings.arguments;
-    final property = args is Property ? args : null;
+    final property = widget.property;
     _prefilled = true;
     _city.text = property?.city ?? '';
     _district.text = property?.district ?? '';
@@ -80,7 +82,7 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
           'تقدير السعر بالذكاء الاصطناعي',
           style: GoogleFonts.cairo(color: gold, fontSize: 17, fontWeight: FontWeight.bold),
         ),
-        leading: IconButton(
+          leading: IconButton(
           icon: const Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
@@ -198,14 +200,14 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
       decoration: BoxDecoration(
         color: cardDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: gold.withOpacity(0.25)),
+        border: Border.all(color: gold.withValues(alpha: 0.25)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: gold.withOpacity(0.15),
+              color: gold.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.auto_awesome, color: gold),
@@ -319,7 +321,7 @@ class _EstimateResultView extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: gold.withOpacity(0.4)),
+        border: Border.all(color: gold.withValues(alpha: 0.4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -406,7 +408,7 @@ class _NoData extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: textMuted.withOpacity(0.2)),
+        border: Border.all(color: textMuted.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -433,9 +435,9 @@ class _ResultError extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
+        color: Colors.red.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [

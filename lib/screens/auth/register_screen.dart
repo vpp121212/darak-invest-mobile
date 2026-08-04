@@ -1,11 +1,13 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/router/app_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_theme.dart';
 
+@RoutePage()
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
@@ -65,10 +67,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!mounted) return;
     if (success) {
       if (ref.read(authProvider).isLoggedIn) {
-        context.go('/dashboard');
+        context.router.replaceAll([const AppShellRoute()]);
       } else {
         _snack('تم إنشاء الحساب، سجّل دخولك الآن');
-        context.go('/login');
+        context.router.replaceAll([const LoginRoute()]);
       }
     }
   }
@@ -163,10 +165,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isSelected ? gold.withOpacity(0.15) : cardDark,
+                  color: isSelected ? gold.withValues(alpha: 0.15) : cardDark,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: isSelected ? gold : textMuted.withOpacity(0.2),
+                    color: isSelected ? gold : textMuted.withValues(alpha: 0.2),
                     width: isSelected ? 2 : 1,
                   ),
                 ),
@@ -282,8 +284,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       prefixIcon: Icon(icon, color: textMuted),
       filled: true,
       fillColor: cardDark,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: textMuted.withOpacity(0.2))),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: textMuted.withOpacity(0.2))),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: textMuted.withValues(alpha: 0.2))),
+      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: textMuted.withValues(alpha: 0.2))),
       focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: gold)),
     );
   }
@@ -292,9 +294,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E40AF).withOpacity(0.15),
+        color: const Color(0xFF1E40AF).withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF1E40AF).withOpacity(0.3)),
+        border: Border.all(color: const Color(0xFF1E40AF).withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -315,9 +317,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
+        color: Colors.red.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -341,7 +343,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isLoading ? gold.withOpacity(0.5) : gold,
+          color: isLoading ? gold.withValues(alpha: 0.5) : gold,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Center(

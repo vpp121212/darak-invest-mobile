@@ -212,7 +212,7 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
       decoration: BoxDecoration(
         color: bgDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: gold.withOpacity(0.25)),
+        border: Border.all(color: gold.withValues(alpha: 0.25)),
       ),
       child: Stack(
         children: [
@@ -291,9 +291,9 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: active ? gold : bgDark.withOpacity(0.75),
+          color: active ? gold : bgDark.withValues(alpha: 0.75),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: gold.withOpacity(0.4)),
+          border: Border.all(color: gold.withValues(alpha: 0.4)),
         ),
         child: Text(
           mode,
@@ -318,7 +318,7 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: enabled ? gold : textMuted.withOpacity(0.2),
+          color: enabled ? gold : textMuted.withValues(alpha: 0.2),
           shape: BoxShape.circle,
           boxShadow: const [
             BoxShadow(color: Colors.black45, blurRadius: 8),
@@ -374,9 +374,9 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: bgDark.withOpacity(0.75),
+        color: bgDark.withValues(alpha: 0.75),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: gold.withOpacity(0.4)),
+        border: Border.all(color: gold.withValues(alpha: 0.4)),
       ),
       child: Text(
         text,
@@ -393,7 +393,7 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: bgDark.withOpacity(0.65),
+        color: bgDark.withValues(alpha: 0.65),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(

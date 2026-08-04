@@ -1,9 +1,10 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import '../../core/router/app_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_theme.dart';
 
@@ -30,13 +31,13 @@ class ProfileScreen extends ConsumerWidget {
           Text('أدوات ذكية', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           _buildMenuItem(Icons.calculate_outlined, 'تقدير السعر الذكي', 'نموذج AI لتقييم العقار', () {
-            context.push('/estimate');
+            context.pushRoute(EstimateRoute());
           }),
           _buildMenuItem(Icons.trending_up, 'حاسبة ROI / التدفق النقدي', 'العائد المتوقع على الاستثمار', () {
-            context.push('/roi');
+            context.pushRoute(RoiRoute());
           }),
           _buildMenuItem(Icons.location_city, 'نبض الحي', 'تحليلات الأحياء والأسعار', () {
-            context.push('/pulse');
+            context.pushRoute(PulseRoute());
           }),
           const SizedBox(height: 24),
           Text('عام', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
@@ -61,13 +62,13 @@ class ProfileScreen extends ConsumerWidget {
         decoration: BoxDecoration(
           color: cardDark,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: gold.withOpacity(0.25)),
+          border: Border.all(color: gold.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
             CircleAvatar(
               radius: 28,
-              backgroundColor: gold.withOpacity(0.15),
+              backgroundColor: gold.withValues(alpha: 0.15),
               child: const Icon(Icons.person_outline, color: gold, size: 30),
             ),
             const SizedBox(width: 14),
@@ -82,7 +83,7 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
             GestureDetector(
-              onTap: () => context.push('/login'),
+              onTap: () => context.pushRoute(const LoginRoute()),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
@@ -104,13 +105,13 @@ class ProfileScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: cardDark,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: gold.withOpacity(0.25)),
+        border: Border.all(color: gold.withValues(alpha: 0.25)),
       ),
       child: Row(
         children: [
           CircleAvatar(
             radius: 28,
-            backgroundColor: gold.withOpacity(0.15),
+            backgroundColor: gold.withValues(alpha: 0.15),
             child: Text(
               name.characters.first,
               style: GoogleFonts.cairo(color: gold, fontSize: 22, fontWeight: FontWeight.bold),
@@ -145,7 +146,7 @@ class ProfileScreen extends ConsumerWidget {
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: gold.withOpacity(0.12),
+            color: gold.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: gold, size: 22),
@@ -165,9 +166,9 @@ class ProfileScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.red.withOpacity(0.12),
+          color: Colors.red.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.red.withOpacity(0.4)),
+          border: Border.all(color: Colors.red.withValues(alpha: 0.4)),
         ),
         child: Center(
           child: Text('تسجيل الخروج', style: GoogleFonts.cairo(color: Colors.red, fontSize: 15, fontWeight: FontWeight.bold)),

@@ -28,7 +28,7 @@ class PropertyCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: cardDark,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: textMuted.withOpacity(0.1)),
+          border: Border.all(color: textMuted.withValues(alpha: 0.1)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,7 +134,7 @@ class PropertyCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: bgDark.withOpacity(0.7),
+                color: bgDark.withValues(alpha: 0.7),
                 shape: BoxShape.circle,
               ),
               child: Icon(

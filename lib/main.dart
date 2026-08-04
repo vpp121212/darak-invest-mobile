@@ -35,7 +35,7 @@ class DarakApp extends StatelessWidget {
         textDirection: TextDirection.rtl,
         child: child!,
       ),
-      routerConfig: appRouter,
+      routerConfig: appRouter.config(),
     );
   }
 }
