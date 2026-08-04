@@ -1,5 +1,5 @@
 var A=[],F=JSON.parse(localStorage.getItem('darak_favs')||'[]'),cur='',user=null,mapInstance=null,currentDetailImages=[];
-var API='https://darak-invest-production.up.railway.app/api';
+var API='https://darak-invest-backend-j6hy.onrender.com/api';
 if(location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.port==='5000'||location.hostname.indexOf('trycloudflare')>-1){API=location.origin+'/api';}
 if(location.hostname==='darak-invest-backend-j6hy.onrender.com'){API=location.origin+'/api';}
 if(window.location.protocol==='file:'){API='http://172.20.10.3:5000/api';}

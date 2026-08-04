@@ -2695,6 +2695,20 @@ var FALLBACK=[
 
 async function loadProperties(){
   applyProps(normProps(FALLBACK));
+  var got=await fetchProps();
+  if(!got)schedulePropsPoll();
+  if(authToken){api('/auth/me').then(function(r){if(r&&r.success){user=r.user;updateUserUI()}}).catch(function(){})}
+  api('/market/overview').then(function(d){if(d&&d.success&&d.sama&&d.sama.repoRate){window._samaRate=d.sama.repoRate;updateFinRate()}}).catch(function(){});
+}
+function schedulePropsPoll(){
+  var polls=0;
+  var t=setInterval(async function(){
+    polls++;
+    if(polls>=6){clearInterval(t);return}
+    if(await fetchProps()){clearInterval(t)}
+  },10000);
+}
+async function fetchProps(){
   var d=null;
   for(var attempt=0;attempt<2;attempt++){
     try{
@@ -2705,19 +2719,19 @@ async function loadProperties(){
       d=r.ok?(await r.json().catch(function(){return null})):null;
     }catch(e){d=null}
     if(d&&Array.isArray(d)&&d.length)break;
-    if(attempt<1)await new Promise(function(r){setTimeout(r,800)});
+    if(attempt<1)await new Promise(function(r){setTimeout(r,500)});
   }
   if(d&&Array.isArray(d)&&d.length){
     applyProps(normProps(d).map(function(p){return Object.assign({},p,{loc:p.loc||(p.district+'، '+p.city),status:p.isFeatured?'حصري':'متاح',agent:p.agent||{name:p.agentName||'مكتب الديار العقارية',role:'وسيط مرخص',phone:p.agentPhone||'+966501234567'}})}));
+    try{
+      var lmap=JSON.parse(localStorage.getItem('darak_local_panos')||'{}');
+      if(lmap&&Object.keys(lmap).length){
+        A.forEach(function(p){if(p&&lmap[p.id]!==undefined)p.panoramicImage=lmap[p.id]});
+      }
+    }catch(e){}
+    return true;
   }
-  try{
-    var lmap=JSON.parse(localStorage.getItem('darak_local_panos')||'{}');
-    if(lmap&&Object.keys(lmap).length){
-      A.forEach(function(p){if(p&&lmap[p.id]!==undefined)p.panoramicImage=lmap[p.id]});
-    }
-  }catch(e){}
-  if(authToken){api('/auth/me').then(function(r){if(r&&r.success){user=r.user;updateUserUI()}}).catch(function(){})}
-  api('/market/overview').then(function(d){if(d&&d.success&&d.sama&&d.sama.repoRate){window._samaRate=d.sama.repoRate;updateFinRate()}}).catch(function(){});
+  return false;
 }
 function applyProps(list){
   A=list;
