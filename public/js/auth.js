@@ -52,5 +52,5 @@ btnSubmit.addEventListener("click", () => {
 
 
   localStorage.setItem("darak_user", JSON.stringify(userObj));
-  window.location.href = "dashboard.html";
+  window.location.href = "index.html";
 });

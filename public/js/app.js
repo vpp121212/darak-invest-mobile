@@ -2,8 +2,9 @@
 function nav(page){
   var pg=document.getElementById('pg-'+page);
   if(!pg){
-    if(page!=='home'&&page!=='legal'&&page!=='about'){window.location.href='dashboard.html#page-'+page}
-    return false;
+    if(page!=='home'){pg=document.getElementById('pg-home')}
+    if(!pg)return false;
+    page='home';
   }
   document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on')});
   document.querySelectorAll('.bi').forEach(function(b){b.classList.remove('on')});
@@ -600,7 +601,7 @@ function fetchPulse(p){
       sb+cards+metro+projects+'<div style="font-size:9px;color:var(--m);text-align:left;margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,.04)">📊 '+esc(px.data_source)+'</div></div></div>';
   }).catch(function(){document.getElementById('pulse-card-'+p.id).innerHTML=''});
 }
-function closeD(){destroyVT();var dp=document.getElementById('detailPage');if(dp&&document.querySelector('#detailPage .detail-page-inner')){if(history.length>1)history.back();else window.location.href='dashboard.html';return}document.getElementById('ov').classList.remove('open');document.body.style.overflow=''}
+function closeD(){destroyVT();var dp=document.getElementById('detailPage');if(dp&&document.querySelector('#detailPage .detail-page-inner')){if(history.length>1)history.back();else window.location.href='index.html';return}document.getElementById('ov').classList.remove('open');document.body.style.overflow=''}
 
 function gNav(d){
   var imgs=document.querySelectorAll('#og img'),cur=0;
@@ -622,13 +623,14 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){try{closeD(
 var mapPropertyId=null,mapFullMap=null,map3dInstance=null,MB_TOKEN='',_tokenPromise=null,_tokenReady=false,_mapboxLoadPromise=null,_mbProbePromise=null;
 
 function isNight(){var h=new Date().getHours();return h<6||h>=18}
+function isDarkPref(){try{if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)return true}catch(e){}return isNight()}
 function fallbackStyle(dark){
   var tiles=dark
     ?['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png','https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png','https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png']
     :['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png','https://b.tile.openstreetmap.org/{z}/{x}/{y}.png','https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'];
   return {version:8,name:'darak-fallback',sources:{base:{type:'raster',tiles:tiles,tileSize:256,attribution:'© OpenStreetMap contributors'}},layers:[{id:'base',type:'raster',source:'base'}]};
 }
-function mapStyle(){return window._mbBlocked?fallbackStyle(true):'mapbox://styles/mapbox/dark-v11'}
+function mapStyle(){return window._mbBlocked?fallbackStyle(isDarkPref()):(isDarkPref()?'mapbox://styles/mapbox/dark-v11':'mapbox://styles/mapbox/light-v11')}
 
 function probeMapbox(){
   if(window._mbBlocked!==undefined)return Promise.resolve(window._mbBlocked===false);
@@ -693,7 +695,7 @@ function warmMapboxLib(){
 
 function withMap(cid,readyFn){
   var c=document.getElementById(cid);if(!c)return;
-  c.style.background='#0a0b10';
+  c.style.background='var(--bg)';
   c.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--m);font-size:13px;gap:10px;direction:rtl"><div style="font-size:28px">🗺️</div><div>جاري تحميل الخرائط...</div></div>';
   var tries=0;
   function step(){
@@ -716,11 +718,12 @@ function ensureToken(){
   });
   _tokenPromise=Promise.all([
     loadMapboxLib(),
-    fetch('/api/config/mapbox').then(function(r){return r.json()}).then(function(d){
+    fetch(API+'/config/mapbox').then(function(r){return r.json()}).then(function(d){
       if(d&&d.token){MB_TOKEN=d.token;if(window.mapboxgl){mapboxgl.accessToken=d.token;try{mapboxgl.setRTLTextPlugin('mapbox-gl-rtl-text.js',null,false);}catch(e){}}}
+      else{window._mbBlocked=true;window._tokenReady=true;return true}
       _tokenReady=true;
       return true;
-    }).catch(function(){_tokenReady=true;return true}),
+    }).catch(function(){window._mbBlocked=true;_tokenReady=true;return true}),
     probeMapbox()
   ]).then(function(res){return !!(res[0]&&(MB_TOKEN||window._mbBlocked))});
   _tokenPromise.catch(function(){_tokenReady=true;return false});
@@ -729,7 +732,7 @@ function ensureToken(){
 
 function mapFail(cid,retryFn){
   var c=document.getElementById(cid);if(!c)return;
-  c.style.background='#0a0b10';
+  c.style.background='var(--bg)';
   c.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--m);font-size:13px;text-align:center;padding:24px;direction:rtl;gap:10px">'+
     '<div style="font-size:32px">🗺️</div>'+
     '<div>الخرائط غير متاحة حالياً — تعذر الاتصال بخدمة الخرائط.<br>تحقق من اتصالك ثم حاول مرة أخرى.</div>'+
@@ -761,10 +764,10 @@ function createPropertyPopup(p){
   }
   return new mapboxgl.Popup({offset:30,direction:'rtl',className:'map-popup',maxWidth:'280px'}).setHTML(
     '<div style="direction:rtl;font-family:\'Cairo\',sans-serif;min-width:220px;padding:16px;line-height:1.7;position:relative">'+imgHtml+
-    '<div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px">'+p.title+'</div>'+
-    '<div style="font-size:11px;color:#999;margin-bottom:6px">📍 '+pLoc(p)+'</div>'+
+    '<div style="font-size:15px;font-weight:700;color:var(--t);margin-bottom:4px">'+p.title+'</div>'+
+    '<div style="font-size:11px;color:var(--m);margin-bottom:6px">📍 '+pLoc(p)+'</div>'+
     '<div style="font-size:22px;font-weight:800;color:#d4af37;margin-bottom:6px">'+fmt(p.price)+' ر.س</div>'+
-    '<div style="display:flex;gap:10px;margin-bottom:8px;font-size:11px;color:#aaa"><span>🛏 '+p.rooms+'</span><span>📐 '+fmt(p.area)+' م²</span><span>🚿 '+p.baths+'</span>'+(p.type==='فيلا'&&p.apartments?'<span>🏢 '+p.apartments+' شقق</span>':'')+'</div>'+
+    '<div style="display:flex;gap:10px;margin-bottom:8px;font-size:11px;color:var(--m)"><span>🛏 '+p.rooms+'</span><span>📐 '+fmt(p.area)+' م²</span><span>🚿 '+p.baths+'</span>'+(p.type==='فيلا'&&p.apartments?'<span>🏢 '+p.apartments+' شقق</span>':'')+'</div>'+
     feat+
     '<button onclick="closeMap();showDetail('+p.id+')" style="width:100%;padding:10px;border-radius:10px;background:linear-gradient(135deg,#d4af37,#b8941f);color:#05060a;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:\'Cairo\',sans-serif;transition:opacity .2s" onmouseover="this.style.opacity=\'.85\'" onmouseout="this.style.opacity=\'1\'">عرض التفاصيل</button></div>'
   );
@@ -783,9 +786,9 @@ function addLegend(map){
   legend.style.cssText='position:absolute;bottom:80px;right:12px;z-index:10;background:rgba(14,16,24,.92);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 14px;backdrop-filter:blur(12px);font-family:Cairo,sans-serif';
   var saleCount=A.filter(function(p){return p.purpose==='بيع'}).length;
   var rentCount=A.filter(function(p){return p.purpose==='إيجار'}).length;
-  legend.innerHTML='<div style="font-size:10px;color:#999;margin-bottom:6px">'+(saleCount+rentCount)+' عقار</div>'+
-    '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><div style="width:12px;height:12px;border-radius:50% 50% 50% 0;background:#d4af37;transform:rotate(-45deg)"></div><span style="font-size:11px;color:#ccc">بيع ('+saleCount+')</span></div>'+
-    '<div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50% 50% 50% 0;background:#60a5fa;transform:rotate(-45deg)"></div><span style="font-size:11px;color:#ccc">إيجار ('+rentCount+')</span></div>';
+  legend.innerHTML='<div style="font-size:10px;color:var(--m);margin-bottom:6px">'+(saleCount+rentCount)+' عقار</div>'+
+    '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><div style="width:12px;height:12px;border-radius:50% 50% 50% 0;background:#d4af37;transform:rotate(-45deg)"></div><span style="font-size:11px;color:var(--m)">بيع ('+saleCount+')</span></div>'+
+    '<div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50% 50% 50% 0;background:#60a5fa;transform:rotate(-45deg)"></div><span style="font-size:11px;color:var(--m)">إيجار ('+rentCount+')</span></div>';
   map.getContainer().appendChild(legend);
 }
 
@@ -803,7 +806,7 @@ function createMap(opts){
   m.addControl(new mapboxgl.NavigationControl(),'top-left');
   m.on('load',function(){
     loaded=true;
-    if(!window._mbBlocked){try{m.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512});m.setTerrain({source:'mapbox-dem',exaggeration:1})}catch(e){};try{m.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',type:'fill-extrusion',minzoom:15,paint:{'fill-extrusion-color':'#2a2d35','fill-extrusion-height':['get','height'],'fill-extrusion-base':['get','min_height'],'fill-extrusion-opacity':0.6}})}catch(e){}}
+    if(!window._mbBlocked){try{m.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512});m.setTerrain({source:'mapbox-dem',exaggeration:1})}catch(e){};try{m.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',type:'fill-extrusion',minzoom:15,paint:{'fill-extrusion-color':isDarkPref()?'#2a2d35':'#c8c6c0','fill-extrusion-height':['get','height'],'fill-extrusion-base':['get','min_height'],'fill-extrusion-opacity':0.6}})}catch(e){}}
     if(opts._addMarkers!==false){addMarkersToMap(m);addLegend(m)}
     if(opts._onLoad)opts._onLoad(m);
   });
@@ -1332,10 +1335,10 @@ function initMap3d(){
       mapFail('map3dView',function(){initMap3d()});
       return;
     }
-    map3dInstance2.addControl(new mapboxgl.NavigationControl(),'top-left');
+      map3dInstance2.addControl(new mapboxgl.NavigationControl(),'top-left');
     map3dInstance2.on('load',function(){
       loaded=true;
-      if(!window._mbBlocked){try{map3dInstance2.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512});map3dInstance2.setTerrain({source:'mapbox-dem',exaggeration:1})}catch(e){};try{map3dInstance2.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',type:'fill-extrusion',minzoom:15,paint:{'fill-extrusion-color':'#2a2d35','fill-extrusion-height':['get','height'],'fill-extrusion-base':['get','min_height'],'fill-extrusion-opacity':0.6}})}catch(e){}}
+      if(!window._mbBlocked){try{map3dInstance2.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512});map3dInstance2.setTerrain({source:'mapbox-dem',exaggeration:1})}catch(e){};try{map3dInstance2.addLayer({id:'3d-buildings',source:'composite','source-layer':'building',type:'fill-extrusion',minzoom:15,paint:{'fill-extrusion-color':isDarkPref()?'#2a2d35':'#c8c6c0','fill-extrusion-height':['get','height'],'fill-extrusion-base':['get','min_height'],'fill-extrusion-opacity':0.6}})}catch(e){}}
       addNeighborhoodsLayer();
     });
     map3dInstance2.on('moveend',loadMapAdsByBounds);

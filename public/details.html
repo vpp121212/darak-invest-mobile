@@ -89,7 +89,7 @@
   <script src="js/auth-legacy.js"></script>
   <script src="js/favs.js"></script>
   <script>
-  function goHome(){window.location.href=authToken?'dashboard.html':'index.html'}
+  function goHome(){window.location.href='index.html'}
   function goBack(){if(history.length>1)history.back();else goHome()}
   document.addEventListener('DOMContentLoaded',function(){
     var q=new URLSearchParams(location.search).get('id');

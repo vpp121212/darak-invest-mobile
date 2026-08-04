@@ -8,10 +8,10 @@ function setSession(d){
   updateUserUI();
 }
 function postAuthNav(){
-  var p=location.pathname.split('/').pop()||'';
-  if(p==='index.html'||p==='')window.location.href='dashboard.html';
+  if(window.nav)window.nav('home');
+  else window.location.href='index.html';
 }
-function goHome(){window.location.href=authToken?'dashboard.html':'index.html'}
+function goHome(){window.location.href='index.html'}
 
 async function bridgeFirebaseUser(fbUser,pw){
   var em=fbUser.email||'';
