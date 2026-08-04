@@ -764,17 +764,22 @@ function withMap(cid,readyFn){
   step();
 }
 
+function fetchTimeout(url,ms){
+  var ctl=('AbortController' in window)?new AbortController():null;
+  var t=setTimeout(function(){if(ctl)ctl.abort()},ms);
+  return fetch(url,{signal:ctl?ctl.signal:undefined}).then(function(r){clearTimeout(t);return r}).catch(function(e){clearTimeout(t);throw e});
+}
 function ensureToken(){
-  if(_tokenReady&&MB_TOKEN&&window.mapboxgl)return Promise.resolve(true);
+  if(_tokenReady&&window.mapboxgl)return Promise.resolve(true);
   if(_tokenPromise)return _tokenPromise.then(function(ok){
     if(!ok&&!window.mapboxgl){_tokenPromise=null}
     return ok||(!!window.mapboxgl&&window._mbBlocked);
   });
   _tokenPromise=Promise.all([
     loadMapboxLib(),
-    fetch(API+'/config/mapbox').then(function(r){return r.json()}).then(function(d){
+    fetchTimeout(API+'/config/mapbox',12000).then(function(r){return r.json()}).then(function(d){
       if(d&&d.token){MB_TOKEN=d.token;if(window.mapboxgl){mapboxgl.accessToken=d.token;try{mapboxgl.setRTLTextPlugin('mapbox-gl-rtl-text.js',null,false);}catch(e){}}}
-      else{window._mbBlocked=true;window._tokenReady=true;return true}
+      else{window._mbBlocked=true;_tokenReady=true;return true}
       _tokenReady=true;
       return true;
     }).catch(function(){window._mbBlocked=true;_tokenReady=true;return true}),
@@ -865,8 +870,14 @@ function createMap(opts){
     if(opts._onLoad)opts._onLoad(m);
   });
   setTimeout(function(){
-    if(!loaded&&m){try{m.remove()}catch(e){};mapFail(o.container)}
-  },20000);
+    if(!loaded&&m){
+      var ok=false;
+      try{ok=!!m.getCanvas()&&m.getCanvas().width>0&&m.getCanvas().height>0}catch(e){}
+      if(ok){return}
+      try{m.remove()}catch(e){}
+      try{o.container&&typeof o.container==='string'&&document.getElementById(o.container)&&mapFail(o.container)}catch(e){}
+    }
+  },25000);
   return m;
 }
 
@@ -1401,8 +1412,15 @@ function initMap3d(){
     map3dInstance2.on('zoom',function(){var z=map3dInstance2.getZoom();map3dInstance2.setLayoutProperty('neighborhoods-fill','visibility',z>=11?'visible':'none');map3dInstance2.setLayoutProperty('neighborhoods-outline','visibility',z>=11?'visible':'none');map3dInstance2.setLayoutProperty('neighborhoods-labels','visibility',z>=11?'visible':'none')});
     setTimeout(loadMapAdsByBounds,1000);
     setTimeout(function(){
-      if(!loaded&&map3dInstance2){try{map3dInstance2.remove()}catch(e){};map3dInstance2=null;mapFail('map3dView',function(){initMap3d()})}
-    },20000)
+      if(!loaded&&map3dInstance2){
+        var ok=false;
+        try{ok=!!map3dInstance2.getCanvas()&&map3dInstance2.getCanvas().width>0&&map3dInstance2.getCanvas().height>0}catch(e){}
+        if(ok){return}
+        try{map3dInstance2.remove()}catch(e){}
+        map3dInstance2=null;
+        try{mapFail('map3dView',function(){initMap3d()})}catch(e){}
+      }
+    },25000)
   })
 }
 function addNeighborhoodsLayer(){
