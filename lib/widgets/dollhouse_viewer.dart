@@ -118,6 +118,7 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
   }
 
   String _html() {
+    final src = _escapeHtml(_scenes[_sceneIndex]);
     return '''
 <!DOCTYPE html>
 <html lang="ar">
@@ -135,7 +136,7 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
   <model-viewer
     id="mv"
-    src="${_scenes[_sceneIndex]}"
+    src="$src"
     alt="3D Dollhouse View"
     auto-rotate
     camera-controls
@@ -147,13 +148,27 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
 ''';
   }
 
+  /// يمنع كسر سمة `src` في HTML بحقن روابط تحتوي علامات اقتباس.
+  static String _escapeHtml(String value) {
+    return value
+        .replaceAll('&', '&amp;')
+        .replaceAll('"', '&quot;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;');
+  }
+
+  /// يمنع كسر نص السلسلة داخل runJavaScript بحقن روابط تحتوي فاصلة عليا.
+  static String _escapeJs(String value) {
+    return value.replaceAll(r'\', r'\\').replaceAll("'", r"\'");
+  }
+
   void _goToScene(int index) {
     if (index < 0 || index >= _scenes.length || index == _sceneIndex) return;
     setState(() => _sceneIndex = index);
     if (_loaded) {
       _controller.runJavaScript(
         "var mv=document.getElementById('mv');"
-        "if(mv){mv.setAttribute('src','${_scenes[index]}');}"
+        "if(mv){mv.setAttribute('src','${_escapeJs(_scenes[index])}');}"
       );
     } else {
       _load();

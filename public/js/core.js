@@ -24,6 +24,10 @@ async function api(path,opts){
 }
 
 function fmt(n){return Number(n||0).toLocaleString('en')}
+
+// تهريب HTML لمنع XSS عند حقن بيانات العقارات في innerHTML (البيانات مصدرها
+// إعلانات المستخدمين فيجب ألا تُفسَّر كوسوم/سكربت).
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function tLbl(t){return t==='verified'?'✓ موثق':t==='office'?'🏢 مكتب':'👤 مباشر'}
 function tCls(t){return t==='verified'?'v':t==='office'?'o':'d'}
 function pImg(p){return absImg((p.images&&p.images[0])||'/uploads/properties/default.jpg')}

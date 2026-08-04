@@ -21,7 +21,9 @@ window.__baseNav=nav;
 /* RENDER */
 function cardHTML(p){
   var im=pImg(p),fav=F.indexOf(p.id)>-1;
-  return'<div class="card" onclick="showDetail('+p.id+')"><div class="card-img"><img src="'+im+'" alt="'+p.title+'" loading="lazy" onerror="this.onerror=null;this.src=\''+pFallback(p)+'\'"><div class="badges"><span class="badge '+(p.purpose==='إيجار'?'badge-r':'badge-s')+'">'+p.purpose+'</span>'+(p.status==='حصري'?'<span class="badge badge-x">⭐ حصري</span>':'')+'</div><button class="fav '+(fav?'on':'')+'" onclick="toggleFav('+p.id+',event)">'+(fav?'❤':'🤍')+'</button><span class="trust trust-'+tCls(p.trust)+'">'+tLbl(p.trust)+'</span>'+(p.panoramicImage||p.pano||p.panoUrl?'<span class="card-360">🌐 360°</span>':'')+(p.tourUrl||p.matterport||p.tour3d?'<span class="card-360">🕶️ 3D</span>':'')+(p.model3dUrl||p.model3d?'<span class="card-360">🧊 مجسم</span>':'')+'</div><div class="card-b"><div class="card-t">'+p.title+'</div><div class="card-l">📍 '+pLoc(p)+'</div><div class="card-p">'+pPrice(p)+'</div>'+(p.expectedPrice?'<div class="card-avm">💰 التقدير: '+fmt(p.expectedPrice)+' ر.س</div>':'')+'<div class="card-m"><span>🛏 '+p.rooms+'</span><span>📐 '+fmt(p.area)+' م²</span><span>🚿 '+p.baths+'</span>'+(p.type==='فيلا'&&p.apartments?'<span>🏢 '+p.apartments+' شقق</span>':'')+'</div></div></div>'
+  var eid=esc(p.id),et=esc(p.title),el=esc(pLoc(p)),ep=esc(pPrice(p)),ea=esc(fmt(p.area)),ee=esc(fmt(p.expectedPrice||0));
+  var eim=esc(im),efb=esc(pFallback(p));
+  return'<div class="card" onclick="showDetail('+eid+')"><div class="card-img"><img src="'+eim+'" alt="'+et+'" loading="lazy" onerror="this.onerror=null;this.src=\''+efb+'\'"><div class="badges"><span class="badge '+(p.purpose==='إيجار'?'badge-r':'badge-s')+'">'+esc(p.purpose)+'</span>'+(p.status==='حصري'?'<span class="badge badge-x">⭐ حصري</span>':'')+'<button class="fav '+(fav?'on':'')+'" onclick="toggleFav('+eid+',event)">'+(fav?'❤':'🤍')+'</button><span class="trust trust-'+tCls(p.trust)+'">'+esc(tLbl(p.trust))+'</span>'+(p.panoramicImage||p.pano||p.panoUrl?'<span class="card-360">🌐 360°</span>':'')+(p.tourUrl||p.matterport||p.tour3d?'<span class="card-360">🕶️ 3D</span>':'')+(p.model3dUrl||p.model3d?'<span class="card-360">🧊 مجسم</span>':'')+'</div><div class="card-b"><div class="card-t">'+et+'</div><div class="card-l">📍 '+el+'</div><div class="card-p">'+ep+'</div>'+(p.expectedPrice?'<div class="card-avm">💰 التقدير: '+ee+' ر.س</div>':'')+'<div class="card-m"><span>🛏 '+esc(p.rooms)+'</span><span>📐 '+ea+' م²</span><span>🚿 '+esc(p.baths)+'</span>'+(p.type==='فيلا'&&p.apartments?'<span>🏢 '+esc(p.apartments)+' شقق</span>':'')+'</div></div></div>'
 }
 function render(f){
   var g=document.getElementById('pg'),list=f||A;
@@ -52,7 +54,7 @@ function renderHomeSections(){
   var feat=A.filter(function(p){return p.isFeatured||p.status==='حصري'}).slice(0,8);
   if(feat.length){
     document.getElementById('homeFeatured').style.display='block';
-    document.getElementById('homeFeatGrid').innerHTML=feat.map(function(p){return'<div class="hf" onclick="showDetail('+p.id+')"><img src="'+pImg(p)+'" alt="" loading="lazy" onerror="this.src=\''+pFallback(p)+'\'"><div class="hf-b"><div class="hf-t">'+p.title+'</div><div class="hf-l">📍 '+pLoc(p)+'</div><div class="hf-p">'+pPrice(p)+'</div></div></div>'}).join('');
+    document.getElementById('homeFeatGrid').innerHTML=feat.map(function(p){var et=esc(p.title);return'<div class="hf" onclick="showDetail('+esc(p.id)+')"><img src="'+esc(pImg(p))+'" alt="'+et+'" loading="lazy" onerror="this.onerror=null;this.src=\''+esc(pFallback(p))+'\'"><div class="hf-b"><div class="hf-t">'+et+'</div><div class="hf-l">📍 '+esc(pLoc(p))+'</div><div class="hf-p">'+esc(pPrice(p))+'</div></div></div>'}).join('');
   }
 
   document.getElementById('propCount').textContent=A.length+' عقار';
@@ -92,7 +94,7 @@ function openPulseDetail(px){
     (px.avg_rent?'<div style="padding:10px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">متوسط الإيجار/سنوياً</div><div style="font-size:13px;font-weight:700;color:var(--g)">'+fmt(px.avg_rent)+' ر.س</div></div>':'')+
     (px.avg_sale?'<div style="padding:10px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">متوسط البيع</div><div style="font-size:13px;font-weight:700;color:var(--g)">'+fmt(px.avg_sale)+' ر.س</div></div>':'')+
     (px.walk_score?'<div style="padding:10px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);text-align:center"><div style="font-size:10px;color:var(--m)">مؤشر المشي</div><div style="font-size:16px;font-weight:700;color:var(--blue)">'+px.walk_score+'</div></div>':'')+
-    '</div>'+metro+projects+'<div style="font-size:9px;color:var(--m);text-align:left;padding-top:4px;border-top:1px solid rgba(255,255,255,.04)">📊 '+px.data_source+'</div><div id="officialBlock"></div></div>';
+    '</div>'+metro+projects+'<div style="font-size:9px;color:var(--m);text-align:left;padding-top:4px;border-top:1px solid rgba(255,255,255,.04)">📊 '+esc(px.data_source)+'</div><div id="officialBlock"></div></div>';
   document.getElementById('ovp').innerHTML=html;
   loadOfficialForDistrict(px.district).then(function(d){
     var b=renderOfficialBlock(d);
@@ -130,7 +132,7 @@ function renderPulse(){
     if(p.green_spaces&&p.green_spaces.length)badge+='<span class="pc-badge pc-badge-green">🌳 '+p.green_spaces.length+' حديقة</span>';
     return '<div class="pc" onclick="openPulseDetail(pulseData.find(function(x){return x.district===\''+(p.district||'').replace(/'/g,"\\'")+'\'&&x.city===\''+(p.city||'').replace(/'/g,"\\'")+'\'}))">'+
       '<div class="pc-top"><div class="pc-score" style="background:'+c+'">'+sc+'</div>'+
-      '<div class="pc-info"><div class="pc-dist">'+p.district+'</div><div class="pc-city">📍 '+p.city+'</div></div></div>'+
+      '<div class="pc-info"><div class="pc-dist">'+esc(p.district)+'</div><div class="pc-city">📍 '+esc(p.city)+'</div></div></div>'+
       '<div class="pc-stats"><div class="pc-stat"><div class="pc-stat-v" style="color:'+rc+'">'+(p.roi||'—')+'%</div><div class="pc-stat-l">العائد</div></div>'+
       '<div class="pc-stat"><div class="pc-stat-v" style="color:'+gc+'">'+(p.future_value_growth?'+'+(p.future_value_growth||0)+'%':'—')+'</div><div class="pc-stat-l">النمو</div></div>'+
       '<div class="pc-stat"><div class="pc-stat-v" style="color:var(--blue)">'+(p.walk_score||'—')+'</div><div class="pc-stat-l">المشي</div></div></div>'+
@@ -145,7 +147,7 @@ function loadPulseData(){
       var cities=[...new Set(pulseData.map(function(p){return p.city}))];
       var cf=document.getElementById('pulseCityFilter');
       cf.innerHTML='<div class="hc on" data-city="" onclick="pulseCity(this)">الكل</div>'+
-        cities.map(function(c){return'<div class="hc" data-city="'+c+'" onclick="pulseCity(this)">📍 '+c+'</div>'}).join('');
+        cities.map(function(c){return'<div class="hc" data-city="'+esc(c)+'" onclick="pulseCity(this)">📍 '+esc(c)+'</div>'}).join('');
       renderPulse();
     }else{
       document.getElementById('pulseGrid').innerHTML='<div class="load">لا توجد بيانات متاحة</div>';
@@ -198,10 +200,10 @@ function loadSources(){
     el.innerHTML=d.sources.map(function(s){
       return'<div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)">'+
         '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">'+
-        '<div style="font-size:13px;font-weight:700;color:var(--t)">'+s.name+'</div>'+
-        '<span style="font-size:9px;padding:2px 8px;border-radius:999px;background:rgba(212,175,55,.12);color:var(--g);font-weight:600;white-space:nowrap">'+s.update+'</span></div>'+
-        '<div style="font-size:11px;color:var(--m);line-height:1.7;margin-bottom:8px">'+s.description+'</div>'+
-        '<a href="'+s.url+'" target="_blank" style="display:inline-block;padding:6px 14px;border-radius:8px;background:linear-gradient(135deg,#d4af37,#b8941f);color:#05060a;font-size:11px;font-weight:700;text-decoration:none">زيارة المصدر 🔗</a></div>';
+        '<div style="font-size:13px;font-weight:700;color:var(--t)">'+esc(s.name)+'</div>'+
+        '<span style="font-size:9px;padding:2px 8px;border-radius:999px;background:rgba(212,175,55,.12);color:var(--g);font-weight:600;white-space:nowrap">'+esc(s.update)+'</span></div>'+
+        '<div style="font-size:11px;color:var(--m);line-height:1.7;margin-bottom:8px">'+esc(s.description)+'</div>'+
+        '<a href="'+esc(s.url)+'" target="_blank" style="display:inline-block;padding:6px 14px;border-radius:8px;background:linear-gradient(135deg,#d4af37,#b8941f);color:#05060a;font-size:11px;font-weight:700;text-decoration:none">زيارة المصدر 🔗</a></div>';
     }).join('');
   });
 }
@@ -328,7 +330,7 @@ async function loadSuggestions(){
   A.forEach(function(p){cities[p.city]=(cities[p.city]||0)+1;types[p.type]=(types[p.type]||0)+1;if(p.facing)facings[p.facing]=(facings[p.facing]||0)+1});
   var topCity=Object.keys(cities).sort(function(a,b){return cities[b]-cities[a]})[0];
   var topType=Object.keys(types).sort(function(a,b){return types[b]-types[a]})[0];
-  list.innerHTML='<div class="af-sug-card">📊 <b>متوسط السعر:</b> '+fmt(avgPrice)+' ر.س في '+A.length+' عقار</div><div class="af-sug-card">🏙️ <b>أكثر مدينة:</b> '+topCity+' ('+cities[topCity]+' عقار)</div><div class="af-sug-card">🏠 <b>أكثر نوع:</b> '+topType+' ('+types[topType]+' عقار)</div>';
+  list.innerHTML='<div class="af-sug-card">📊 <b>متوسط السعر:</b> '+fmt(avgPrice)+' ر.س في '+A.length+' عقار</div><div class="af-sug-card">🏙️ <b>أكثر مدينة:</b> '+esc(topCity)+' ('+esc(cities[topCity])+' عقار)</div><div class="af-sug-card">🏠 <b>أكثر نوع:</b> '+esc(topType)+' ('+esc(types[topType])+' عقار)</div>';
 }
 
 async function toggleFav(id,e){
@@ -363,14 +365,15 @@ function showDetail(id){
   var imgs=(p.images&&p.images.length)?p.images:[pFallback(p)];
   var tb3d=(p.tourUrl||p.matterport||p.tour3d)?'<button class="gal-360btn" onclick="openVR(currentDetailImages)">🕶️ جولة 3D</button>':'';
   var tb360=imgs.length?'<button class="gal-360btn" onclick="openVR(currentDetailImages)">🌐 جولة 360°</button>':'';
+  var eid=esc(p.id),et=esc(p.title),el=esc(pLoc(p)),ep=esc(pPrice(p)),efb=esc(pFallback(p));
   var html='<button class="cls" onclick="closeD()">×</button>';
-  html+='<div class="ov-gal" id="og">'+imgs.map(function(s,i){return'<img src="'+s+'" '+(i===0?'class="on"':'')+' onerror="this.onerror=null;this.src=\''+pFallback(p)+'\'">'}).join('')+(imgs.length>1?'<button class="gal-nav gal-n" onclick="gNav(1)">›</button><button class="gal-nav gal-p" onclick="gNav(-1)">‹</button>':'')+'<div class="gal-c">📷 '+imgs.length+' صور</div>'+tb3d+tb360+'</div>';
+  html+='<div class="ov-gal" id="og">'+imgs.map(function(s,i){return'<img src="'+esc(s)+'" '+(i===0?'class="on"':'')+' onerror="this.onerror=null;this.src=\''+efb+'\'">'}).join('')+(imgs.length>1?'<button class="gal-nav gal-n" onclick="gNav(1)">›</button><button class="gal-nav gal-p" onclick="gNav(-1)">‹</button>':'')+'<div class="gal-c">📷 '+imgs.length+' صور</div>'+tb3d+tb360+'</div>';
   currentDetailImages=imgs;
-  html+='<span class="db db-'+tCls(p.trust)+'">'+tLbl(p.trust)+'</span>';
-  html+='<div class="dt">'+p.title+'</div><div class="dl">📍 '+pLoc(p)+'</div><div class="dp">'+pPrice(p)+'</div><div id="avm-chip-'+p.id+'"></div>';
-  html+='<div class="sp"><div class="si"><div class="si-v">'+fmt(p.area)+' م²</div><div class="si-l">المساحة</div></div><div class="si"><div class="si-v">'+(p.rooms||'—')+'</div><div class="si-l">الغرف</div></div><div class="si"><div class="si-v">'+(p.baths||'—')+'</div><div class="si-l">الحمامات</div></div><div class="si"><div class="si-v">'+(p.cars||'—')+'</div><div class="si-l">مواقف</div></div>'+(p.type==='فيلا'&&p.apartments?'<div class="si"><div class="si-v">'+p.apartments+'</div><div class="si-l">الشقق</div></div>':'')+'<div class="si"><div class="si-v">'+(p.facing||'—')+'</div><div class="si-l">الواجهة</div></div><div class="si"><div class="si-v">'+(p.year||'—')+'</div><div class="si-l">البناء</div></div></div>';
-  if(p.features&&p.features.length){html+='<div class="fd"><h3>المميزات</h3><div class="fch">'+p.features.map(function(f){return'<span style="padding:6px 12px;border-radius:999px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.15);font-size:11px;color:var(--m)">'+f+'</span>'}).join('')+'</div></div>'}
-  if(p.desc){html+='<div class="desc"><h3>الوصف</h3><p>'+p.desc+'</p></div>'}
+  html+='<span class="db db-'+tCls(p.trust)+'">'+esc(tLbl(p.trust))+'</span>';
+  html+='<div class="dt">'+et+'</div><div class="dl">📍 '+el+'</div><div class="dp">'+ep+'</div><div id="avm-chip-'+eid+'"></div>';
+  html+='<div class="sp"><div class="si"><div class="si-v">'+esc(fmt(p.area))+' م²</div><div class="si-l">المساحة</div></div><div class="si"><div class="si-v">'+esc(p.rooms||'—')+'</div><div class="si-l">الغرف</div></div><div class="si"><div class="si-v">'+esc(p.baths||'—')+'</div><div class="si-l">الحمامات</div></div><div class="si"><div class="si-v">'+esc(p.cars||'—')+'</div><div class="si-l">مواقف</div></div>'+(p.type==='فيلا'&&p.apartments?'<div class="si"><div class="si-v">'+esc(p.apartments)+'</div><div class="si-l">الشقق</div></div>':'')+'<div class="si"><div class="si-v">'+esc(p.facing||'—')+'</div><div class="si-l">الواجهة</div></div><div class="si"><div class="si-v">'+esc(p.year||'—')+'</div><div class="si-l">البناء</div></div></div>';
+  if(p.features&&p.features.length){html+='<div class="fd"><h3>المميزات</h3><div class="fch">'+p.features.map(function(f){return'<span style="padding:6px 12px;border-radius:999px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.15);font-size:11px;color:var(--m)">'+esc(f)+'</span>'}).join('')+'</div></div>'}
+  if(p.desc){html+='<div class="desc"><h3>الوصف</h3><p>'+esc(p.desc)+'</p></div>'}
   var vtTour=p.tourUrl||p.matterport||p.tour3d;
   var vtPano=p.panoramicImage||p.pano||p.panoUrl;
   var vtModel=p.model3dUrl||p.model3d||null;
@@ -381,10 +384,10 @@ function showDetail(id){
   html+='<div class="vt-body" id="vt-plan" style="display:none"></div>';
   html+='<div class="vt-body" id="vt-in"'+(defMode==='in'?'':' style="display:none"')+'></div>';
   html+='</div>';
-  html+='<div id="pulse-card-'+p.id+'"><div class="load" style="padding:16px">جاري تحميل مؤشر نبض الحي...</div></div>'
+  html+='<div id="pulse-card-'+eid+'"><div class="load" style="padding:16px">جاري تحميل مؤشر نبض الحي...</div></div>'
   var ph=(p.agent&&p.agent.phone)?p.agent.phone.replace(/[^0-9]/g,''):'';
-  html+='<div class="ag"><div class="ag-n">'+(p.agent&&p.agent.name||'دارك وحيك')+'</div><div class="ag-r">'+(p.agent&&p.agent.role||'بائع مباشر')+'</div><div id="ag-rating-'+p.id+'"></div><div class="ag-b">'+(ph?'<button class="ag-btn ag-w" onclick="contactAgent(\''+ph+'\',\'wa\')">💬 واتساب</button><button class="ag-btn ag-c" onclick="contactAgent(\''+ph+'\',\'tel\')">📞 اتصال</button>':'')+'</div></div>';
-  html+='<div class="dacts"><button class="dbt s" onclick="openAVM(currentDetail)">🧮 قيمة تقديرية</button><button class="dbt s" onclick="openAIP(currentDetail)">🤖 تحليل السعر</button>'+(p.lat&&p.lng?'<button class="dbt s" onclick="open3D(currentDetail)">🏗️ عرض 3D</button>':'')+'<button class="dbt s" onclick="shareProp('+p.id+')">📤 مشاركة</button><button class="dbt d" onclick="reportAd('+p.id+')">🚩 بلاغ</button></div>';
+  html+='<div class="ag"><div class="ag-n">'+esc(p.agent&&p.agent.name||'دارك وحيك')+'</div><div class="ag-r">'+esc(p.agent&&p.agent.role||'بائع مباشر')+'</div><div id="ag-rating-'+eid+'"></div><div class="ag-b">'+(ph?'<button class="ag-btn ag-w" onclick="contactAgent(\''+ph+'\',\'wa\')">💬 واتساب</button><button class="ag-btn ag-c" onclick="contactAgent(\''+ph+'\',\'tel\')">📞 اتصال</button>':'')+'</div></div>';
+  html+='<div class="dacts"><button class="dbt s" onclick="openAVM(currentDetail)">🧮 قيمة تقديرية</button><button class="dbt s" onclick="openAIP(currentDetail)">🤖 تحليل السعر</button>'+(p.lat&&p.lng?'<button class="dbt s" onclick="open3D(currentDetail)">🏗️ عرض 3D</button>':'')+'<button class="dbt s" onclick="shareProp('+eid+')">📤 مشاركة</button><button class="dbt d" onclick="reportAd('+eid+')">🚩 بلاغ</button></div>';
   var dp=document.getElementById('detailPage');
   if(dp){
     dp.innerHTML='<div class="detail-page-inner">'+html+'</div>';
@@ -530,7 +533,7 @@ function openRatingOv(advId,propId){
   var name=p.agent&&p.agent.name||'المعلن';
   var html='<button class="cls" onclick="closeOv()">×</button><div style="padding-top:44px;text-align:center">';
   html+='<div style="font-size:28px;margin-bottom:6px">⭐</div>';
-  html+='<div style="font-size:15px;font-weight:700;color:var(--t);margin-bottom:4px">تقييم '+name+'</div>';
+  html+='<div style="font-size:15px;font-weight:700;color:var(--t);margin-bottom:4px">تقييم '+esc(name)+'</div>';
   html+='<div style="font-size:11px;color:var(--m);margin-bottom:16px">اختر تقييمك من 1 إلى 5 نجوم</div>';
   html+='<div style="display:flex;justify-content:center;gap:6px;margin-bottom:16px">';
   for(var i=1;i<=5;i++){html+='<span id="rs-'+i+'" onclick="selectRating('+i+')" style="font-size:32px;cursor:pointer;color:var(--m);transition:color .15s">☆</span>'}
@@ -562,11 +565,11 @@ function fetchPulse(p){
     var metro='',projects='';
     if(px.metro_stations&&px.metro_stations.length){
       metro='<div style="margin-bottom:8px"><div style="font-size:11px;color:var(--g);font-weight:600;margin-bottom:6px">🚇 أقرب محطات المترو</div>'+
-        px.metro_stations.map(function(m){return'<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--m);padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.02);margin-bottom:4px"><span style="width:8px;height:8px;border-radius:50%;background:'+(m.line==='الأزرق'?'#2196f3':'#ef5350')+';flex-shrink:0"></span><span style="flex:1">'+m.name+'</span><span style="color:var(--green);font-weight:600">'+m.distance+'</span><span style="font-size:9px;color:var(--m)">'+m.year+'</span></div>'}).join('')+'</div>';
+        px.metro_stations.map(function(m){return'<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--m);padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.02);margin-bottom:4px"><span style="width:8px;height:8px;border-radius:50%;background:'+(m.line==='الأزرق'?'#2196f3':'#ef5350')+';flex-shrink:0"></span><span style="flex:1">'+esc(m.name)+'</span><span style="color:var(--green);font-weight:600">'+esc(m.distance)+'</span><span style="font-size:9px;color:var(--m)">'+esc(m.year)+'</span></div>'}).join('')+'</div>';
     }
     if(px.nearby_projects&&px.nearby_projects.length){
       projects='<div style="margin-bottom:8px"><div style="font-size:11px;color:var(--g);font-weight:600;margin-bottom:6px">🏗️ مشاريع كبرى قريبة</div>'+
-        px.nearby_projects.map(function(m){return'<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--m);padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.02);margin-bottom:4px"><span>'+m.name+'</span><span style="flex:1"></span><span style="color:var(--blue)">'+m.distance+'</span></div>'}).join('')+'</div>';
+        px.nearby_projects.map(function(m){return'<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--m);padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.02);margin-bottom:4px"><span>'+esc(m.name)+'</span><span style="flex:1"></span><span style="color:var(--blue)">'+esc(m.distance)+'</span></div>'}).join('')+'</div>';
     }
     var growth=px.future_value_growth?('<span style="color:var(--green)">+'+px.future_value_growth+'%</span>'):'—';
     var roiColor=px.roi>7?'var(--green)':px.roi>5?'var(--g)':'var(--red)';
@@ -594,7 +597,7 @@ function fetchPulse(p){
     var sb=px.sports_boulevard?'<div style="display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);font-size:11px;color:var(--green);margin-bottom:8px">🏃 يمر بالحي <strong>المسار الرياضي</strong> — جودة حياة أعلى</div>':'';
     document.getElementById('pulse-card-'+p.id).innerHTML='<div class="fd"><h3>📊 مؤشر نبض الحي الذكي</h3><div style="background:rgba(8,9,14,.95);border:1px solid rgba(212,175,55,.15);border-radius:var(--r);padding:14px;animation:pulseIn .4s ease">'+
       '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;padding:10px;border-radius:10px;background:'+scoreBg+';border:1px solid '+scoreBorder+'"><div style="width:48px;height:48px;border-radius:50%;background:'+scoreColor+';color:#05060a;font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+pulseScore+'</div><div><div style="font-size:14px;font-weight:700;color:'+scoreColor+'">مؤشر نبض الحي: '+scoreLabel+'</div><div style="font-size:10px;color:var(--m);margin-top:2px">تقييم شامل للحي بناءً على العائد، النمو، جودة الحياة</div></div></div>'+
-      sb+cards+metro+projects+'<div style="font-size:9px;color:var(--m);text-align:left;margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,.04)">📊 '+px.data_source+'</div></div></div>';
+      sb+cards+metro+projects+'<div style="font-size:9px;color:var(--m);text-align:left;margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,.04)">📊 '+esc(px.data_source)+'</div></div></div>';
   }).catch(function(){document.getElementById('pulse-card-'+p.id).innerHTML=''});
 }
 function closeD(){destroyVT();var dp=document.getElementById('detailPage');if(dp&&document.querySelector('#detailPage .detail-page-inner')){if(history.length>1)history.back();else window.location.href='dashboard.html';return}document.getElementById('ov').classList.remove('open');document.body.style.overflow=''}

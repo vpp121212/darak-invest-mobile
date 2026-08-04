@@ -64,10 +64,15 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
   }
 
   static List<String> _urls(String raw) {
+    // الروابط يجب أن تكون http(s) حرفياً وخالية من أي محارف هجومية
+    // (اقتباسات/أقواس/مسافات) حتى لا تُستخدم لحقن HTML/JS في العارضين.
+    final dangerous = RegExp(r'''[\s"'`<>]''');
     return raw
         .split(RegExp(r'[\s,;]+'))
         .map((e) => e.trim())
-        .where((e) => RegExp(r'^https?://', caseSensitive: false).hasMatch(e))
+        .where((e) =>
+            RegExp(r'^https?://', caseSensitive: false).hasMatch(e) &&
+            !dangerous.hasMatch(e))
         .toList();
   }
 
