@@ -1,4 +1,4 @@
-const CACHE_NAME = 'darak-v11';
+const CACHE_NAME = 'darak-v12';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
