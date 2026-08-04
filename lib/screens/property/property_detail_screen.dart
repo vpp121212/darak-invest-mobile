@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -109,7 +110,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
       pinned: true,
       backgroundColor: bgDark,
       leading: GestureDetector(
-        onTap: () => Navigator.pop(context),
+        onTap: () => context.pop(),
         child: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
@@ -422,7 +423,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 child: _buildAiToolButton(
                   icon: Icons.calculate_outlined,
                   label: 'تقدير السعر',
-                  onTap: () => Navigator.pushNamed(context, '/estimate', arguments: _property),
+                  onTap: () => context.push('/estimate', extra: _property),
                 ),
               ),
               const SizedBox(width: 8),
@@ -430,7 +431,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 child: _buildAiToolButton(
                   icon: Icons.location_city,
                   label: 'نبض الحي',
-                  onTap: () => Navigator.pushNamed(context, '/pulse', arguments: _property.district),
+                  onTap: () => context.push('/pulse', extra: _property.district),
                 ),
               ),
               const SizedBox(width: 8),
@@ -438,7 +439,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 child: _buildAiToolButton(
                   icon: Icons.trending_up,
                   label: 'حاسبة ROI',
-                  onTap: () => Navigator.pushNamed(context, '/roi', arguments: _property),
+                  onTap: () => context.push('/roi', extra: _property),
                 ),
               ),
             ],
@@ -739,7 +740,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
   }
 
   void _openSimilar(Property p) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => PropertyDetailScreen(property: p)));
+    context.push('/property', extra: p);
   }
 
   Future<void> _share() async {

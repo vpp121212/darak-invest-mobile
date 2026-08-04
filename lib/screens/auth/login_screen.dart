@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../providers/auth_provider.dart';
@@ -33,7 +34,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           _passwordController.text,
         );
     if (success && mounted) {
-      Navigator.pushReplacementNamed(context, '/dashboard');
+      context.go('/dashboard');
     }
   }
 
@@ -243,7 +244,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       children: [
         Text('ليس لديك حساب؟ ', style: GoogleFonts.cairo(color: textMuted, fontSize: 14)),
         GestureDetector(
-          onTap: () => Navigator.pushNamed(context, '/register'),
+          onTap: () => context.push('/register'),
           child: Text('سجل الآن', style: GoogleFonts.cairo(color: gold, fontSize: 14, fontWeight: FontWeight.bold)),
         ),
       ],

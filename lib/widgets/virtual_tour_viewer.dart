@@ -177,7 +177,7 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
     // (10k+ بكسل) ذاكرة الجهاز — العرض النهائي لا يتجاوز عرض الشاشة.
     final provider = ResizeImage(
       CachedNetworkImageProvider(url),
-      maxWidth: _maxTextureWidth,
+      width: _maxTextureWidth,
     );
     final stream = provider.resolve(ImageConfiguration.empty);
     final completer = Completer<ui.Image>();

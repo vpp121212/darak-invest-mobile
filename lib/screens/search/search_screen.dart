@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../models/property.dart';
 import '../../providers/search_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/property_card.dart';
-import '../property/property_detail_screen.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -392,7 +392,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 title: Text(item, style: GoogleFonts.cairo(color: textLight)),
                 onTap: () {
                   onTap(item);
-                  Navigator.pop(ctx);
+                  context.pop();
                 },
               )),
           const SizedBox(height: 16),
@@ -464,10 +464,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   void _openDetail(Property property) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => PropertyDetailScreen(property: property)),
-    );
+    context.push('/property', extra: property);
   }
 
   String _formatNumber(num value) {

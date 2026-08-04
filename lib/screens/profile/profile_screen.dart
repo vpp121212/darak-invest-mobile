@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -29,13 +30,13 @@ class ProfileScreen extends ConsumerWidget {
           Text('أدوات ذكية', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           _buildMenuItem(Icons.calculate_outlined, 'تقدير السعر الذكي', 'نموذج AI لتقييم العقار', () {
-            Navigator.pushNamed(context, '/estimate');
+            context.push('/estimate');
           }),
           _buildMenuItem(Icons.trending_up, 'حاسبة ROI / التدفق النقدي', 'العائد المتوقع على الاستثمار', () {
-            Navigator.pushNamed(context, '/roi');
+            context.push('/roi');
           }),
           _buildMenuItem(Icons.location_city, 'نبض الحي', 'تحليلات الأحياء والأسعار', () {
-            Navigator.pushNamed(context, '/pulse');
+            context.push('/pulse');
           }),
           const SizedBox(height: 24),
           Text('عام', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
@@ -81,7 +82,7 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
             GestureDetector(
-              onTap: () => Navigator.pushNamed(context, '/login'),
+              onTap: () => context.push('/login'),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(

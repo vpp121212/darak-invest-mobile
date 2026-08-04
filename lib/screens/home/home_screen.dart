@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../models/property.dart';
 import '../../providers/properties_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/property_card.dart';
-import '../property/property_detail_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -91,10 +91,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _openDetail(Property property) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => PropertyDetailScreen(property: property)),
-    );
+    context.push('/property', extra: property);
   }
 
   void _showComingSoon(String feature) {
@@ -105,7 +102,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildSearchBar() {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, '/search'),
+      onTap: () => context.push('/search'),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
@@ -264,7 +261,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     : null,
                 onTap: () {
                   onSelected(item);
-                  Navigator.pop(ctx);
+                  context.pop();
                 },
               )),
           const SizedBox(height: 16),
@@ -283,7 +280,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       children: tools.map((tool) {
         return Expanded(
           child: GestureDetector(
-            onTap: () => Navigator.pushNamed(context, tool.$3),
+            onTap: () => context.push(tool.$3),
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 4),
               padding: const EdgeInsets.symmetric(vertical: 14),

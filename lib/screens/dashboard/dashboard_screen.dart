@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/utils/formatters.dart';
@@ -7,7 +8,6 @@ import '../../models/property.dart';
 import '../../providers/properties_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/property_card.dart';
-import '../property/property_detail_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -87,7 +87,7 @@ class _DashboardContent extends StatelessWidget {
         const SizedBox(height: 12),
         ...cheapestTop.map((p) => PropertyCard(
               property: p,
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PropertyDetailScreen(property: p))),
+              onTap: () => context.push('/property', extra: p),
             )),
         const SizedBox(height: 24),
       ],

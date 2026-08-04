@@ -3,12 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'screens/ai/estimate_screen.dart';
-import 'screens/ai/pulse_screen.dart';
-import 'screens/ai/roi_screen.dart';
-import 'screens/auth/login_screen.dart';
-import 'screens/auth/register_screen.dart';
-import 'screens/root/app_shell.dart';
+import 'core/router/app_router.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -25,7 +20,7 @@ class DarakApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'دارك وحيك',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
@@ -40,14 +35,7 @@ class DarakApp extends StatelessWidget {
         textDirection: TextDirection.rtl,
         child: child!,
       ),
-      home: const AppShell(),
-      routes: {
-        '/login': (_) => const LoginScreen(),
-        '/register': (_) => const RegisterScreen(),
-        '/estimate': (_) => const EstimateScreen(),
-        '/roi': (_) => const RoiScreen(),
-        '/pulse': (_) => const PulseScreen(),
-      },
+      routerConfig: appRouter,
     );
   }
 }

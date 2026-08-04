@@ -18,7 +18,7 @@ class PropertiesNotifier extends StateNotifier<AsyncValue<List<Property>>> {
 
   Future<void> load() async {
     state = const AsyncValue.loading();
-    final List<Property> apiList;
+    List<Property> apiList;
     try {
       apiList = await ApiService.getProperties();
     } catch (_) {

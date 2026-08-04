@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../providers/auth_provider.dart';
@@ -64,10 +65,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!mounted) return;
     if (success) {
       if (ref.read(authProvider).isLoggedIn) {
-        Navigator.pushReplacementNamed(context, '/dashboard');
+        context.go('/dashboard');
       } else {
         _snack('تم إنشاء الحساب، سجّل دخولك الآن');
-        Navigator.pushReplacementNamed(context, '/login');
+        context.go('/login');
       }
     }
   }
@@ -358,7 +359,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       children: [
         Text('لديك حساب بالفعل؟ ', style: GoogleFonts.cairo(color: textMuted, fontSize: 14)),
         GestureDetector(
-          onTap: () => Navigator.pop(context),
+          onTap: () => context.pop(),
           child: Text('سجّل دخول', style: GoogleFonts.cairo(color: gold, fontSize: 14, fontWeight: FontWeight.bold)),
         ),
       ],

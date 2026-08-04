@@ -1,0 +1,12 @@
+# Project Guidelines for OpenCode
+
+
+## Tech Stack
+- Framework: Flutter / Dart
+- Architecture: Clean Architecture
+
+
+## Coding Rules
+- Follow clean architecture principles (data, domain, presentation layers).
+- Write strict types and avoid using `dynamic` where possible.
+- Ensure all environment configurations use `EnvConfig`.

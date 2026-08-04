@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/utils/formatters.dart';
@@ -69,7 +70,7 @@ class _RoiScreenState extends State<RoiScreen> {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_forward, color: textLight),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
       ),
       body: GestureDetector(
