@@ -250,7 +250,25 @@ function loadSources(){
 function toggleAdvFilters(){
   var el=document.getElementById('advFilters');
   el.classList.toggle('open');
-  if(el.classList.contains('open')&&A.length){loadSuggestions()}
+  if(el.classList.contains('open')){
+    syncDistrictFilter();
+    if(A.length){loadSuggestions()}
+  }
+}
+function syncDistrictFilter(){
+  var sel=document.getElementById('af-district');
+  if(!sel)return;
+  var prev=sel.value;
+  var c=document.getElementById('hc')?document.getElementById('hc').value:'';
+  var groups=window.getDistrictGroups?getDistrictGroups(c):[];
+  var html='<option value="">الكل</option>';
+  groups.forEach(function(m){
+    html+='<optgroup label="'+m.municipality_ar+'">';
+    (m.districts||[]).forEach(function(d){html+='<option value="'+d.name_ar+'">'+d.name_ar+'</option>'});
+    html+='</optgroup>';
+  });
+  sel.innerHTML=html;
+  if(prev&&groups.some(function(m){return(m.districts||[]).some(function(d){return d.name_ar===prev})}))sel.value=prev;
 }
 document.querySelectorAll('.af-chip').forEach(function(chip){
   chip.addEventListener('click',function(){
@@ -268,6 +286,7 @@ function resetFilters(){
   document.getElementById('hc').value='';
   document.getElementById('ht').value='';
   document.getElementById('hp').value='';
+  if(document.getElementById('af-district'))document.getElementById('af-district').value='';
   document.getElementById('af-minPrice').value='';
   document.getElementById('af-maxPrice').value='';
   document.getElementById('af-minArea').value='';
@@ -282,6 +301,7 @@ async function doSearch(){
   var q=(document.getElementById('hq').value||'').toLowerCase();
   var c=document.getElementById('hc').value;
   var t=document.getElementById('ht').value;
+  var district=document.getElementById('af-district')?document.getElementById('af-district').value:'';
   var mp=Number(document.getElementById('hp').value);
   var minP=Number(document.getElementById('af-minPrice').value)||0;
   var maxP=Number(document.getElementById('af-maxPrice').value)||mp;
@@ -300,7 +320,7 @@ async function doSearch(){
   ['af-f-pool','af-f-elev','af-f-garage','af-f-ac','af-f-kitchen','af-f-furnished','af-f-entrance','af-f-roof'].forEach(function(id){
     var el=document.getElementById(id);if(el&&el.checked)features.push(el.value);
   });
-  var hasFilters=q||c||t||minP||maxP||minA||maxA||purpose||rooms||baths||apartments||facing||age||sort||streetW||cars||features.length;
+  var hasFilters=q||c||t||district||minP||maxP||minA||maxA||purpose||rooms||baths||apartments||facing||age||sort||streetW||cars||features.length;
   if(!hasFilters){render();return}
   var params=new URLSearchParams();
   if(q)params.set('q',q);
@@ -326,6 +346,7 @@ async function doSearch(){
     var results=d.properties.map(function(p){
       return Object.assign({},p,{loc:p.loc||(p.district+'، '+p.city),status:p.isFeatured?'حصري':'متاح',agent:p.agent||{name:p.agentName||'مكتب الديار العقارية',role:'وسيط مرخص',phone:p.agentPhone||'+966501234567'}});
     });
+    if(district){results=results.filter(function(p){var nd=normalizeDistrict(p.district);return nd===district||nd.indexOf(district)>-1})}
     if(sort==='nearest'&&navigator.geolocation){
       navigator.geolocation.getCurrentPosition(function(pos){
         results.sort(function(a,b){
@@ -348,6 +369,7 @@ async function doSearch(){
       if(facing&&p.facing!==facing)return false;
       if(streetW&&p.streetW<streetW)return false;
       if(cars&&p.cars<cars)return false;
+      if(district){var nd=normalizeDistrict(p.district);if(nd!==district&&nd.indexOf(district)===-1)return false}
       if(features.length){var pf=p.features||[];if(!features.every(function(f){return pf.indexOf(f)>-1}))return false}
       if(q){var s=(p.title+' '+p.loc+' '+p.city+' '+p.district+' '+p.type+' '+(p.desc||'')).toLowerCase();if(s.indexOf(q)===-1)return false}
       return true;
@@ -2511,8 +2533,18 @@ function updateFinRate(){
 }
 
 /* ADD PROPERTY */
+function fillDistrictsList(dl,city){
+  if(!dl)return false;
+  var names=window.getDistrictNames?getDistrictNames(city):[];
+  if(names.length){
+    dl.innerHTML=names.map(function(x){return '<option value="'+x+'">'}).join('');
+    return true;
+  }
+  return false;
+}
 async function fetchDistricts(){
   var city=document.getElementById('ap-city')?document.getElementById('ap-city').value:'';
+  if(fillDistrictsList(document.getElementById('districts-list'),city))return;
   try{
     var url='/search/districts';
     if(city)url+='?city='+encodeURIComponent(city);
@@ -2525,6 +2557,7 @@ async function fetchDistricts(){
 }
 async function fetchMktDistricts(){
   var city=document.getElementById('mkt-city')?document.getElementById('mkt-city').value:'';
+  if(fillDistrictsList(document.getElementById('mkt-districts-list'),city))return;
   try{
     var url='/search/districts';
     if(city)url+='?city='+encodeURIComponent(city);

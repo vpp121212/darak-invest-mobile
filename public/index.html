@@ -35,7 +35,7 @@
     </div>
     <div class="srch">
       <input type="text" id="hq" placeholder="ابحث بالاسم أو المنطقة...">
-      <div class="srch-row"><select id="hc"><option value="">المدينة</option></select><select id="ht" onchange="toggleApartmentsFilter()"><option value="">النوع</option><option>فيلا</option><option>شقة</option><option>أرض</option><option>مكتب</option><option>محل</option><option>بنتهاوس</option><option>قصر</option><option>شاليه</option><option>دوبلكس</option><option>مزرعة</option></select><select id="hp"><option value="">السعر الأقصى</option><option value="500000">أقل من 500,000</option><option value="1000000">أقل من 1,000,000</option><option value="2000000">أقل من 2,000,000</option><option value="5000000">أقل من 5,000,000</option></select></div>
+      <div class="srch-row"><select id="hc" onchange="syncDistrictFilter()"><option value="">المدينة</option></select><select id="ht" onchange="toggleApartmentsFilter()"><option value="">النوع</option><option>فيلا</option><option>شقة</option><option>أرض</option><option>مكتب</option><option>محل</option><option>بنتهاوس</option><option>قصر</option><option>شاليه</option><option>دوبلكس</option><option>مزرعة</option></select><select id="hp"><option value="">السعر الأقصى</option><option value="500000">أقل من 500,000</option><option value="1000000">أقل من 1,000,000</option><option value="2000000">أقل من 2,000,000</option><option value="5000000">أقل من 5,000,000</option></select></div>
       <button class="srch-adv-btn" onclick="toggleAdvFilters()">⚙️ فلاتر متقدمة</button>
       <button class="srch-btn" onclick="doSearch()">🔍 بحث</button>
     </div>
@@ -55,6 +55,12 @@
         <div class="af-row">
           <select id="af-purpose" class="af-select"><option value="">الغرض</option><option>بيع</option><option>إيجار</option></select>
         </div>
+      </div>
+
+      <!-- District -->
+      <div class="af-section">
+        <div class="af-label">الحي (حسب المدينة المختارة)</div>
+        <select id="af-district" class="af-select full"><option value="">الكل</option></select>
       </div>
 
       <!-- Area Range -->
@@ -1242,6 +1248,7 @@
   <div class="ios-hint" id="ios"><button class="close-ios" onclick="document.getElementById('ios').style.display='none'">×</button>للتثبيت: اضغط زر المشاركة <b>⬆</b> ثم "إضافة إلى الشاشة الرئيسية"</div>
   <footer class="ft"><div class="wrap">دارك وحيك © 2026 — جميع الحقوق محفوظة · بإدارة المهندس / سعد الرويس · <a href="#" onclick="nav('legal');return false" style="color:var(--g)">الصفحة القانونية</a></div></footer>
   <script src="js/firebase-config.js"></script>
+  <script src="js/districts-data.js"></script>
   <script src="js/core.js"></script>
   <script src="js/app.js"></script>
   <script src="js/auth-legacy.js"></script>
