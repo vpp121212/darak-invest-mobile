@@ -2694,16 +2694,21 @@ var FALLBACK=[
 ];
 
 async function loadProperties(){
+  applyProps(normProps(FALLBACK));
   var d=null;
-  for(var attempt=0;attempt<4;attempt++){
-    d=await api('/properties/all');
+  for(var attempt=0;attempt<2;attempt++){
+    try{
+      var ctl=new AbortController();
+      var to=setTimeout(function(){ctl.abort()},8000);
+      var r=await fetch(API+'/properties/all',{signal:ctl.signal});
+      clearTimeout(to);
+      d=r.ok?(await r.json().catch(function(){return null})):null;
+    }catch(e){d=null}
     if(d&&Array.isArray(d)&&d.length)break;
-    if(attempt<3)await new Promise(function(r){setTimeout(r,3000)});
+    if(attempt<1)await new Promise(function(r){setTimeout(r,800)});
   }
   if(d&&Array.isArray(d)&&d.length){
-    A=normProps(d).map(function(p){return Object.assign({},p,{loc:p.loc||(p.district+'، '+p.city),status:p.isFeatured?'حصري':'متاح',agent:p.agent||{name:p.agentName||'مكتب الديار العقارية',role:'وسيط مرخص',phone:p.agentPhone||'+966501234567'}})});
-  }else{
-    A=normProps(FALLBACK);
+    applyProps(normProps(d).map(function(p){return Object.assign({},p,{loc:p.loc||(p.district+'، '+p.city),status:p.isFeatured?'حصري':'متاح',agent:p.agent||{name:p.agentName||'مكتب الديار العقارية',role:'وسيط مرخص',phone:p.agentPhone||'+966501234567'}})}));
   }
   try{
     var lmap=JSON.parse(localStorage.getItem('darak_local_panos')||'{}');
@@ -2711,6 +2716,11 @@ async function loadProperties(){
       A.forEach(function(p){if(p&&lmap[p.id]!==undefined)p.panoramicImage=lmap[p.id]});
     }
   }catch(e){}
+  if(authToken){api('/auth/me').then(function(r){if(r&&r.success){user=r.user;updateUserUI()}}).catch(function(){})}
+  api('/market/overview').then(function(d){if(d&&d.success&&d.sama&&d.sama.repoRate){window._samaRate=d.sama.repoRate;updateFinRate()}}).catch(function(){});
+}
+function applyProps(list){
+  A=list;
   if(document.getElementById('pg'))render();
   if(document.getElementById('homeStats'))renderHomeSections();
   var sel=document.getElementById('hc');
@@ -2719,8 +2729,6 @@ async function loadProperties(){
     sel.innerHTML='<option value="">المدينة</option>';
     cs.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o)});
   }
-  if(authToken){api('/auth/me').then(function(r){if(r&&r.success){user=r.user;updateUserUI()}}).catch(function(){})}
-  api('/market/overview').then(function(d){if(d&&d.success&&d.sama&&d.sama.repoRate){window._samaRate=d.sama.repoRate;updateFinRate()}}).catch(function(){});
 }
 loadProperties();
 var payParam=new URLSearchParams(location.search).get('payment');

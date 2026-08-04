@@ -1,5 +1,5 @@
 var A=[],F=JSON.parse(localStorage.getItem('darak_favs')||'[]'),cur='',user=null,mapInstance=null,currentDetailImages=[];
-var API='https://darak-invest-backend-j6hy.onrender.com/api';
+var API='https://darak-invest-production.up.railway.app/api';
 if(location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.port==='5000'||location.hostname.indexOf('trycloudflare')>-1){API=location.origin+'/api';}
 if(location.hostname==='darak-invest-backend-j6hy.onrender.com'){API=location.origin+'/api';}
 if(window.location.protocol==='file:'){API='http://172.20.10.3:5000/api';}
@@ -16,7 +16,7 @@ async function api(path,opts){
   var headers={'Content-Type':'application/json'};
   if(authToken)headers['Authorization']='Bearer '+authToken;
   try{
-    var r=await fetch(API+path,{...opts,headers:{...headers,...(opts&&opts.headers||{})},signal:AbortSignal.timeout?AbortSignal.timeout(30000):undefined});
+    var r=await fetch(API+path,{...opts,headers:{...headers,...(opts&&opts.headers||{})},signal:AbortSignal.timeout?AbortSignal.timeout(10000):undefined});
     var d=await r.json().catch(function(){return{}});
     if(!r.ok){return {error:fmtErr(d),code:d.code||'UNKNOWN',status:r.status}}
     return d;
