@@ -1,0 +1,115 @@
+<!DOCTYPE html><html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>دارك وحيك - لوحة التحكم الاستثمارية</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+
+  <div class="app-container">
+    
+    <!-- الهيدر والترحيب بالمستخدم -->
+    <div class="user-header">
+      <div>
+        <div class="welcome-text">مرحباً بك 👋</div>
+        <h2 id="user-display-name" class="user-name-title">جاري التحميل...</h2>
+      </div>
+      <button id="btn-logout" class="btn-logout-icon" title="تسجيل الخروج">🚪</button>
+    </div>
+
+
+    <!-- بطاقة المحفظة الاستثمارية الفاخرة -->
+    <div class="portfolio-card">
+      <div class="portfolio-label">رصيد المحفظة الاستثمارية</div>
+      <div class="portfolio-amount" id="balance-display">0.00 ر.س</div>
+      
+      <div class="portfolio-footer">
+        <div class="portfolio-growth">⬆ 14.2% نمو متوقع لمحافظ الأحياء</div>
+        <button id="btn-deposit" class="btn-deposit-action">+ إيداع رصيد</button>
+      </div>
+    </div>
+
+
+    <!-- قسم رادار الأحياء الخليجية والفرص الاستثمارية -->
+    <div class="section-header">
+      <h3>🌟 رادار الأحياء والفرص الواعدة</h3>
+    </div>
+
+
+    <!-- فرصة استثمارية 1: حي الملقا -->
+    <div class="gulf-radar-card">
+      <div class="radar-tag">📊 الأكثر طلباً في الرياض</div>
+      <div class="radar-header">
+        <div>
+          <h4>صندوق حي الملقا الاستثماري</h4>
+          <p class="radar-sub">مجمع تجاري وسكني فاخر</p>
+        </div>
+        <div class="roi-badge">+15.8% <span>عائد سنوياً</span></div>
+      </div>
+
+
+      <div class="funding-bar-container">
+        <div class="funding-info">
+          <span>نسبة تغطية الفرصة</span>
+          <strong>75% (3,750,000 ر.س)</strong>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 75%;"></div>
+        </div>
+      </div>
+
+
+      <div class="card-actions">
+        <button class="btn-invest-action" onclick="handleInvest('صندوق حي الملقا', 1000, '15.8%')">استثمر 1,000 ر.س</button>
+      </div>
+    </div>
+
+
+    <!-- فرصة استثمارية 2: حي النرجس -->
+    <div class="gulf-radar-card">
+      <div class="radar-tag">📈 حي واعد مرتفع النمو</div>
+      <div class="radar-header">
+        <div>
+          <h4>مخطط دارك - حي النرجس</h4>
+          <p class="radar-sub">تطوير أبراج سكنية ومكاتب</p>
+        </div>
+        <div class="roi-badge">+13.5% <span>عائد سنوياً</span></div>
+      </div>
+
+
+      <div class="funding-bar-container">
+        <div class="funding-info">
+          <span>نسبة تغطية الفرصة</span>
+          <strong>45% (2,250,000 ر.س)</strong>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 45%;"></div>
+        </div>
+      </div>
+
+
+      <div class="card-actions">
+        <button class="btn-invest-action" onclick="handleInvest('مخطط دارك - حي النرجس', 500, '13.5%')">استثمر 500 ر.س</button>
+      </div>
+    </div>
+
+
+    <!-- قائمة استثماراتي الحالية -->
+    <div class="section-header" style="margin-top: 25px;">
+      <h3>💼 محفظة استثماراتي القائمة</h3>
+    </div>
+
+
+    <div id="my-investments-list" class="investments-list-container">
+      <div class="empty-state">جاري جلب استثماراتك...</div>
+    </div>
+
+
+  </div>
+
+
+  <script src="js/portfolio.js"></script>
+</body>
+</html>
