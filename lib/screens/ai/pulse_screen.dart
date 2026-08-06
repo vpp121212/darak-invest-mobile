@@ -91,7 +91,7 @@ class _PulseScreenState extends ConsumerState<PulseScreen> {
               child: Center(
                 child: Text(
                   'اعرض نبض الحي',
-                  style: GoogleFonts.cairo(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.cairo(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ),

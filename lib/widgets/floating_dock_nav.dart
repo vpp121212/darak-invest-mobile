@@ -1,9 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../theme/app_theme.dart';
 
-/// Floating pill navigation dock — a modern "from scratch" mobile pattern.
+/// Floating frosted-glass pill dock — dark surface with an electric-lime
+/// active state, Nike Training Club style.
 class FloatingDockNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -32,30 +35,28 @@ class FloatingDockNav extends StatelessWidget {
         height: 68,
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
-          color: cardDark.withValues(alpha: 0.92),
+          color: glassFill,
           borderRadius: BorderRadius.circular(34),
-          border: Border.all(color: Colors.white, width: 1.5),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x33006B5E),
-              blurRadius: 28,
-              offset: Offset(0, 10),
-            ),
-          ],
+          border: Border.all(color: glassBorder),
+          boxShadow: softShadow,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: List.generate(5, (index) {
-            if (index == 2) {
-              return _AddButton(onTap: () => onTap(index));
-            }
-            return _DockItem(
-              icon: icons[index],
-              label: labels[index],
-              active: currentIndex == index,
-              onTap: () => onTap(index),
-            );
-          }),
+        clipBehavior: Clip.antiAlias,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(5, (index) {
+              if (index == 2) {
+                return _AddButton(onTap: () => onTap(index));
+              }
+              return _DockItem(
+                icon: icons[index],
+                label: labels[index],
+                active: currentIndex == index,
+                onTap: () => onTap(index),
+              );
+            }),
+          ),
         ),
       ),
     );
@@ -96,14 +97,12 @@ class _DockItem extends StatelessWidget {
               duration: const Duration(milliseconds: 220),
               padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
-                gradient: active
-                    ? const LinearGradient(colors: brandGradient)
-                    : null,
+                color: active ? primary : Colors.transparent,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
-                color: active ? Colors.white : textMuted,
+                color: active ? Colors.black : textMuted,
                 size: 20,
               ),
             ),
@@ -146,13 +145,13 @@ class _AddButton extends StatelessWidget {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Color(0x4D00A896),
+              color: Color(0x66CCFF00),
               blurRadius: 16,
               offset: Offset(0, 6),
             ),
           ],
         ),
-        child: const Icon(Icons.add, color: Colors.white, size: 32),
+        child: const Icon(Icons.add, color: Colors.black, size: 32),
       ),
     );
   }

@@ -80,7 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           SliverToBoxAdapter(child: _buildOfflineBanner(catalogue.error!)),
         ],
         SliverToBoxAdapter(child: _buildHeader('أحدث العقارات', catalogue.properties.length)),
-        SliverToBoxAdapter(child: _buildLatestCarousel(catalogue.properties)),
+        SliverToBoxAdapter(child: _InfinitePropertyLoop(properties: catalogue.properties)),
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
@@ -95,9 +95,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(
-                  '${filtered.length} عقار',
-                  style: GoogleFonts.cairo(color: textMuted, fontSize: 13),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: primarySoft,
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Text(
+                    '${filtered.length} عقار',
+                    style: GoogleFonts.cairo(color: primary, fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
             ),
@@ -133,17 +140,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: brandGradient,
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: primary,
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: const [
-                  BoxShadow(color: Color(0x3300A896), blurRadius: 12, offset: Offset(0, 4)),
+                  BoxShadow(color: Color(0x66CCFF00), blurRadius: 14, offset: Offset(0, 4)),
                 ],
               ),
-              child: const Icon(Icons.home_work_rounded, color: Colors.white, size: 24),
+              child: const Icon(Icons.home_work_rounded, color: Colors.black, size: 24),
             ),
             const SizedBox(width: 12),
             Column(
@@ -167,9 +170,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Container(
               width: 44,
               height: 44,
-              decoration: const BoxDecoration(
-                color: cardDark,
+              decoration: BoxDecoration(
+                color: glassFill,
                 shape: BoxShape.circle,
+                border: Border.all(color: glassBorder),
                 boxShadow: softShadow,
               ),
               child: IconButton(
@@ -190,13 +194,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         height: 200,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: brandGradient,
+            colors: [Color(0xFF161616), Color(0xFF1C1C1C)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: glassBorder),
           boxShadow: const [
-            BoxShadow(color: Color(0x4000A896), blurRadius: 26, offset: Offset(0, 12)),
+            BoxShadow(color: Color(0x4D000000), blurRadius: 26, offset: Offset(0, 12)),
+            BoxShadow(color: Color(0x24CCFF00), blurRadius: 30),
           ],
         ),
         clipBehavior: Clip.antiAlias,
@@ -210,7 +216,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 height: 140,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.14),
+                  color: primary.withValues(alpha: 0.10),
                 ),
               ),
             ),
@@ -222,7 +228,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 height: 150,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.10),
+                  color: cyan.withValues(alpha: 0.08),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 16,
+              right: 16,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: primarySoft,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Text(
+                  'تطوّرك يبدأ من هنا',
+                  style: GoogleFonts.cairo(color: primary, fontSize: 11, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -231,6 +252,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const SizedBox(height: 6),
                   Text(
                     'اعثر على بيت أحلامك',
                     style: GoogleFonts.cairo(
@@ -243,7 +265,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Text(
                     'عقارات موثّقة وأدوات ذكية لتقدير الأسعار والاستثمار',
                     style: GoogleFonts.cairo(
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: textMuted,
                       fontSize: 12,
                     ),
                   ),
@@ -253,15 +275,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: Container(
                       padding: const EdgeInsets.fromLTRB(16, 6, 6, 6),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: glassFill,
                         borderRadius: BorderRadius.circular(30),
+                        border: Border.all(color: glassBorder),
                         boxShadow: const [
-                          BoxShadow(color: Color(0x33000000), blurRadius: 14, offset: Offset(0, 6)),
+                          BoxShadow(color: Color(0x4D000000), blurRadius: 14, offset: Offset(0, 6)),
                         ],
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.search, color: textMuted, size: 22),
+                          const Icon(Icons.search, color: primary, size: 22),
                           const SizedBox(width: 10),
                           Text(
                             'ابحث عن عقارك المثالي...',
@@ -271,13 +294,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(colors: brandGradient),
+                              color: primary,
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: Text(
                               'بحث',
                               style: GoogleFonts.cairo(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -302,8 +325,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: cardDark,
+          color: glassFill,
           borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: glassBorder),
           boxShadow: softShadow,
         ),
         child: Row(
@@ -317,16 +341,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   duration: const Duration(milliseconds: 220),
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
-                    gradient: isSelected
-                        ? const LinearGradient(colors: brandGradient)
-                        : null,
+                    color: isSelected ? primary : Colors.transparent,
                     borderRadius: BorderRadius.circular(26),
+                    boxShadow: isSelected
+                        ? const [BoxShadow(color: Color(0x66CCFF00), blurRadius: 12)]
+                        : null,
                   ),
                   child: Center(
                     child: Text(
                       purpose,
                       style: GoogleFonts.cairo(
-                        color: isSelected ? Colors.white : textMuted,
+                        color: isSelected ? Colors.black : textMuted,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
@@ -379,9 +404,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: cardDark,
+          color: glassFill,
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: textMuted.withValues(alpha: 0.12)),
+          border: Border.all(color: glassBorder),
           boxShadow: softShadow,
         ),
         child: Row(
@@ -407,11 +432,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.red.withValues(alpha: 0.1),
+          color: red.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+          border: Border.all(color: red.withValues(alpha: 0.35)),
         ),
-        child: Text('مسح الفلاتر', style: GoogleFonts.cairo(color: Colors.red, fontSize: 13)),
+        child: Text('مسح الفلاتر', style: GoogleFonts.cairo(color: red, fontSize: 13)),
       ),
     );
   }
@@ -465,8 +490,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
-                  color: cardDark,
+                  color: glassFill,
                   borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: glassBorder),
                   boxShadow: softShadow,
                 ),
                 child: Column(
@@ -474,10 +500,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: brandGradient),
+                        color: primary,
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: Icon(tool.$2, color: Colors.white, size: 22),
+                      child: Icon(tool.$2, color: Colors.black, size: 22),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -504,18 +530,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.red.withValues(alpha: 0.08),
+          color: red.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.red.withValues(alpha: 0.25)),
+          border: Border.all(color: red.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
-            const Icon(Icons.cloud_off, color: Colors.red, size: 18),
+            const Icon(Icons.cloud_off, color: red, size: 18),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 'تعذّر تحديث البيانات — تعرض نسخة محفوظة/تجريبية',
-                style: GoogleFonts.cairo(color: Colors.red, fontSize: 12),
+                style: GoogleFonts.cairo(color: red, fontSize: 12),
               ),
             ),
           ],
@@ -534,32 +560,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             title,
             style: GoogleFonts.cairo(color: textLight, fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          Text('$count عقار', style: GoogleFonts.cairo(color: textMuted, fontSize: 13)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLatestCarousel(List<Property> properties) {
-    if (properties.isEmpty) return const SizedBox.shrink();
-    return SizedBox(
-      height: 360,
-      child: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-        scrollDirection: Axis.horizontal,
-        itemCount: properties.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 4),
-        itemBuilder: (context, index) {
-          final p = properties[index];
-          return SizedBox(
-            width: 280,
-            child: PropertyCard(
-              property: p,
-              onTap: () => _openDetail(p),
-              onFavorite: () => _showComingSoon('المفضلة'),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: primarySoft,
+              borderRadius: BorderRadius.circular(30),
             ),
-          );
-        },
+            child: Text('$count عقار', style: GoogleFonts.cairo(color: primary, fontSize: 12, fontWeight: FontWeight.bold)),
+          ),
+        ],
       ),
     );
   }
@@ -584,6 +593,84 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
+/// Seamless endless horizontal loop of property cards — scrolls continuously
+/// in either direction by wrapping around a repeated set.
+class _InfinitePropertyLoop extends StatefulWidget {
+  final List<Property> properties;
+
+  const _InfinitePropertyLoop({required this.properties});
+
+  @override
+  State<_InfinitePropertyLoop> createState() => _InfinitePropertyLoopState();
+}
+
+class _InfinitePropertyLoopState extends State<_InfinitePropertyLoop> {
+  static const _cardWidth = 280.0;
+  static const _gap = 4.0;
+  static const _cycles = 200;
+
+  late final ScrollController _controller;
+
+  double get _cycleExtent => widget.properties.length * (_cardWidth + _gap);
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = ScrollController(initialScrollOffset: _cycleExtent);
+    _controller.addListener(_wrap);
+  }
+
+  @override
+  void dispose() {
+    _controller
+      ..removeListener(_wrap)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _wrap() {
+    if (!_controller.hasClients) return;
+    final position = _controller.position;
+    final total = position.maxScrollExtent;
+    if (total <= 0) return;
+    if (position.pixels >= total - _cycleExtent) {
+      _controller.jumpTo(position.pixels - _cycleExtent);
+    } else if (position.pixels < _cycleExtent) {
+      _controller.jumpTo(position.pixels + _cycleExtent);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.properties.isEmpty) return const SizedBox.shrink();
+    return SizedBox(
+      height: 360,
+      child: ListView.separated(
+        controller: _controller,
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+        scrollDirection: Axis.horizontal,
+        itemCount: widget.properties.length * _cycles,
+        separatorBuilder: (_, __) => const SizedBox(width: _gap),
+        itemBuilder: (context, index) {
+          final p = widget.properties[index % widget.properties.length];
+          return SizedBox(
+            width: _cardWidth,
+            child: PropertyCard(
+              property: p,
+              onTap: () => context.pushRoute(PropertyDetailRoute(property: p)),
+              onFavorite: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('المفضلة — قريباً', style: GoogleFonts.cairo())),
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
 class _HomeSkeleton extends StatelessWidget {
   const _HomeSkeleton();
 
@@ -598,8 +685,9 @@ class _HomeSkeleton extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 16),
               height: 280,
               decoration: BoxDecoration(
-                color: cardDark,
+                color: glassFill,
                 borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: glassBorder),
                 boxShadow: softShadow,
               ),
               child: Center(
@@ -644,10 +732,10 @@ class _HomeError extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: brandGradient),
+                color: primary,
                 borderRadius: BorderRadius.circular(30),
               ),
-              child: Text('إعادة المحاولة', style: GoogleFonts.cairo(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+              child: Text('إعادة المحاولة', style: GoogleFonts.cairo(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)),
             ),
           ),
         ),

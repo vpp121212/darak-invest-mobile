@@ -179,7 +179,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
               child: Icon(
                 Icons.tune,
-                color: _showAdvanced ? Colors.white : primary,
+                color: _showAdvanced ? Colors.black : primary,
                 size: 22,
               ),
             ),
@@ -327,7 +327,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       child: Text(
                         isAny ? 'الكل' : '$roomCount',
                         style: GoogleFonts.cairo(
-                          color: isSelected ? Colors.white : textMuted,
+                          color: isSelected ? Colors.black : textMuted,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
@@ -349,7 +349,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 borderRadius: BorderRadius.circular(30),
               ),
               child: Center(
-                child: Text('تطبيق الفلاتر', style: GoogleFonts.cairo(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+                child: Text('تطبيق الفلاتر', style: GoogleFonts.cairo(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)),
               ),
             ),
           ),

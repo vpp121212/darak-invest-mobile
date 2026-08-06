@@ -226,15 +226,16 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                gradient: isRent
-                    ? const LinearGradient(colors: [blue, cyan])
-                    : const LinearGradient(colors: brandGradient),
+                color: isRent ? cyan : primary,
                 borderRadius: BorderRadius.circular(30),
+                boxShadow: const [
+                  BoxShadow(color: Color(0x66CCFF00), blurRadius: 10),
+                ],
               ),
               child: Text(
                 _property.purpose,
                 style: GoogleFonts.cairo(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
                 ),
@@ -257,15 +258,15 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF059669),
+                  color: success,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.verified, size: 14, color: Colors.white),
+                    const Icon(Icons.verified, size: 14, color: Colors.black),
                     const SizedBox(width: 4),
-                    Text('موثّق ${_property.trust}%', style: GoogleFonts.cairo(color: Colors.white, fontSize: 11)),
+                    Text('موثّق ${_property.trust}%', style: GoogleFonts.cairo(color: Colors.black, fontSize: 11, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -303,9 +304,9 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
-            color: cardDark,
+            color: glassFill,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: textMuted.withValues(alpha: 0.1)),
+            border: Border.all(color: glassBorder),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -405,9 +406,9 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: cardDark,
+        color: glassFill,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: gold.withValues(alpha: 0.25)),
+        border: Border.all(color: gold.withValues(alpha: 0.35)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -489,9 +490,9 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
           children: _property.features.map((f) => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: cardDark,
+                  color: glassFill,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: gold.withValues(alpha: 0.3)),
+                  border: Border.all(color: gold.withValues(alpha: 0.35)),
                 ),
                 child: Text(f, style: GoogleFonts.cairo(color: gold, fontSize: 13)),
               )).toList(),
@@ -558,9 +559,9 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: cardDark,
+        color: glassFill,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: gold.withValues(alpha: 0.2)),
+        border: Border.all(color: gold.withValues(alpha: 0.35)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -594,15 +595,15 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF059669),
+                    color: success,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.verified, size: 14, color: Colors.white),
+                      const Icon(Icons.verified, size: 14, color: Colors.black),
                       const SizedBox(width: 4),
-                      Text('موثق', style: GoogleFonts.cairo(color: Colors.white, fontSize: 11)),
+                      Text('موثق', style: GoogleFonts.cairo(color: Colors.black, fontSize: 11, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
@@ -691,8 +692,8 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: cardDark,
-        border: Border(top: BorderSide(color: textMuted.withValues(alpha: 0.1))),
+        color: const Color(0xF00A0A0A),
+        border: Border(top: BorderSide(color: textMuted.withValues(alpha: 0.15))),
       ),
       child: SafeArea(
         child: Row(
@@ -712,13 +713,13 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                     gradient: const LinearGradient(colors: brandGradient),
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: const [
-                      BoxShadow(color: Color(0x4000A896), blurRadius: 16, offset: Offset(0, 6)),
+                      BoxShadow(color: Color(0x66CCFF00), blurRadius: 16, offset: Offset(0, 6)),
                     ],
                   ),
                   child: Center(
                     child: Text(
                       'تواصل مع الوكيل',
-                      style: GoogleFonts.cairo(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.cairo(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -731,7 +732,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: cardDark,
+                    color: glassFill,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: const Color(0xFF25D366).withValues(alpha: 0.4)),
                   ),

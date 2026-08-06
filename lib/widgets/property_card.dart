@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -5,7 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../models/property.dart';
 import '../theme/app_theme.dart';
 
-/// Modern glassy property card — rounded, gradient overlay, price pill.
+/// Athletic frosted-glass property card — blurred translucent surface with
+/// electric-lime accents, inspired by Nike Training Club.
 class PropertyCard extends StatelessWidget {
   final Property property;
   final VoidCallback? onTap;
@@ -27,17 +30,24 @@ class PropertyCard extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-          color: cardDark,
+          color: glassFill,
           borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: glassBorder),
           boxShadow: softShadow,
         ),
         clipBehavior: Clip.antiAlias,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildImageSection(),
-            _buildContentSection(),
-          ],
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildImageSection(),
+                _buildContentSection(),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -74,7 +84,7 @@ class PropertyCard extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Colors.transparent, Color(0xB3002B31)],
+                colors: [Colors.transparent, Color(0xE6000000)],
               ),
             ),
           ),
@@ -85,18 +95,16 @@ class PropertyCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              gradient: property.purpose == 'بيع'
-                  ? const LinearGradient(colors: brandGradient)
-                  : const LinearGradient(colors: [blue, cyan]),
+              color: property.purpose == 'بيع' ? primary : cyan,
               borderRadius: BorderRadius.circular(30),
               boxShadow: const [
-                BoxShadow(color: Color(0x33006B5E), blurRadius: 10),
+                BoxShadow(color: Color(0x66CCFF00), blurRadius: 12),
               ],
             ),
             child: Text(
               property.purpose,
               style: GoogleFonts.cairo(
-                color: Colors.white,
+                color: Colors.black,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),
@@ -110,18 +118,19 @@ class PropertyCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.92),
+                color: Colors.white.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(30),
+                border: Border.all(color: glassBorder),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.verified, size: 14, color: success),
+                  const Icon(Icons.verified, size: 14, color: primary),
                   const SizedBox(width: 4),
                   Text(
                     'موثق',
                     style: GoogleFonts.cairo(
-                      color: textPrimary,
+                      color: Colors.white,
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                     ),
@@ -159,8 +168,9 @@ class PropertyCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.95),
+              color: Colors.black.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: glassBorder),
               boxShadow: const [
                 BoxShadow(color: Color(0x40000000), blurRadius: 10),
               ],
@@ -184,12 +194,13 @@ class PropertyCard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(9),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.92),
+                  color: Colors.black.withValues(alpha: 0.55),
                   shape: BoxShape.circle,
+                  border: Border.all(color: glassBorder),
                 ),
                 child: Icon(
                   isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: isFavorite ? Colors.red : primary,
+                  color: isFavorite ? red : primary,
                   size: 20,
                 ),
               ),
@@ -243,7 +254,7 @@ class PropertyCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           if (agent != null) ...[
-            Divider(height: 1, color: textMuted.withValues(alpha: 0.1)),
+            Divider(height: 1, color: textMuted.withValues(alpha: 0.15)),
             const SizedBox(height: 10),
             Row(
               children: [
@@ -251,13 +262,13 @@ class PropertyCard extends StatelessWidget {
                   width: 22,
                   height: 22,
                   decoration: const BoxDecoration(
-                    gradient: LinearGradient(colors: brandGradient),
+                    color: primary,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.person,
                     size: 14,
-                    color: Colors.white.withValues(alpha: 0.95),
+                    color: Colors.black.withValues(alpha: 0.8),
                   ),
                 ),
                 const SizedBox(width: 8),

@@ -1,50 +1,53 @@
 import 'package:flutter/material.dart';
 
-/// Bright modern teal/cyan palette — "Gulf water" identity (single source of truth).
+/// Athletic dark palette — "Nike Training Club / Whoop" identity.
+///
+/// Deep black background with an electric lime (#CCFF00) primary and a
+/// spring-green secondary. Frosted-glass surfaces sit on top of the black.
 class AppColors {
-  /// Page background — very light icy-mint white.
-  static const Color bg = Color(0xFFF2FAFC);
+  /// Page background — deep black.
+  static const Color bg = Color(0xFF0A0A0A);
 
-  /// Card / surface background — white.
-  static const Color card = Color(0xFFFFFFFF);
+  /// Solid dark surface (base for frosted glass cards).
+  static const Color card = Color(0xFF161616);
 
-  /// Primary vibrant teal.
-  static const Color primary = Color(0xFF00A896);
+  /// Primary — electric lime (neon green).
+  static const Color primary = Color(0xFFCCFF00);
 
-  /// Bright cyan (secondary brand accent).
-  static const Color cyan = Color(0xFF00B4D8);
+  /// Secondary accent — spring green.
+  static const Color cyan = Color(0xFF00F0A0);
 
-  /// Lighter teal accent (badges, hints).
-  static const Color primaryLight = Color(0xFF5EE0D0);
+  /// Lighter lime (badges, hints).
+  static const Color primaryLight = Color(0xFFE8FF7A);
 
-  /// Soft teal tint (selected states, icon chips).
-  static const Color primarySoft = Color(0xFFD9F6F1);
+  /// Soft lime tint (selected states, icon chips).
+  static const Color primarySoft = Color(0x26CCFF00);
 
-  /// Soft cyan tint.
-  static const Color cyanSoft = Color(0xFFD8F1FA);
+  /// Soft spring-green tint.
+  static const Color cyanSoft = Color(0x1F00F0A0);
 
-  /// Brand gradient: teal → cyan.
+  /// Brand gradient: electric lime → spring green.
   static const List<Color> gradient = [primary, cyan];
 
   /// Success green.
-  static const Color success = Color(0xFF12B886);
+  static const Color success = Color(0xFF34D399);
 
-  /// Secondary sky blue (rent badges).
-  static const Color blue = Color(0xFF0EA5E9);
+  /// Secondary sky blue.
+  static const Color blue = Color(0xFF38BDF8);
 
   /// Danger red.
-  static const Color red = Color(0xFFEF4444);
+  static const Color red = Color(0xFFFF4D4F);
 
-  /// Primary text — deep teal-black.
-  static const Color textPrimary = Color(0xFF073B3E);
+  /// Primary text — near-white.
+  static const Color textPrimary = Color(0xFFF4F6F5);
 
-  /// Muted text — cool grey-teal.
-  static const Color textMuted = Color(0xFF5A8186);
+  /// Muted text — cool grey.
+  static const Color textMuted = Color(0xFF8B9096);
 
   /// Dark scrim for overlays over images and immersive viewers.
-  static const Color scrim = Color(0xFF052E35);
+  static const Color scrim = Color(0xFF000000);
 
-  /// Legacy alias — royal blue slot now maps to the primary teal.
+  /// Legacy alias — old gold slot maps to the electric lime primary.
   static const Color royal = primary;
   static const Color royalLight = primaryLight;
   static const Color royalSoft = primarySoft;

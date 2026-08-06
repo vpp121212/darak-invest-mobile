@@ -348,8 +348,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
         child: Center(
           child: isLoading
-              ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-              : Text('إنشاء الحساب', style: GoogleFonts.cairo(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold)),
+              ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
+              : Text('إنشاء الحساب', style: GoogleFonts.cairo(color: Colors.black, fontSize: 17, fontWeight: FontWeight.bold)),
         ),
       ),
     );
