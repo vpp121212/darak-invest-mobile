@@ -8,7 +8,7 @@ import '../theme/app_theme.dart';
 /// Radar card for a promising neighborhood investment opportunity.
 ///
 /// Visual spec matches the Gulf Investment & Radar HTML component:
-/// navy gradient card, gold tag, green ROI badge and green->blue progress.
+/// royal-blue gradient card, light tag, green ROI badge and green->blue progress.
 class NeighborhoodRadarCard extends StatelessWidget {
   final InvestmentOpportunity opportunity;
   final VoidCallback onViewDistrict;
@@ -23,7 +23,7 @@ class NeighborhoodRadarCard extends StatelessWidget {
 
   static const _accent = Color(0xFF00E676);
   static const _tagGold = Color(0xFFFFD700);
-  static const _progressBlue = Color(0xFF00B0FF);
+  static const _progressBlue = Color(0xFF4FC3F7);
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class NeighborhoodRadarCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF0D1B2A), Color(0xFF162A45)],
+          colors: [Color(0xFF1E3A8A), Color(0xFF1D4ED8)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -226,16 +226,16 @@ class NeighborhoodRadarCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 13),
         decoration: BoxDecoration(
-          color: filled ? gold : Colors.transparent,
+          color: filled ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: gold, width: filled ? 0 : 1),
+          border: Border.all(color: Colors.white, width: filled ? 0 : 1),
         ),
         child: Center(
           child: Text(
             label,
             textAlign: TextAlign.center,
             style: GoogleFonts.cairo(
-              color: filled ? bgDark : gold,
+              color: filled ? const Color(0xFF1D4ED8) : Colors.white,
               fontSize: 12,
               fontWeight: FontWeight.bold,
             ),

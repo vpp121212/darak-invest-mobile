@@ -77,7 +77,7 @@ class PropertyCard extends StatelessWidget {
             child: Text(
               property.purpose,
               style: GoogleFonts.cairo(
-                color: property.purpose == 'بيع' ? bgDark : textLight,
+                color: Colors.white,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),
@@ -121,7 +121,7 @@ class PropertyCard extends StatelessWidget {
                 ),
                 child: Text(
                   'تجريبي',
-                  style: GoogleFonts.cairo(color: bgDark, fontSize: 11, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.cairo(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -134,12 +134,12 @@ class PropertyCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: bgDark.withValues(alpha: 0.7),
+                color: scrim.withValues(alpha: 0.7),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: isFavorite ? Colors.red : textLight,
+                color: isFavorite ? Colors.red : Colors.white,
                 size: 20,
               ),
             ),

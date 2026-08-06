@@ -237,7 +237,7 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
         child: Center(
           child: Text(
             'احسب التقدير',
-            style: GoogleFonts.cairo(color: bgDark, fontSize: 16, fontWeight: FontWeight.bold),
+            style: GoogleFonts.cairo(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
       ),

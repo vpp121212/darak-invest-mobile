@@ -90,7 +90,7 @@ class ProfileScreen extends ConsumerWidget {
                   color: gold,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text('دخول', style: GoogleFonts.cairo(color: bgDark, fontSize: 13, fontWeight: FontWeight.bold)),
+                child: Text('دخول', style: GoogleFonts.cairo(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
               ),
             ),
           ],

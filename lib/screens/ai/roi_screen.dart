@@ -134,7 +134,7 @@ class _RoiScreenState extends State<RoiScreen> {
                 child: Center(
                   child: Text(
                     'احسب العائد',
-                    style: GoogleFonts.cairo(color: bgDark, fontSize: 16, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.cairo(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),

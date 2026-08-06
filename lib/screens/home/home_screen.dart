@@ -159,7 +159,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Text(
                   purpose,
                   style: GoogleFonts.cairo(
-                    color: isSelected ? bgDark : textMuted,
+                    color: isSelected ? Colors.white : textMuted,
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
                   ),
@@ -413,7 +413,7 @@ class _HomeError extends StatelessWidget {
                 color: gold,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Text('إعادة المحاولة', style: GoogleFonts.cairo(color: bgDark, fontSize: 15, fontWeight: FontWeight.bold)),
+              child: Text('إعادة المحاولة', style: GoogleFonts.cairo(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
             ),
           ),
         ),

@@ -115,10 +115,10 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
         child: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: bgDark.withValues(alpha: 0.7),
+            color: scrim.withValues(alpha: 0.7),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.arrow_forward, color: textLight),
+          child: const Icon(Icons.arrow_forward, color: Colors.white),
         ),
       ),
       actions: [
@@ -128,12 +128,12 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
             margin: const EdgeInsets.all(8),
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: bgDark.withValues(alpha: 0.7),
+              color: scrim.withValues(alpha: 0.7),
               shape: BoxShape.circle,
             ),
             child: Icon(
               _isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: _isFavorite ? Colors.red : textLight,
+              color: _isFavorite ? Colors.red : Colors.white,
             ),
           ),
         ),
@@ -143,10 +143,10 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
             margin: const EdgeInsets.all(8),
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: bgDark.withValues(alpha: 0.7),
+              color: scrim.withValues(alpha: 0.7),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.share, color: textLight),
+            child: const Icon(Icons.share, color: Colors.white),
           ),
         ),
       ],
@@ -194,12 +194,12 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: bgDark.withValues(alpha: 0.8),
+                  color: scrim.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   '${_currentImage + 1} / ${_images.length}',
-                  style: GoogleFonts.cairo(color: textLight, fontSize: 13),
+                  style: GoogleFonts.cairo(color: Colors.white, fontSize: 13),
                 ),
               ),
             ),
@@ -232,7 +232,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
               child: Text(
                 _property.purpose,
                 style: GoogleFonts.cairo(
-                  color: isRent ? textLight : bgDark,
+                  color: Colors.white,
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
                 ),
@@ -713,7 +713,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                   child: Center(
                     child: Text(
                       'تواصل مع الوكيل',
-                      style: GoogleFonts.cairo(color: bgDark, fontSize: 16, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.cairo(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),

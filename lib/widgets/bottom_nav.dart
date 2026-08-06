@@ -69,7 +69,7 @@ class BottomNav extends StatelessWidget {
                         ),
                         child: Icon(
                           item['activeIcon'] as IconData,
-                          color: bgDark,
+                          color: Colors.white,
                           size: 28,
                         ),
                       ),

@@ -229,11 +229,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ? const SizedBox(
                   width: 24,
                   height: 24,
-                  child: CircularProgressIndicator(color: bgDark, strokeWidth: 2),
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                 )
               : Text(
                   'تسجيل الدخول',
-                  style: GoogleFonts.cairo(color: bgDark, fontSize: 17, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.cairo(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
                 ),
         ),
       ),

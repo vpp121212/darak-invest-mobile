@@ -341,7 +341,7 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
           height: widget.height,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            color: bgDark,
+            color: scrim,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: gold.withValues(alpha: 0.25)),
           ),
@@ -454,7 +454,7 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
                 child: Text(
                   'إعادة المحاولة',
                   style: GoogleFonts.cairo(
-                    color: bgDark,
+                    color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
@@ -490,7 +490,7 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
         width: 34,
         height: 34,
         decoration: BoxDecoration(
-          color: bgDark.withValues(alpha: 0.75),
+          color: scrim.withValues(alpha: 0.75),
           shape: BoxShape.circle,
           border: Border.all(color: gold.withValues(alpha: 0.4)),
         ),
@@ -521,23 +521,23 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
               decoration: BoxDecoration(
                 color: gold,
                 shape: BoxShape.circle,
-                border: Border.all(color: textLight.withValues(alpha: 0.6)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.6)),
                 boxShadow: const [
                   BoxShadow(color: Colors.black45, blurRadius: 10),
                 ],
               ),
-              child: Icon(icon, color: bgDark, size: 26),
+              child: Icon(icon, color: Colors.white, size: 26),
             ),
             const SizedBox(height: 2),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
               decoration: BoxDecoration(
-                color: bgDark.withValues(alpha: 0.7),
+                color: scrim.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 label,
-                style: GoogleFonts.cairo(color: textLight, fontSize: 9),
+                style: GoogleFonts.cairo(color: Colors.white, fontSize: 9),
               ),
             ),
           ],
@@ -550,7 +550,7 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: bgDark.withValues(alpha: 0.75),
+        color: scrim.withValues(alpha: 0.75),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: gold.withValues(alpha: 0.4)),
       ),
@@ -569,12 +569,12 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: bgDark.withValues(alpha: 0.65),
+        color: scrim.withValues(alpha: 0.65),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         text,
-        style: GoogleFonts.cairo(color: textLight, fontSize: 10),
+        style: GoogleFonts.cairo(color: Colors.white, fontSize: 10),
       ),
     );
   }
@@ -608,7 +608,7 @@ class _FullscreenTour extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () => Navigator.of(context).pop(),
-                    child: const Icon(Icons.close, color: textLight),
+                    child: const Icon(Icons.close, color: Colors.white),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -616,7 +616,7 @@ class _FullscreenTour extends StatelessWidget {
                       title ?? 'جولة 360°',
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.cairo(
-                        color: textLight,
+                        color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),

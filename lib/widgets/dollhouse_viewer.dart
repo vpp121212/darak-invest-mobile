@@ -56,7 +56,7 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
     _scenes = _normalizeScenes();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(bgDark)
+      ..setBackgroundColor(scrim)
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageFinished: (_) {
@@ -210,7 +210,7 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
       height: widget.height,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: bgDark,
+        color: scrim,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: gold.withValues(alpha: 0.25)),
       ),
@@ -291,14 +291,14 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: active ? gold : bgDark.withValues(alpha: 0.75),
+          color: active ? gold : scrim.withValues(alpha: 0.75),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: gold.withValues(alpha: 0.4)),
         ),
         child: Text(
           mode,
           style: GoogleFonts.cairo(
-            color: active ? bgDark : gold,
+            color: active ? Colors.white : gold,
             fontSize: 10,
             fontWeight: FontWeight.bold,
           ),
@@ -324,7 +324,7 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
             BoxShadow(color: Colors.black45, blurRadius: 8),
           ],
         ),
-        child: Icon(icon, color: enabled ? bgDark : textMuted, size: 22),
+        child: Icon(icon, color: enabled ? Colors.white : textMuted, size: 22),
       ),
     );
   }
@@ -358,7 +358,7 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
               child: Text(
                 'إعادة المحاولة',
                 style: GoogleFonts.cairo(
-                  color: bgDark,
+                  color: Colors.white,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
@@ -374,7 +374,7 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: bgDark.withValues(alpha: 0.75),
+        color: scrim.withValues(alpha: 0.75),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: gold.withValues(alpha: 0.4)),
       ),
@@ -393,12 +393,12 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: bgDark.withValues(alpha: 0.65),
+        color: scrim.withValues(alpha: 0.65),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         text,
-        style: GoogleFonts.cairo(color: textLight, fontSize: 10),
+        style: GoogleFonts.cairo(color: Colors.white, fontSize: 10),
       ),
     );
   }
