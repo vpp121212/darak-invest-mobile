@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/router/app_router.dart';
 import '../../core/utils/formatters.dart';
 import '../../models/property.dart';
+import '../../providers/favorites_provider.dart';
 import '../../providers/properties_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/dollhouse_viewer.dart';
@@ -28,7 +29,6 @@ class PropertyDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
-  bool _isFavorite = false;
   int _currentImage = 0;
 
   Property get _property => widget.property;
@@ -106,6 +106,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
   }
 
   Widget _buildImageGallery() {
+    final isFav = ref.watch(favoritesProvider).contains(_property.id);
     return SliverAppBar(
       expandedHeight: 350,
       pinned: true,
@@ -123,7 +124,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
       ),
       actions: [
         GestureDetector(
-          onTap: () => setState(() => _isFavorite = !_isFavorite),
+          onTap: () => ref.read(favoritesProvider.notifier).toggle(_property.id),
           child: Container(
             margin: const EdgeInsets.all(8),
             padding: const EdgeInsets.all(8),
@@ -132,8 +133,8 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
               shape: BoxShape.circle,
             ),
             child: Icon(
-              _isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: _isFavorite ? Colors.red : Colors.white,
+              isFav ? Icons.favorite : Icons.favorite_border,
+              color: isFav ? Colors.red : Colors.white,
             ),
           ),
         ),

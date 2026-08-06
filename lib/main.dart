@@ -31,10 +31,35 @@ class DarakApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      builder: (context, child) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: child!,
-      ),
+      builder: (context, child) {
+        final width = MediaQuery.sizeOf(context).width;
+        Widget frame = child!;
+        if (width > 520) {
+          frame = ColoredBox(
+            color: const Color(0xFF050505),
+            child: Center(
+              child: Container(
+                width: 430,
+                height: double.infinity,
+                clipBehavior: Clip.antiAlias,
+                decoration: const BoxDecoration(
+                  border: Border(
+                    left: BorderSide(color: Color(0x1FFFFFFF), width: 1),
+                    right: BorderSide(color: Color(0x1FFFFFFF), width: 1),
+                    top: BorderSide.none,
+                    bottom: BorderSide.none,
+                  ),
+                ),
+                child: frame,
+              ),
+            ),
+          );
+        }
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: frame,
+        );
+      },
       routerConfig: appRouter.config(),
     );
   }

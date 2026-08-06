@@ -33,7 +33,17 @@ void main() {
     await tester.pump();
 
     // The offline banner is shown while the demo/fallback list stays usable.
+    await tester.scrollUntilVisible(
+      find.text('تعذّر تحديث البيانات — تعرض نسخة محفوظة/تجريبية'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('تعذّر تحديث البيانات — تعرض نسخة محفوظة/تجريبية'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('أحدث العقارات'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('أحدث العقارات'), findsOneWidget);
   });
 
@@ -50,6 +60,11 @@ void main() {
     await tester.pump();
 
     // Fallback list renders even though the API call failed.
+    await tester.scrollUntilVisible(
+      find.text('أحدث العقارات'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('أحدث العقارات'), findsOneWidget);
   });
 }

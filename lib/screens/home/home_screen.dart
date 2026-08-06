@@ -4,7 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/router/app_router.dart';
+import '../../core/utils/formatters.dart';
+import '../../data/neighborhoods_data.dart';
 import '../../models/property.dart';
+import '../../providers/favorites_provider.dart';
 import '../../providers/properties_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/property_card.dart';
@@ -75,7 +78,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         SliverToBoxAdapter(child: _buildHero()),
         SliverToBoxAdapter(child: _buildPurposeTabs()),
         SliverToBoxAdapter(child: _buildFilterRow()),
-        SliverToBoxAdapter(child: _buildAiToolsRow()),
+        SliverToBoxAdapter(child: _buildAiToolsGrid()),
+        SliverToBoxAdapter(child: _buildNeighborhoodsRail()),
         if (catalogue.error != null) ...[
           SliverToBoxAdapter(child: _buildOfflineBanner(catalogue.error!)),
         ],
@@ -117,9 +121,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
-                (context, index) => PropertyCard(
-                  property: filtered[index],
-                  onTap: () => _openDetail(filtered[index]),
+                (context, index) => Consumer(
+                  builder: (context, ref, _) {
+                    final favorites = ref.watch(favoritesProvider);
+                    return PropertyCard(
+                      property: filtered[index],
+                      onTap: () => _openDetail(filtered[index]),
+                      onFavorite: () => ref.read(favoritesProvider.notifier).toggle(filtered[index].id),
+                      isFavorite: favorites.contains(filtered[index].id),
+                    );
+                  },
                 ),
                 childCount: filtered.length,
               ),
@@ -473,53 +484,153 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildAiToolsRow() {
+  Widget _buildAiToolsGrid() {
     final tools = <(String, IconData, VoidCallback)>[
-      ('تقدير السعر', Icons.calculate_outlined, () => context.pushRoute(EstimateRoute())),
+      ('الخريطة', Icons.map_outlined, () => context.pushRoute(MapRoute())),
       ('نبض الحي', Icons.location_city, () => context.pushRoute(PulseRoute())),
+      ('تقدير السعر', Icons.calculate_outlined, () => context.pushRoute(EstimateRoute())),
       ('حاسبة ROI', Icons.trending_up, () => context.pushRoute(RoiRoute())),
+      ('التمويل', Icons.payments_outlined, () => context.pushRoute(FinanceRoute())),
+      ('المقارنة', Icons.compare_arrows, () => context.pushRoute(const CompareRoute())),
+      ('تقرير السوق', Icons.insights, () => context.pushRoute(const MarketReportRoute())),
+      ('المفضلة', Icons.favorite_border, () => context.pushRoute(const FavoritesRoute())),
+      ('الوكلاء', Icons.support_agent, () => context.pushRoute(const AgentsRoute())),
     ];
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-      child: Row(
-        children: tools.map((tool) {
-          return Expanded(
-            child: GestureDetector(
-              onTap: tool.$3,
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                decoration: BoxDecoration(
-                  color: glassFill,
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(color: glassBorder),
-                  boxShadow: softShadow,
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: primary,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Icon(tool.$2, color: Colors.black, size: 22),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: tools.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: 0.95,
+        ),
+        itemBuilder: (context, index) {
+          final tool = tools[index];
+          return GestureDetector(
+            onTap: tool.$3,
+            child: Container(
+              decoration: BoxDecoration(
+                color: glassFill,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: glassBorder),
+                boxShadow: softShadow,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: primary,
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      tool.$1,
-                      style: GoogleFonts.cairo(
-                        color: textLight,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: Icon(tool.$2, color: Colors.black, size: 20),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    tool.$1,
+                    style: GoogleFonts.cairo(
+                      color: textLight,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           );
-        }).toList(),
+        },
+      ),
+    );
+  }
+
+  Widget _buildNeighborhoodsRail() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Row(
+              children: [
+                Text(
+                  'الأحياء',
+                  style: GoogleFonts.cairo(color: textLight, fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const Spacer(),
+                Text(
+                  'استكشف بالحي',
+                  style: GoogleFonts.cairo(color: textMuted, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 148,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: kNeighborhoods.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (context, index) {
+                final n = kNeighborhoods[index];
+                return GestureDetector(
+                  onTap: () => context.pushRoute(NeighborhoodDetailRoute(district: n.name)),
+                  child: Container(
+                    width: 150,
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: glassFill,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: glassBorder),
+                      boxShadow: softShadow,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.location_city, color: primary, size: 18),
+                            const Spacer(),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: primarySoft,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                '+${n.growth}٪',
+                                style: GoogleFonts.cairo(
+                                  color: primary,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        Text(
+                          n.name,
+                          style: GoogleFonts.cairo(color: textLight, fontSize: 15, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'من ${Formatters.compactPrice(n.avgPrice)}',
+                          style: GoogleFonts.cairo(color: textMuted, fontSize: 11),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -655,12 +766,14 @@ class _InfinitePropertyLoopState extends State<_InfinitePropertyLoop> {
           final p = widget.properties[index % widget.properties.length];
           return SizedBox(
             width: _cardWidth,
-            child: PropertyCard(
-              property: p,
-              onTap: () => context.pushRoute(PropertyDetailRoute(property: p)),
-              onFavorite: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('المفضلة — قريباً', style: GoogleFonts.cairo())),
+            child: Consumer(
+              builder: (context, ref, _) {
+                final favorites = ref.watch(favoritesProvider);
+                return PropertyCard(
+                  property: p,
+                  onTap: () => context.pushRoute(PropertyDetailRoute(property: p)),
+                  onFavorite: () => ref.read(favoritesProvider.notifier).toggle(p.id),
+                  isFavorite: favorites.contains(p.id),
                 );
               },
             ),
