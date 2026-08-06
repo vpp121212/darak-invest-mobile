@@ -76,7 +76,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final res = await ApiService.login(email, password);
-      final token = (res['token'] ?? res['accessToken']) as String;
+      final token = res['token'] ?? res['accessToken'];
+      if (token is! String || token.isEmpty) {
+        state = state.copyWith(
+          isLoading: false,
+          error: 'لم يستجب الخادم بجلسة صالحة، حاول مجدداً',
+        );
+        return false;
+      }
       final user = User.fromJson((res['user'] ?? res) as Map<String, dynamic>);
       ApiService.setToken(token);
 
@@ -94,13 +101,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final res = await ApiService.register(data);
-      final token = (res['token'] ?? res['accessToken']) as String?;
-      if (token != null) {
+      final token = res['token'] ?? res['accessToken'];
+      if (token is String && token.isNotEmpty) {
         ApiService.setToken(token);
         final user = User.fromJson((res['user'] ?? res) as Map<String, dynamic>);
         await TokenStorage.saveSession(token, jsonEncode(user.toJson()));
         state = AuthState(token: token, user: user);
       } else {
+        // Registration succeeded but the server did not auto-login.
         state = state.copyWith(isLoading: false);
       }
       return true;

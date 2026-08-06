@@ -7,6 +7,8 @@
 
 
 ## Coding Rules
-- Follow clean architecture principles (data, domain, presentation layers).
+- Follow a pragmatic layered structure (core / data / services / providers / screens). Keep models immutable with explicit `fromJson`/`toJson`.
 - Write strict types and avoid using `dynamic` where possible.
-- Ensure all environment configurations use `EnvConfig`.
+- All environment configuration lives in `EnvConfig` (`lib/core/config/env_config.dart`); never hardcode URLs or secrets.
+- Keep the Arabic RTL dark theme (Cairo font, gold accent) consistent across screens.
+- Run `flutter analyze` and `flutter test` before finishing a change.

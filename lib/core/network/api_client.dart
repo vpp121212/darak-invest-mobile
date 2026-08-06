@@ -5,14 +5,15 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import 'app_exception.dart';
+import '../config/env_config.dart';
 
 /// Central HTTP client for the Darak backend.
 ///
 /// Owns the base URL, request timeout, auth header, JSON decoding and
 /// unified error mapping so callers only deal with [AppException].
 class ApiClient {
-  static const String baseUrl = 'https://darak-invest-backend-j6hy.onrender.com';
-  static const Duration timeout = Duration(seconds: 45);
+  static String get baseUrl => EnvConfig.apiBaseUrl;
+  static Duration get timeout => EnvConfig.apiTimeout;
 
   ApiClient._();
   static final ApiClient instance = ApiClient._();

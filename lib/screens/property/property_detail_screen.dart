@@ -41,16 +41,15 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final similar = ref.watch(propertiesProvider).maybeWhen(
-          data: (list) => list
-              .where((p) =>
-                  p.id != _property.id &&
-                  p.purpose == _property.purpose &&
-                  p.city == _property.city)
-              .take(6)
-              .toList(),
-          orElse: () => <Property>[],
-        );
+    final similar = ref
+        .watch(propertiesProvider)
+        .properties
+        .where((p) =>
+            p.id != _property.id &&
+            p.purpose == _property.purpose &&
+            p.city == _property.city)
+        .take(6)
+        .toList();
 
     return Scaffold(
       backgroundColor: bgDark,

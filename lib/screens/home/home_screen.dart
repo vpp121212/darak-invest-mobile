@@ -8,7 +8,6 @@ import '../../models/property.dart';
 import '../../providers/properties_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/property_card.dart';
-
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -26,7 +25,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final propertiesAsync = ref.watch(propertiesProvider);
+    final catalogue = ref.watch(propertiesProvider);
 
     return Scaffold(
       backgroundColor: bgDark,
@@ -47,38 +46,47 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         color: gold,
         backgroundColor: cardDark,
         onRefresh: () => ref.read(propertiesProvider.notifier).load(),
-        child: propertiesAsync.when(
-          loading: () => const _HomeSkeleton(),
-          error: (e, _) => _HomeError(message: e.toString(), onRetry: () => ref.read(propertiesProvider.notifier).load()),
-          data: (properties) {
-            final filtered = _applyFilters(properties);
-            return ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                const SizedBox(height: 12),
-                _buildSearchBar(),
-                const SizedBox(height: 12),
-                _buildPurposeTabs(),
-                const SizedBox(height: 16),
-                _buildFilterRow(),
-                const SizedBox(height: 20),
-                _buildAiToolsRow(),
-                const SizedBox(height: 20),
-                _buildHeader('أحدث العقارات', properties.length),
-                const SizedBox(height: 12),
-                if (filtered.isEmpty)
-                  const _EmptyState()
-                else
-                  ...filtered.map((p) => PropertyCard(
-                        property: p,
-                        onTap: () => _openDetail(p),
-                      )),
-                const SizedBox(height: 20),
-              ],
-            );
-          },
-        ),
+        child: _buildBody(catalogue),
       ),
+    );
+  }
+
+  Widget _buildBody(PropertyCatalogueState catalogue) {
+    if (catalogue.isLoading) return const _HomeSkeleton();
+    if (catalogue.error != null && catalogue.properties.isEmpty) {
+      return _HomeError(
+        message: catalogue.error!,
+        onRetry: () => ref.read(propertiesProvider.notifier).load(),
+      );
+    }
+    final filtered = _applyFilters(catalogue.properties);
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      children: [
+        const SizedBox(height: 12),
+        if (catalogue.error != null) ...[
+          _OfflineBanner(error: catalogue.error!),
+          const SizedBox(height: 12),
+        ],
+        _buildSearchBar(),
+        const SizedBox(height: 12),
+        _buildPurposeTabs(),
+        const SizedBox(height: 16),
+        _buildFilterRow(),
+        const SizedBox(height: 20),
+        _buildAiToolsRow(),
+        const SizedBox(height: 20),
+        _buildHeader('أحدث العقارات', catalogue.properties.length),
+        const SizedBox(height: 12),
+        if (filtered.isEmpty)
+          const _EmptyState()
+        else
+          ...filtered.map((p) => PropertyCard(
+                property: p,
+                onTap: () => _openDetail(p),
+              )),
+        const SizedBox(height: 20),
+      ],
     );
   }
 
@@ -336,6 +344,36 @@ class _HomeSkeleton extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+class _OfflineBanner extends StatelessWidget {
+  final String error;
+
+  const _OfflineBanner({required this.error});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.red.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.cloud_off, color: Colors.red, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'تعذّر تحديث البيانات — تعرض نسخة محفوظة/تجريبية',
+              style: GoogleFonts.cairo(color: Colors.red, fontSize: 12),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

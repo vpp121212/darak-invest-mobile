@@ -68,11 +68,6 @@ class ApiService {
     return res as Map<String, dynamic>;
   }
 
-  static Future<Map<String, dynamic>> match(Map<String, dynamic> data) async {
-    final res = await _client.post('/api/ai/match', body: data);
-    return res as Map<String, dynamic>;
-  }
-
   static Future<Map<String, dynamic>> getNeighborhoodPulse(String district) async {
     final res =
         await _client.get('/api/pulse/neighborhood/${Uri.encodeComponent(district)}');

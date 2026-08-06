@@ -1,16 +1,51 @@
-# darak_wa_hayk
+# دارك وحيك — تطبيق Flutter
 
-A new Flutter project.
+منصة عقارية ذكية عربية (RTL) للبيع والإيجار في السعودية، بواجهة داكنة هوية «عين القطار» (كحلي عميق + ذهبي) وكتابة Cairo.
 
-## Getting Started
+## المزايا
 
-This project is a starting point for a Flutter application.
+- تصفح/بحث عقارات مع فلاتر (مدينة، حي، نوع، الغرض، السعر، المساحة)
+- أدوات ذكية: تقدير السعر بالذكاء الاصطناعي، نبض الحي، حاسبة ROI
+- جولات 360° وبيت الدمية ثلاثي الأبعاد (Pannellum / model-viewer)
+- حسابات (متصفح / معلن / وسيط / مكتب) مع جلسة آمنة
+- إضافة عقار (يتطلب تسجيل دخول) مع تخزين محلي دون اتصال
+- Offline-first: بيانات تجريبية + كاش محلي عند فشل الخادم
 
-A few resources to get you started if this is your first Flutter project:
+## التقنيات
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Flutter + Riverpod (StateNotifier/AsyncValue)
+- auto_route (توجيه نوع-آمن + كود مولّد)
+- backend: Express على Render (رابط مكوّن عبر `EnvConfig`)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## التشغيل
+
+```bash
+flutter pub get
+flutter run                  # يفتح النسخة التجريبية بالبيانات الحية
+flutter run -d chrome
+```
+
+### متغيرات البناء (Environment)
+
+يُمرَّر عبر `--dart-define` مع قيم افتراضية للإنتاج:
+
+```bash
+flutter run --dart-define=API_BASE_URL=https://staging.example.com
+flutter build web --release --base-href=/darak-invest-mobile/
+```
+
+| المتغير | الافتراضي | الوصف |
+|---|---|---|
+| `API_BASE_URL` | `https://darak-invest-backend-j6hy.onrender.com` | رابط الخادم |
+| `SHOW_DEMO_PROPERTY` | `false` | إظهار العقار التجريبي (360°/3D) |
+
+## الاختبار والتحقق
+
+```bash
+flutter analyze
+flutter test
+```
+
+## النشر
+
+النسخة المنشورة تُبنى وتُنسخ إلى `public/` (يخدمها GitHub Actions عبر GitHub Pages). انظر `.github/workflows/pages.yml`.

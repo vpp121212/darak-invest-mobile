@@ -1,3 +1,5 @@
+import '../core/utils/formatters.dart';
+
 class AgentInfo {
   final String id;
   final String name;
@@ -99,14 +101,8 @@ class Property {
     this.agent,
   });
 
-  String get formattedPrice {
-    if (price >= 1000000) {
-      return '${(price / 1000000).toStringAsFixed(price % 1000000 == 0 ? 0 : 1)} مليون';
-    } else if (price >= 1000) {
-      return '${(price / 1000).toStringAsFixed(price % 1000 == 0 ? 0 : 1)} ألف';
-    }
-    return price.toStringAsFixed(0);
-  }
+  /// Compact Arabic-friendly price: 3500000 -> "3.5 مليون".
+  String get formattedPrice => Formatters.compactPrice(price);
 
   String get mainImage => images.isNotEmpty ? images.first : '';
 

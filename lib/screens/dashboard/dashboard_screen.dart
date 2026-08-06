@@ -15,7 +15,7 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final propertiesAsync = ref.watch(propertiesProvider);
+    final catalogue = ref.watch(propertiesProvider);
 
     return Scaffold(
       backgroundColor: bgDark,
@@ -34,26 +34,32 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: propertiesAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator(color: gold)),
-        error: (e, _) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.cloud_off, size: 60, color: textMuted),
-              const SizedBox(height: 12),
-              Text('تعذّر تحميل بيانات السوق', style: GoogleFonts.cairo(color: textMuted, fontSize: 16)),
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: Text(e.toString(), textAlign: TextAlign.center, style: GoogleFonts.cairo(color: textMuted, fontSize: 12)),
-              ),
-            ],
-          ),
-        ),
-        data: (properties) => _DashboardContent(properties: properties),
-      ),
+      body: _buildBody(catalogue),
     );
+  }
+
+  Widget _buildBody(PropertyCatalogueState catalogue) {
+    if (catalogue.isLoading) {
+      return const Center(child: CircularProgressIndicator(color: gold));
+    }
+    if (catalogue.error != null && catalogue.properties.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.cloud_off, size: 60, color: textMuted),
+            const SizedBox(height: 12),
+            Text('تعذّر تحميل بيانات السوق', style: GoogleFonts.cairo(color: textMuted, fontSize: 16)),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Text(catalogue.error!, textAlign: TextAlign.center, style: GoogleFonts.cairo(color: textMuted, fontSize: 12)),
+            ),
+          ],
+        ),
+      );
+    }
+    return _DashboardContent(properties: catalogue.properties);
   }
 }
 
