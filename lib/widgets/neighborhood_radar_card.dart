@@ -8,7 +8,7 @@ import '../theme/app_theme.dart';
 /// Radar card for a promising neighborhood investment opportunity.
 ///
 /// Visual spec matches the Gulf Investment & Radar HTML component:
-/// royal-blue gradient card, light tag, green ROI badge and green->blue progress.
+/// teal->cyan gradient card, light tag, green ROI badge and green->cyan progress.
 class NeighborhoodRadarCard extends StatelessWidget {
   final InvestmentOpportunity opportunity;
   final VoidCallback onViewDistrict;
@@ -22,8 +22,8 @@ class NeighborhoodRadarCard extends StatelessWidget {
   });
 
   static const _accent = Color(0xFF00E676);
-  static const _tagGold = Color(0xFFFFD700);
-  static const _progressBlue = Color(0xFF4FC3F7);
+  static const _tagLight = Color(0xFFFFD7A1);
+  static const _progressCyan = Color(0xFF5EE0D0);
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class NeighborhoodRadarCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF1E3A8A), Color(0xFF1D4ED8)],
+          colors: [Color(0xFF00A896), Color(0xFF00B4D8)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -67,19 +67,19 @@ class NeighborhoodRadarCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: _tagGold.withValues(alpha: 0.15),
+        color: Colors.white.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _tagGold.withValues(alpha: 0.3)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.insights, color: _tagGold, size: 14),
+          const Icon(Icons.insights, color: _tagLight, size: 14),
           const SizedBox(width: 4),
           Text(
             tag,
             style: GoogleFonts.cairo(
-              color: _tagGold,
+              color: _tagLight,
               fontSize: 11,
               fontWeight: FontWeight.bold,
             ),
@@ -108,7 +108,7 @@ class NeighborhoodRadarCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 opp.subtitle,
-                style: GoogleFonts.cairo(color: textMuted, fontSize: 12),
+                style: GoogleFonts.cairo(color: Colors.white.withValues(alpha: 0.9), fontSize: 12),
               ),
             ],
           ),
@@ -153,7 +153,7 @@ class NeighborhoodRadarCard extends StatelessWidget {
           children: [
             Text(
               'مبلغ تغطية الفرصة',
-              style: GoogleFonts.cairo(color: textMuted, fontSize: 12),
+              style: GoogleFonts.cairo(color: Colors.white.withValues(alpha: 0.9), fontSize: 12),
             ),
             const Spacer(),
             Text(
@@ -177,16 +177,16 @@ class NeighborhoodRadarCard extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: FractionallySizedBox(
               widthFactor: (percent.clamp(0, 100) / 100),
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [_accent, _progressBlue],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [_accent, _progressCyan],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  borderRadius: BorderRadius.circular(10),
                 ),
-              ),
             ),
           ),
         ),
@@ -235,7 +235,7 @@ class NeighborhoodRadarCard extends StatelessWidget {
             label,
             textAlign: TextAlign.center,
             style: GoogleFonts.cairo(
-              color: filled ? const Color(0xFF1D4ED8) : Colors.white,
+              color: filled ? primary : Colors.white,
               fontSize: 12,
               fontWeight: FontWeight.bold,
             ),

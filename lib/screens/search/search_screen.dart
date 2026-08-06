@@ -134,8 +134,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             child: Container(
               decoration: BoxDecoration(
                 color: cardDark,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: textMuted.withValues(alpha: 0.2)),
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: softShadow,
               ),
               child: TextField(
                 controller: _searchController,
@@ -165,13 +165,21 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             child: Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: _showAdvanced ? gold : cardDark,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: gold.withValues(alpha: 0.3)),
+                gradient: _showAdvanced
+                    ? const LinearGradient(colors: brandGradient)
+                    : null,
+                color: _showAdvanced ? null : cardDark,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: _showAdvanced ? null : softShadow,
+                border: Border.all(
+                  color: _showAdvanced
+                      ? Colors.transparent
+                      : textMuted.withValues(alpha: 0.12),
+                ),
               ),
               child: Icon(
                 Icons.tune,
-                color: _showAdvanced ? Colors.white : gold,
+                color: _showAdvanced ? Colors.white : primary,
                 size: 22,
               ),
             ),
@@ -202,8 +210,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: cardDark,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: textMuted.withValues(alpha: 0.2)),
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: softShadow,
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -238,8 +246,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: cardDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: gold.withValues(alpha: 0.2)),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: softShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,7 +255,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('فلاتر متقدمة', style: GoogleFonts.cairo(color: gold, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('فلاتر متقدمة', style: GoogleFonts.cairo(color: primary, fontSize: 16, fontWeight: FontWeight.bold)),
               TextButton(
                 onPressed: _resetAdvanced,
                 child: Text('مسح الكل', style: GoogleFonts.cairo(color: Colors.red, fontSize: 12)),
@@ -298,16 +306,23 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               final isSelected = _rooms == roomCount;
               final isAny = roomCount == 0;
               return Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => _rooms = roomCount),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 2),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      color: isSelected ? gold : bgDark,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: isSelected ? gold : textMuted.withValues(alpha: 0.2)),
-                    ),
+                  child: GestureDetector(
+                    onTap: () => setState(() => _rooms = roomCount),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 2),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        gradient: isSelected
+                            ? const LinearGradient(colors: brandGradient)
+                            : null,
+                        color: isSelected ? null : bgDark,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected
+                              ? Colors.transparent
+                              : textMuted.withValues(alpha: 0.18),
+                        ),
+                      ),
                     child: Center(
                       child: Text(
                         isAny ? 'الكل' : '$roomCount',
@@ -330,8 +345,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 14),
               decoration: BoxDecoration(
-                color: gold,
-                borderRadius: BorderRadius.circular(14),
+                gradient: const LinearGradient(colors: brandGradient),
+                borderRadius: BorderRadius.circular(30),
               ),
               child: Center(
                 child: Text('تطبيق الفلاتر', style: GoogleFonts.cairo(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),

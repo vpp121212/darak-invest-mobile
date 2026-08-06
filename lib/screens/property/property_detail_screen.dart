@@ -226,8 +226,10 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: isRent ? const Color(0xFF1E40AF) : gold,
-                borderRadius: BorderRadius.circular(8),
+                gradient: isRent
+                    ? const LinearGradient(colors: [blue, cyan])
+                    : const LinearGradient(colors: brandGradient),
+                borderRadius: BorderRadius.circular(30),
               ),
               child: Text(
                 _property.purpose,
@@ -707,8 +709,11 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
-                    color: gold,
-                    borderRadius: BorderRadius.circular(14),
+                    gradient: const LinearGradient(colors: brandGradient),
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: const [
+                      BoxShadow(color: Color(0x4000A896), blurRadius: 16, offset: Offset(0, 6)),
+                    ],
                   ),
                   child: Center(
                     child: Text(

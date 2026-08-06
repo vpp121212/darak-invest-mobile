@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../models/property.dart';
 import '../theme/app_theme.dart';
 
+/// Modern glassy property card — rounded, gradient overlay, price pill.
 class PropertyCard extends StatelessWidget {
   final Property property;
   final VoidCallback? onTap;
@@ -27,9 +28,10 @@ class PropertyCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
           color: cardDark,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: textMuted.withValues(alpha: 0.1)),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: softShadow,
         ),
+        clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -44,35 +46,52 @@ class PropertyCard extends StatelessWidget {
   Widget _buildImageSection() {
     return Stack(
       children: [
-        ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-          child: CachedNetworkImage(
-            imageUrl: property.mainImage,
-            height: 180,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            placeholder: (c, _) => Container(
-              height: 180,
-              color: bgDark,
-              child: const Center(
-                child: CircularProgressIndicator(color: gold, strokeWidth: 2),
-              ),
+        CachedNetworkImage(
+          imageUrl: property.mainImage,
+          height: 190,
+          width: double.infinity,
+          fit: BoxFit.cover,
+          placeholder: (c, _) => Container(
+            height: 190,
+            color: bgDark,
+            child: const Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
             ),
-            errorWidget: (c, _, __) => Container(
-              height: 180,
-              color: cardDark,
-              child: const Icon(Icons.home, size: 50, color: textMuted),
+          ),
+          errorWidget: (c, _, __) => Container(
+            height: 190,
+            color: primarySoft,
+            child: const Icon(Icons.home_rounded, size: 50, color: textMuted),
+          ),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 90,
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.transparent, Color(0xB3002B31)],
+              ),
             ),
           ),
         ),
         Positioned(
-          top: 10,
-          right: 10,
+          top: 12,
+          right: 12,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: property.purpose == 'بيع' ? gold : blue,
-              borderRadius: BorderRadius.circular(8),
+              gradient: property.purpose == 'بيع'
+                  ? const LinearGradient(colors: brandGradient)
+                  : const LinearGradient(colors: [blue, cyan]),
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: const [
+                BoxShadow(color: Color(0x33006B5E), blurRadius: 10),
+              ],
             ),
             child: Text(
               property.purpose,
@@ -86,22 +105,26 @@ class PropertyCard extends StatelessWidget {
         ),
         if (property.trust >= 80)
           Positioned(
-            top: 10,
-            left: 10,
+            top: 12,
+            left: 12,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: green,
-                borderRadius: BorderRadius.circular(8),
+                color: Colors.white.withValues(alpha: 0.92),
+                borderRadius: BorderRadius.circular(30),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.verified, size: 14, color: Colors.white),
+                  const Icon(Icons.verified, size: 14, color: success),
                   const SizedBox(width: 4),
                   Text(
                     'موثق',
-                    style: GoogleFonts.cairo(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.cairo(
+                      color: textPrimary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -109,42 +132,69 @@ class PropertyCard extends StatelessWidget {
           ),
         if (property.isDemo)
           Positioned(
-            top: 10,
+            top: 12,
             left: 0,
             right: 0,
             child: Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                 decoration: BoxDecoration(
-                  color: gold,
-                  borderRadius: BorderRadius.circular(8),
+                  color: scrim.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(30),
                 ),
                 child: Text(
                   'تجريبي',
-                  style: GoogleFonts.cairo(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.cairo(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
           ),
         Positioned(
-          bottom: 10,
-          left: 10,
-          child: GestureDetector(
-            onTap: onFavorite,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: scrim.withValues(alpha: 0.7),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: isFavorite ? Colors.red : Colors.white,
-                size: 20,
+          bottom: 12,
+          right: 12,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.95),
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: const [
+                BoxShadow(color: Color(0x40000000), blurRadius: 10),
+              ],
+            ),
+            child: Text(
+              '${_formatPrice(property.price)} ر.س${property.purpose == 'إيجار' ? '/شهر' : ''}',
+              style: GoogleFonts.cairo(
+                color: primary,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
         ),
+        if (onFavorite != null)
+          Positioned(
+            bottom: 12,
+            left: 12,
+            child: GestureDetector(
+              onTap: onFavorite,
+              child: Container(
+                padding: const EdgeInsets.all(9),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.92),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: isFavorite ? Colors.red : primary,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -158,14 +208,18 @@ class PropertyCard extends StatelessWidget {
         children: [
           Text(
             property.title,
-            style: GoogleFonts.cairo(color: textLight, fontSize: 16, fontWeight: FontWeight.bold),
+            style: GoogleFonts.cairo(
+              color: textLight,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 6),
           Row(
             children: [
-              const Icon(Icons.location_on, size: 16, color: gold),
+              const Icon(Icons.location_on, size: 16, color: primary),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
@@ -180,23 +234,34 @@ class PropertyCard extends StatelessWidget {
           const SizedBox(height: 10),
           Row(
             children: [
-              _buildSpecItem(Icons.king_bed, '${property.rooms} غرف'),
+              _buildSpecItem(Icons.king_bed_outlined, '${property.rooms} غرف'),
               const SizedBox(width: 14),
               _buildSpecItem(Icons.bathtub_outlined, '${property.baths} حمام'),
               const SizedBox(width: 14),
-              _buildSpecItem(Icons.square_foot, '${property.area} م²'),
+              _buildSpecItem(Icons.straighten, '${_formatNumber(property.area)} م²'),
             ],
           ),
           const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${_formatPrice(property.price)} ${property.purpose == 'إيجار' ? 'ر.س/شهر' : 'ر.س'}',
-                style: GoogleFonts.cairo(color: gold, fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              if (agent != null)
-                Flexible(
+          if (agent != null) ...[
+            Divider(height: 1, color: textMuted.withValues(alpha: 0.1)),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Container(
+                  width: 22,
+                  height: 22,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(colors: brandGradient),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.person,
+                    size: 14,
+                    color: Colors.white.withValues(alpha: 0.95),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
                   child: Text(
                     agent.name,
                     style: GoogleFonts.cairo(color: textMuted, fontSize: 12),
@@ -204,8 +269,9 @@ class PropertyCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -223,7 +289,11 @@ class PropertyCard extends StatelessWidget {
   }
 
   String _formatPrice(num price) {
-    return price.toStringAsFixed(0).replaceAllMapped(
+    return _formatNumber(price);
+  }
+
+  String _formatNumber(num value) {
+    return value.toStringAsFixed(0).replaceAllMapped(
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (Match m) => '${m[1]},',
         );

@@ -1,37 +1,51 @@
 import 'package:flutter/material.dart';
 
-/// Royal-blue light palette (single source of truth).
+/// Bright modern teal/cyan palette — "Gulf water" identity (single source of truth).
 class AppColors {
-  /// Page background — very light blue-grey.
-  static const Color bg = Color(0xFFF4F7FC);
+  /// Page background — very light icy-mint white.
+  static const Color bg = Color(0xFFF2FAFC);
 
   /// Card / surface background — white.
   static const Color card = Color(0xFFFFFFFF);
 
-  /// Primary royal blue.
-  static const Color royal = Color(0xFF1D4ED8);
+  /// Primary vibrant teal.
+  static const Color primary = Color(0xFF00A896);
 
-  /// Lighter royal-blue accent (badges, hints).
-  static const Color royalLight = Color(0xFF60A5FA);
+  /// Bright cyan (secondary brand accent).
+  static const Color cyan = Color(0xFF00B4D8);
 
-  /// Soft royal-blue tint (selected states, icon chips).
-  static const Color royalSoft = Color(0xFFEAF0FB);
+  /// Lighter teal accent (badges, hints).
+  static const Color primaryLight = Color(0xFF5EE0D0);
+
+  /// Soft teal tint (selected states, icon chips).
+  static const Color primarySoft = Color(0xFFD9F6F1);
+
+  /// Soft cyan tint.
+  static const Color cyanSoft = Color(0xFFD8F1FA);
+
+  /// Brand gradient: teal → cyan.
+  static const List<Color> gradient = [primary, cyan];
 
   /// Success green.
-  static const Color success = Color(0xFF16A34A);
+  static const Color success = Color(0xFF12B886);
 
-  /// Secondary blue (rent badges).
-  static const Color blue = Color(0xFF2563EB);
+  /// Secondary sky blue (rent badges).
+  static const Color blue = Color(0xFF0EA5E9);
 
   /// Danger red.
-  static const Color red = Color(0xFFDC2626);
+  static const Color red = Color(0xFFEF4444);
 
-  /// Primary text — dark slate.
-  static const Color textPrimary = Color(0xFF0F172A);
+  /// Primary text — deep teal-black.
+  static const Color textPrimary = Color(0xFF073B3E);
 
-  /// Muted text.
-  static const Color textMuted = Color(0xFF64748B);
+  /// Muted text — cool grey-teal.
+  static const Color textMuted = Color(0xFF5A8186);
 
-  /// Dark scrim for overlays over images and immersive 3D viewers.
-  static const Color scrim = Color(0xFF0B1220);
+  /// Dark scrim for overlays over images and immersive viewers.
+  static const Color scrim = Color(0xFF052E35);
+
+  /// Legacy alias — royal blue slot now maps to the primary teal.
+  static const Color royal = primary;
+  static const Color royalLight = primaryLight;
+  static const Color royalSoft = primarySoft;
 }

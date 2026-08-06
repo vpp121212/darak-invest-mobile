@@ -6,7 +6,7 @@ import '../../core/router/app_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/tab_provider.dart';
 import '../../theme/app_theme.dart';
-import '../../widgets/bottom_nav.dart';
+import '../../widgets/floating_dock_nav.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../home/home_screen.dart';
 import '../profile/add_property_screen.dart';
@@ -46,9 +46,10 @@ class _AppShellState extends ConsumerState<AppShell> {
   Widget build(BuildContext context) {
     final currentIndex = ref.watch(activeTabProvider);
     return Scaffold(
+      extendBody: true,
       backgroundColor: bgDark,
       body: IndexedStack(index: currentIndex, children: _tabs),
-      bottomNavigationBar: BottomNav(
+      bottomNavigationBar: FloatingDockNav(
         currentIndex: currentIndex,
         onTap: _onTabSelected,
       ),

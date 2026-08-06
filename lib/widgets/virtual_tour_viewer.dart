@@ -369,7 +369,7 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      _hintChip(multi ? 'المسّ السهم الذهبي للتنقل' : 'اسحب للاستكشاف'),
+                      _hintChip(multi ? 'المسّ السهم السماوي للتنقل' : 'اسحب للاستكشاف'),
                       const SizedBox(width: 6),
                       if (!multi) _hintChip('قرصة للتكبير'),
                     ],
