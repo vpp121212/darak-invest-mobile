@@ -11,6 +11,7 @@ import '../../screens/auth/register_screen.dart';
 import '../../screens/compare/compare_screen.dart';
 import '../../screens/favorites/favorites_screen.dart';
 import '../../screens/finance/finance_screen.dart';
+import '../../screens/legal/legal_screen.dart';
 import '../../screens/map/map_screen.dart';
 import '../../screens/market/market_report_screen.dart';
 import '../../screens/neighborhood/neighborhood_detail_screen.dart';
@@ -39,6 +40,7 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: CompareRoute.page),
         AutoRoute(page: MarketReportRoute.page),
         AutoRoute(page: AgentsRoute.page),
+        AutoRoute(page: LegalRoute.page),
       ];
 }
 

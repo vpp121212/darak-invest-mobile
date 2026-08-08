@@ -167,6 +167,22 @@ class FinanceRouteArgs {
 }
 
 /// generated route for
+/// [LegalScreen]
+class LegalRoute extends PageRouteInfo<void> {
+  const LegalRoute({List<PageRouteInfo>? children})
+      : super(LegalRoute.name, initialChildren: children);
+
+  static const String name = 'LegalRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const LegalScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [LoginScreen]
 class LoginRoute extends PageRouteInfo<void> {
   const LoginRoute({List<PageRouteInfo>? children})

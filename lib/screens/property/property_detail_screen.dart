@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -525,29 +527,160 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('الموقع', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
+        Row(
+          children: [
+            const Icon(Icons.map_outlined, color: gold, size: 20),
+            const SizedBox(width: 6),
+            Text('الموقع على الخريطة', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
+            const Spacer(),
+            GestureDetector(
+              onTap: () => context.pushRoute(MapRoute(initialProperty: _property)),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: gold,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text('الخريطة الكاملة', style: GoogleFonts.cairo(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: 12),
         ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: SizedBox(
-            height: 200,
-            child: FlutterMap(
-              options: MapOptions(initialCenter: center, initialZoom: 13),
+            height: 220,
+            child: Stack(
               children: [
-                TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.darakwaheyk.mobile',
-                ),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: center,
-                      child: const Icon(Icons.location_pin, color: gold, size: 40),
+                FlutterMap(
+                  options: MapOptions(
+                    initialCenter: center,
+                    initialZoom: 14,
+                    interactionOptions: const InteractionOptions(
+                      flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+                    ),
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                      subdomains: const ['a', 'b', 'c', 'd'],
+                      userAgentPackageName: 'com.darakwaheyk.mobile',
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          point: center,
+                          width: 220,
+                          height: 92,
+                          alignment: Alignment.bottomCenter,
+                          child: _buildAdLabel(_property),
+                        ),
+                      ],
                     ),
                   ],
                 ),
+                Positioned(
+                  left: 8,
+                  bottom: 6,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: scrim.withValues(alpha: 0.6),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '© OpenStreetMap © CARTO',
+                      style: GoogleFonts.cairo(color: textMuted, fontSize: 9),
+                    ),
+                  ),
+                ),
+                if (!hasCoords)
+                  Positioned(
+                    right: 8,
+                    top: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: scrim.withValues(alpha: 0.7),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: gold.withValues(alpha: 0.4)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.info_outline, size: 12, color: gold),
+                          const SizedBox(width: 4),
+                          Text('موقع تقريبي', style: GoogleFonts.cairo(color: gold, fontSize: 10, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          '${_property.district}، ${_property.city} — ${_property.street.isNotEmpty ? _property.street : 'الموقع على الخريطة'}',
+          style: GoogleFonts.cairo(color: textMuted, fontSize: 12),
+        ),
+      ],
+    );
+  }
+
+  /// Marker bubble showing the ad name (عنوان الإعلان) above the pin.
+  Widget _buildAdLabel(Property p) {
+    final isRent = p.purpose == 'إيجار';
+    final color = isRent ? cyan : primary;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          constraints: const BoxConstraints(maxWidth: 200),
+          decoration: BoxDecoration(
+            color: glassFill,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: color, width: 1.2),
+            boxShadow: softShadow,
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  p.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.cairo(color: textLight, fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${p.district}، ${p.city}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.cairo(color: textMuted, fontSize: 10),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Container(
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.black, width: 2),
+            boxShadow: [BoxShadow(color: color.withValues(alpha: 0.6), blurRadius: 12)],
+          ),
+          child: Icon(
+            isRent ? Icons.real_estate_agent : Icons.home_rounded,
+            color: Colors.black,
+            size: 18,
           ),
         ),
       ],

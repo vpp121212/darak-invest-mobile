@@ -44,6 +44,9 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           _buildMenuItem(Icons.settings_outlined, 'الإعدادات', null, () {}),
           _buildMenuItem(Icons.help_outline, 'المساعدة والدعم', null, () {}),
+          _buildMenuItem(Icons.gavel, 'السياسة القانونية', 'الشروط وسياسة الخصوصية', () {
+            context.pushRoute(const LegalRoute());
+          }),
           if (auth.isLoggedIn) ...[
             const SizedBox(height: 24),
             _buildLogoutButton(ref),

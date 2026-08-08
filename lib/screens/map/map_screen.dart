@@ -31,6 +31,14 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   Property? _selected;
 
   @override
+  void initState() {
+    super.initState();
+    // When opened from a property detail page, preselect the ad so its
+    // name (عنوان الإعلان) shows immediately on the map.
+    _selected = widget.initialProperty;
+  }
+
+  @override
   void dispose() {
     _mapController.dispose();
     super.dispose();
