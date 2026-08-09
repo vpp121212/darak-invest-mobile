@@ -52,6 +52,11 @@ import messageRoutes from './routes/messages.js';
 import maintenanceRoutes from './routes/maintenance.js';
 import valuationReportRoutes from './routes/valuationReports.js';
 import priceIndexRoutes from './routes/priceIndex.js';
+import listingRoutes from './routes/listings.js';
+import favoriteRoutes from './routes/favorites.js';
+import contractRoutes from './routes/contracts.js';
+import valuationRoutes from './routes/valuation.js';
+import adminRoutes from './routes/admin.js';
 
 dotenv.config();
 
@@ -133,6 +138,13 @@ app.use('/api/bookings', bookingRoutes);
   app.use('/api/maintenance', maintenanceRoutes);
   app.use('/api/valuation-reports', valuationReportRoutes);
   app.use('/api/price-index', priceIndexRoutes);
+  app.use('/api/listings', listingRoutes);
+  app.use('/api/favorites', favoriteRoutes);
+  app.use('/api/contracts', contractRoutes);
+  app.use('/api/brokers', agentRoutes);
+  app.use('/api/map', heatmapRoutes);
+  app.use('/api/valuation', valuationRoutes);
+  app.use('/api/admin', adminRoutes);
 app.use('/api/skills', skillRoutes);
 
 app.get('/api/health', (req, res) => {
