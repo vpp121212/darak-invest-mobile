@@ -228,4 +228,33 @@ class ApiService {
   static Future<void> markAllNotificationsRead() async {
     await _client.post('/api/notifications/mark-all');
   }
+
+  /// الدفع — إعدادات بوابة الدفع (وضع الاختبار/الرئيسي).
+  static Future<Map<String, dynamic>> getPaymentsConfig() async {
+    final res = await _client.get('/api/payments/config', auth: false);
+    return res as Map<String, dynamic>;
+  }
+
+  /// الدفع — إنشاء فاتورة/نية دفع لباقة محددة.
+  static Future<Map<String, dynamic>> createPaymentIntent(String packageId) async {
+    final res = await _client.post('/api/payments/create-intent', body: {
+      'packageId': packageId,
+    });
+    return res as Map<String, dynamic>;
+  }
+
+  /// الدفع — إتمام الدفع في وضع الاختبار (بدون بوابة خارجية).
+  static Future<Map<String, dynamic>> completeTestPayment(String paymentId) async {
+    final res = await _client.post('/api/payments/test-complete', body: {
+      'paymentId': paymentId,
+    });
+    return res as Map<String, dynamic>;
+  }
+
+  /// الدفع — سجل دفعات المستخدم.
+  static Future<List<Map<String, dynamic>>> getMyPayments() async {
+    final data = await _client.get('/api/payments');
+    final list = data is Map ? (data['payments'] ?? []) : (data ?? []);
+    return (list as List).map((e) => e as Map<String, dynamic>).toList();
+  }
 }

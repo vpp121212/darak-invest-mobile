@@ -43,6 +43,12 @@ class ProfileScreen extends ConsumerWidget {
             context.pushRoute(const NotificationsRoute());
           }),
           const SizedBox(height: 24),
+          Text('الاشتراك', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          _buildMenuItem(Icons.workspace_premium_outlined, 'الباقات والاشتراك', 'الترقية إلى باقة احترافية أو مؤسسات', () {
+            context.pushRoute(const SubscriptionRoute());
+          }),
+          const SizedBox(height: 24),
           Text('أدوات ذكية', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           _buildMenuItem(Icons.calculate_outlined, 'تقدير السعر الذكي', 'نموذج AI لتقييم العقار', () {

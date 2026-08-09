@@ -70,7 +70,7 @@ router.get('/me', async (req, res) => {
   if (!token) return res.status(401).json(Errors.unauthorized().toJSON());
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-jwt-secret-darak-2026');
-    const [user] = await sql`SELECT id, name, email, phone, role FROM users WHERE id = ${decoded.id}`;
+    const [user] = await sql`SELECT id, name, email, phone, role, package, "packageExpiry" FROM users WHERE id = ${decoded.id}`;
     if (!user) return res.status(401).json(Errors.unauthorized('المستخدم غير موجود').toJSON());
     res.json({ success: true, user });
   } catch (err) {

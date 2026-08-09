@@ -18,6 +18,20 @@ router.get('/config', (req, res) => {
   });
 });
 
+router.get('/', protect, async (req, res) => {
+  try {
+    const payments = await sql`
+      SELECT id, amount, currency, status, "packageId", description, "paymentMethod", "paidAt", "createdAt"
+      FROM payments WHERE "userId" = ${req.user.id}
+      ORDER BY "createdAt" DESC LIMIT 30
+    `;
+    res.json({ success: true, payments });
+  } catch (err) {
+    console.error('List payments error:', err);
+    res.status(500).json(Errors.internal().toJSON());
+  }
+});
+
 router.post('/create-intent', protect, async (req, res) => {
   try {
     const { packageId } = req.body;

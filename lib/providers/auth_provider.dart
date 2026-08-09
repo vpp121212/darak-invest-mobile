@@ -72,6 +72,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// إعادة تحميل بيانات المستخدم (بعد ترقية الباقة مثلاً).
+  Future<void> refreshProfile() => _refreshProfile();
+
   Future<bool> login(String email, String password) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
