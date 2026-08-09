@@ -7,7 +7,9 @@ import '../../core/router/app_router.dart';
 import '../../core/utils/formatters.dart';
 import '../../data/neighborhoods_data.dart';
 import '../../models/property.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/favorites_provider.dart';
+import '../../providers/notifications_provider.dart';
 import '../../providers/properties_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/property_card.dart';
@@ -178,19 +180,48 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ],
             ),
             const Spacer(),
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: glassFill,
-                shape: BoxShape.circle,
-                border: Border.all(color: glassBorder),
-                boxShadow: softShadow,
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.notifications_outlined, color: textMuted, size: 22),
-                onPressed: () => _showComingSoon('الإشعارات'),
-              ),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: glassFill,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: glassBorder),
+                    boxShadow: softShadow,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.notifications_outlined, color: textMuted, size: 22),
+                    onPressed: () {
+                      final auth = ref.read(authProvider);
+                      if (auth.isLoggedIn) {
+                        ref.read(notificationsProvider.notifier).load();
+                      }
+                      context.pushRoute(const NotificationsRoute());
+                    },
+                  ),
+                ),
+                if (ref.watch(notificationsProvider).unreadCount > 0)
+                  Positioned(
+                    top: -2,
+                    left: -2,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: gold,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: bgDark, width: 2),
+                      ),
+                      child: Text(
+                        '${ref.watch(notificationsProvider).unreadCount}',
+                        style: GoogleFonts.cairo(
+                            color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ],
         ),
@@ -696,14 +727,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _openDetail(Property property) {
     context.pushRoute(PropertyDetailRoute(property: property));
   }
-
-  void _showComingSoon(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$feature — قريباً', style: GoogleFonts.cairo())),
-    );
-  }
 }
-
 /// Seamless endless horizontal loop of property cards — scrolls continuously
 /// in either direction by wrapping around a repeated set.
 class _InfinitePropertyLoop extends StatefulWidget {

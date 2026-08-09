@@ -33,8 +33,14 @@ class ProfileScreen extends ConsumerWidget {
           _buildMenuItem(Icons.event_available_outlined, 'وساطتي', 'مواعيد المعاينة وعروض الشراء', () {
             context.pushRoute(const MyBrokerageRoute());
           }),
+          _buildMenuItem(Icons.chat_bubble_outline, 'الرسائل', 'التواصل مع الوسطاء والمشترين', () {
+            context.pushRoute(const ConversationsRoute());
+          }),
           _buildMenuItem(Icons.support_agent, 'الوكلاء', 'التواصل مع الوكلاء المعتمدين', () {
             context.pushRoute(const AgentsRoute());
+          }),
+          _buildMenuItem(Icons.notifications_outlined, 'الإشعارات', 'آخر التحديثات حول مواعيدك وعروضك', () {
+            context.pushRoute(const NotificationsRoute());
           }),
           const SizedBox(height: 24),
           Text('أدوات ذكية', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),

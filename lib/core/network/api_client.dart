@@ -74,6 +74,14 @@ class ApiClient {
         ));
   }
 
+  Future<dynamic> put(String path, {Map<String, dynamic>? body, bool auth = true}) {
+    return _send(() => http.put(
+          _uri(path),
+          headers: _headers(auth: auth),
+          body: jsonEncode(body ?? const {}),
+        ));
+  }
+
   Future<dynamic> _send(Future<http.Response> Function() request) async {
     try {
       final response = await request().timeout(timeout);

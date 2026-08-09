@@ -1,5 +1,7 @@
 import '../core/network/api_client.dart';
 import '../models/booking.dart';
+import '../models/conversation.dart';
+import '../models/notification_item.dart';
 import '../models/offer.dart';
 import '../models/property.dart';
 /// Data access layer for the Darak backend.
@@ -168,5 +170,62 @@ class ApiService {
   }) async {
     final res = await _client.patch('/api/bookings/offers/$id', body: {'status': status});
     return res as Map<String, dynamic>;
+  }
+
+  /// الرسائل — قائمة المحادثات.
+  static Future<List<Conversation>> getConversations() async {
+    final data = await _client.get('/api/messages/conversations');
+    final list = data is Map ? (data['conversations'] ?? []) : (data ?? []);
+    return (list as List)
+        .map((e) => Conversation.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// الرسائل — بدء محادثة مع مستخدم (وعقار اختياري) أو إرجاع الموجودة.
+  static Future<String> createConversation({
+    required String userId,
+    String? propertyId,
+  }) async {
+    final res = await _client.post('/api/messages/conversations', body: {
+      'userId': int.tryParse(userId) ?? userId,
+      if (propertyId != null) 'propertyId': int.tryParse(propertyId) ?? propertyId,
+    }) as Map<String, dynamic>;
+    return (res['conversationId'] ?? '').toString();
+  }
+
+  /// الرسائل — رسائل محادثة معيّنة.
+  static Future<List<Message>> getMessages(String conversationId) async {
+    final data = await _client.get('/api/messages/conversations/$conversationId/messages');
+    final list = data is Map ? (data['messages'] ?? []) : (data ?? []);
+    return (list as List)
+        .map((e) => Message.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// الرسائل — إرسال رسالة.
+  static Future<void> sendMessage({
+    required String conversationId,
+    required String body,
+  }) async {
+    await _client.post('/api/messages/conversations/$conversationId/messages', body: {
+      'body': body,
+    });
+  }
+
+  /// الإشعارات — قائمة آخر 50 إشعارًا.
+  static Future<List<AppNotification>> getNotifications() async {
+    final data = await _client.get('/api/notifications');
+    final list = data is Map ? (data['notifications'] ?? []) : (data ?? []);
+    return (list as List)
+        .map((e) => AppNotification.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  static Future<void> markNotificationRead(String id) async {
+    await _client.put('/api/notifications/$id/read');
+  }
+
+  static Future<void> markAllNotificationsRead() async {
+    await _client.post('/api/notifications/mark-all');
   }
 }

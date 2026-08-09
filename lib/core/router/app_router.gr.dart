@@ -90,6 +90,53 @@ class BookingRouteArgs {
 }
 
 /// generated route for
+/// [ChatScreen]
+class ChatRoute extends PageRouteInfo<ChatRouteArgs> {
+  ChatRoute({
+    Key? key,
+    required String conversationId,
+    List<PageRouteInfo>? children,
+  }) : super(
+          ChatRoute.name,
+          args: ChatRouteArgs(key: key, conversationId: conversationId),
+          initialChildren: children,
+        );
+
+  static const String name = 'ChatRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<ChatRouteArgs>();
+      return ChatScreen(key: args.key, conversationId: args.conversationId);
+    },
+  );
+}
+
+class ChatRouteArgs {
+  const ChatRouteArgs({this.key, required this.conversationId});
+
+  final Key? key;
+
+  final String conversationId;
+
+  @override
+  String toString() {
+    return 'ChatRouteArgs{key: $key, conversationId: $conversationId}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ChatRouteArgs) return false;
+    return key == other.key && conversationId == other.conversationId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ conversationId.hashCode;
+}
+
+/// generated route for
 /// [CompareScreen]
 class CompareRoute extends PageRouteInfo<void> {
   const CompareRoute({List<PageRouteInfo>? children})
@@ -101,6 +148,22 @@ class CompareRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const CompareScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [ConversationsScreen]
+class ConversationsRoute extends PageRouteInfo<void> {
+  const ConversationsRoute({List<PageRouteInfo>? children})
+      : super(ConversationsRoute.name, initialChildren: children);
+
+  static const String name = 'ConversationsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ConversationsScreen();
     },
   );
 }
@@ -369,6 +432,22 @@ class NeighborhoodDetailRouteArgs {
 
   @override
   int get hashCode => key.hashCode ^ district.hashCode;
+}
+
+/// generated route for
+/// [NotificationsScreen]
+class NotificationsRoute extends PageRouteInfo<void> {
+  const NotificationsRoute({List<PageRouteInfo>? children})
+      : super(NotificationsRoute.name, initialChildren: children);
+
+  static const String name = 'NotificationsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const NotificationsScreen();
+    },
+  );
 }
 
 /// generated route for

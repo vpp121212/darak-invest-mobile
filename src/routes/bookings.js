@@ -32,6 +32,16 @@ function formatOffer(row) {
   return { ...rest, images: parseImages(images) };
 }
 
+async function notify(userId, title, message, type = 'info') {
+  if (!userId) return;
+  try {
+    await sql`INSERT INTO notifications ("userId", title, message, type)
+              VALUES (${userId}, ${title}, ${message}, ${type})`;
+  } catch (err) {
+    console.error('[notify]', err.message);
+  }
+}
+
 async function loadProperty(propertyId) {
   const [property] = await sql`SELECT id, title, "agentUserId", "agentPhone", "agentName" FROM properties WHERE id = ${propertyId}`;
   return property;
@@ -79,6 +89,12 @@ router.post('/', protect, async (req, res) => {
       VALUES (${req.user.id}, ${propertyId}, ${property.agentUserId}, ${type}, ${scheduledAt}, ${note})
       RETURNING id
     `;
+    await notify(
+      property.agentUserId,
+      'طلب موعد جديد',
+      `طلب ${type} على عقارك «${property.title}»`,
+      'booking'
+    );
     res.status(201).json({ success: true, id: result.id, message: 'تم إرسال طلب حجز الموعد، وسيؤكده الوسيط' });
   } catch (err) {
     console.error(err);
@@ -101,10 +117,17 @@ router.patch('/:id', protect, async (req, res) => {
     }
     if (status === 'cancelled' && isRequester && existing.status !== 'cancelled') {
       await sql`UPDATE appointments SET status = ${status}, "updatedAt" = NOW() WHERE id = ${req.params.id}`;
+      await notify(existing.agentUserId, 'إلغاء موعد', 'أُلغيت المعاينة من قبل الطالب', 'booking');
       return res.json({ success: true, message: 'تم إلغاء الموعد' });
     }
     if ((status === 'confirmed' || status === 'completed' || status === 'cancelled') && isAgent) {
       await sql`UPDATE appointments SET status = ${status}, "updatedAt" = NOW() WHERE id = ${req.params.id}`;
+      const msg = status === 'confirmed'
+        ? 'تم تأكيد موعد المعاينة الخاص بك'
+        : status === 'completed'
+            ? 'تم إنهاء الموعد — نشكرك على زيارتك'
+            : 'تم إلغاء الموعد من قبل الوسيط';
+      await notify(existing.userId, 'تحديث موعد', msg, 'booking');
       return res.json({ success: true, message: 'تم تحديث حالة الموعد' });
     }
     return res.status(403).json(Errors.forbidden('لا تملك صلاحية لهذا الإجراء').toJSON());
@@ -155,6 +178,12 @@ router.post('/offers', protect, async (req, res) => {
       VALUES (${req.user.id}, ${propertyId}, ${Number(amount)}, ${paymentMethod}, ${note})
       RETURNING id
     `;
+    await notify(
+      property.agentUserId,
+      'عرض شراء جديد',
+      `وصل عرض بقيمة ${Number(amount).toLocaleString('en-US')} ر.س على عقارك «${property.title}»`,
+      'offer'
+    );
     res.status(201).json({ success: true, id: result.id, message: 'تم إرسال عرضك، وسيراجعه الوسيط' });
   } catch (err) {
     console.error(err);
@@ -178,10 +207,15 @@ router.patch('/offers/:id', protect, async (req, res) => {
     }
     if (status === 'cancelled' && isBuyer && existing.status === 'pending') {
       await sql`UPDATE offers SET status = ${status}, "updatedAt" = NOW() WHERE id = ${req.params.id}`;
+      await notify(property?.agentUserId, 'إلغاء عرض', 'أُلغي العرض المقدم على عقارك', 'offer');
       return res.json({ success: true, message: 'تم إلغاء العرض' });
     }
     if ((status === 'accepted' || status === 'rejected') && isSeller && existing.status === 'pending') {
       await sql`UPDATE offers SET status = ${status}, "updatedAt" = NOW() WHERE id = ${req.params.id}`;
+      const msg = status === 'accepted'
+        ? 'تم قبول عرضك على العقار — يتواصل معك الوسيط لإتمام العقد'
+        : 'تم رفض عرضك على العقار';
+      await notify(existing.userId, 'تحديث عرض الشراء', msg, 'offer');
       return res.json({ success: true, message: 'تم تحديث حالة العرض' });
     }
     return res.status(403).json(Errors.forbidden('لا تملك صلاحية لهذا الإجراء').toJSON());

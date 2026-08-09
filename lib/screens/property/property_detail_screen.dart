@@ -13,7 +13,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/router/app_router.dart';
 import '../../core/utils/formatters.dart';
 import '../../models/property.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/favorites_provider.dart';
+import '../../providers/messages_provider.dart';
 import '../../providers/properties_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/dollhouse_viewer.dart';
@@ -898,6 +900,19 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 ),
               ),
             ],
+            const SizedBox(width: 10),
+            GestureDetector(
+              onTap: () => _messageAgent(),
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: glassFill,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: gold.withValues(alpha: 0.6)),
+                ),
+                child: const Icon(Icons.mail_outline, color: gold, size: 24),
+              ),
+            ),
           ],
         ),
       ),
@@ -926,6 +941,28 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       _showMessage('تعذّر فتح واتساب');
     }
+  }
+
+  Future<void> _messageAgent() async {
+    final agent = _property.agent;
+    final auth = ref.read(authProvider);
+    if (agent == null) {
+      _showMessage('لا يوجد وسيط لهذا العقار');
+      return;
+    }
+    if (!auth.isLoggedIn) {
+      context.pushRoute(const LoginRoute());
+      return;
+    }
+    final conversationId = await ref
+        .read(messagesProvider.notifier)
+        .startConversation(userId: agent.id, propertyId: _property.id);
+    if (conversationId == null) {
+      _showMessage('تعذّر بدء المحادثة');
+      return;
+    }
+    if (!mounted) return;
+    context.pushRoute(ChatRoute(conversationId: conversationId));
   }
 
   void _showMessage(String msg) {

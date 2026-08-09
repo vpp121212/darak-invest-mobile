@@ -529,6 +529,32 @@ if (dbUrl) {
   CREATE INDEX IF NOT EXISTS idx_appointments_agent ON appointments("agentUserId");
   CREATE INDEX IF NOT EXISTS idx_offers_user ON offers("userId");
   CREATE INDEX IF NOT EXISTS idx_offers_property ON offers("propertyId");
+
+  CREATE TABLE IF NOT EXISTS conversations (
+    id SERIAL PRIMARY KEY,
+    "userOneId" INTEGER REFERENCES users(id) NOT NULL,
+    "userTwoId" INTEGER REFERENCES users(id) NOT NULL,
+    "propertyId" INTEGER REFERENCES properties(id),
+    "lastMessage" TEXT DEFAULT '',
+    "lastMessageAt" TEXT DEFAULT (NOW()),
+    "unreadOne" INTEGER DEFAULT 0,
+    "unreadTwo" INTEGER DEFAULT 0,
+    "createdAt" TEXT DEFAULT (NOW()),
+    UNIQUE("userOneId", "userTwoId", "propertyId")
+  );
+
+  CREATE TABLE IF NOT EXISTS messages (
+    id SERIAL PRIMARY KEY,
+    "conversationId" INTEGER REFERENCES conversations(id) NOT NULL,
+    "senderId" INTEGER REFERENCES users(id) NOT NULL,
+    body TEXT NOT NULL,
+    "isRead" INTEGER DEFAULT 0,
+    "createdAt" TEXT DEFAULT (NOW())
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages("conversationId");
+  CREATE INDEX IF NOT EXISTS idx_conversations_user ON conversations("userOneId");
+  CREATE INDEX IF NOT EXISTS idx_conversations_user2 ON conversations("userTwoId");
 `);
   } catch (err) {
     console.error('[db] فشل الاتصال بقاعدة البيانات:', err.message);
