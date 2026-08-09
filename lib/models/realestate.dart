@@ -262,3 +262,66 @@ class InvoiceTotals {
     );
   }
 }
+
+class MaintenanceRequest {
+  final String id;
+  final String category;
+  final String title;
+  final String description;
+  final String priority;
+  final String status;
+  final double cost;
+  final String propertyTitle;
+  final String vendorName;
+  final String createdAt;
+
+  const MaintenanceRequest({
+    required this.id,
+    this.category = 'عام',
+    this.title = '',
+    this.description = '',
+    this.priority = 'medium',
+    this.status = 'pending',
+    this.cost = 0,
+    this.propertyTitle = '',
+    this.vendorName = '',
+    this.createdAt = '',
+  });
+
+  factory MaintenanceRequest.fromJson(Map<String, dynamic> json) {
+    return MaintenanceRequest(
+      id: (json['id'] ?? '').toString(),
+      category: _str(json['category']),
+      title: _str(json['title']),
+      description: _str(json['description']),
+      priority: _str(json['priority']),
+      status: _str(json['status']),
+      cost: (json['cost'] ?? 0).toDouble(),
+      propertyTitle: _str(json['propertyTitle']),
+      vendorName: _str(json['vendorName']),
+      createdAt: _str(json['createdAt']),
+    );
+  }
+
+  bool get isPending => status == 'pending';
+  bool get isAssigned => status == 'assigned';
+  bool get isInProgress => status == 'in_progress';
+  bool get isCompleted => status == 'completed';
+  bool get isCancelled => status == 'cancelled';
+
+  String get statusLabel => switch (status) {
+        'pending' => 'قيد الانتظار',
+        'assigned' => 'تم التعيين',
+        'in_progress' => 'قيد التنفيذ',
+        'completed' => 'مكتمل',
+        'cancelled' => 'ملغي',
+        _ => status,
+      };
+
+  String get priorityLabel => switch (priority) {
+        'low' => 'منخفضة',
+        'high' => 'عالية',
+        'urgent' => 'عاجلة',
+        _ => 'متوسطة',
+      };
+}

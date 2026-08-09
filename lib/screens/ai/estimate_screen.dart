@@ -6,7 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/utils/formatters.dart';
 import '../../models/estimate_result.dart';
 import '../../models/property.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/estimate_provider.dart';
+import '../../services/api_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/ai_field.dart';
 
@@ -294,9 +296,28 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
         if (result.sampleSize == null || result.sampleSize == 0) {
           return _NoData(message: result.message);
         }
-        return _EstimateResultView(result: result);
+        return _EstimateResultView(result: result, onSave: () => _saveReport(result));
       },
     );
+  }
+
+  Future<void> _saveReport(EstimateResult result) async {
+    if (!(ref.read(authProvider).isLoggedIn)) {
+      _snack('سجّل دخولك لحفظ التقرير');
+      return;
+    }
+    try {
+      await ApiService.saveValuationReport({
+        'title': '${result.expected ?? ''} ر.س',
+        'estimate': result.expected ?? 0,
+        'minPrice': result.suitable ?? 0,
+        'maxPrice': result.maximum ?? 0,
+        'confidence': result.saleChance ?? 0,
+      });
+      _snack('تم حفظ التقرير في سجل التقييم');
+    } catch (_) {
+      _snack('تعذر حفظ التقرير');
+    }
   }
 
   void _snack(String msg) {
@@ -306,8 +327,9 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
 
 class _EstimateResultView extends StatelessWidget {
   final EstimateResult result;
+  final VoidCallback onSave;
 
-  const _EstimateResultView({required this.result});
+  const _EstimateResultView({required this.result, required this.onSave});
 
   @override
   Widget build(BuildContext context) {
@@ -348,6 +370,23 @@ class _EstimateResultView extends StatelessWidget {
               style: GoogleFonts.cairo(color: textMuted, fontSize: 12),
             ),
           ],
+          const SizedBox(height: 16),
+          GestureDetector(
+            onTap: onSave,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: gold.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: gold.withValues(alpha: 0.4)),
+              ),
+              child: Center(
+                child: Text('حفظ التقرير في سجلي',
+                    style: GoogleFonts.cairo(color: gold, fontSize: 14, fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ),
         ],
       ),
     );

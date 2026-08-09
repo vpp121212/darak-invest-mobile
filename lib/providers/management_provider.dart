@@ -10,6 +10,7 @@ class ManagementState {
   final InvoiceTotals invoiceTotals;
   final List<RealEstateLicense> licenses;
   final List<RealEstateDeed> deeds;
+  final List<MaintenanceRequest> maintenance;
   final bool isLoading;
   final String? error;
 
@@ -20,6 +21,7 @@ class ManagementState {
     this.invoiceTotals = const InvoiceTotals(),
     this.licenses = const [],
     this.deeds = const [],
+    this.maintenance = const [],
     this.isLoading = false,
     this.error,
   });
@@ -31,6 +33,7 @@ class ManagementState {
     InvoiceTotals? invoiceTotals,
     List<RealEstateLicense>? licenses,
     List<RealEstateDeed>? deeds,
+    List<MaintenanceRequest>? maintenance,
     bool? isLoading,
     String? error,
     bool clearError = false,
@@ -42,6 +45,7 @@ class ManagementState {
       invoiceTotals: invoiceTotals ?? this.invoiceTotals,
       licenses: licenses ?? this.licenses,
       deeds: deeds ?? this.deeds,
+      maintenance: maintenance ?? this.maintenance,
       isLoading: isLoading ?? this.isLoading,
       error: clearError ? null : (error ?? this.error),
     );
@@ -60,6 +64,7 @@ class ManagementNotifier extends StateNotifier<ManagementState> {
         ApiService.getInvoices(),
         ApiService.getLicenses(),
         ApiService.getDeeds(),
+        ApiService.getMaintenanceRequests(),
       ]);
       state = ManagementState(
         stats: results[0] as ManagementStats,
@@ -68,6 +73,7 @@ class ManagementNotifier extends StateNotifier<ManagementState> {
         invoiceTotals: (results[2] as (List<RentalInvoice>, InvoiceTotals)).$2,
         licenses: results[3] as List<RealEstateLicense>,
         deeds: results[4] as List<RealEstateDeed>,
+        maintenance: results[5] as List<MaintenanceRequest>,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
@@ -143,6 +149,28 @@ class ManagementNotifier extends StateNotifier<ManagementState> {
   Future<bool> addDeed(Map<String, dynamic> data) async {
     try {
       await ApiService.createDeed(data);
+      await load();
+      return true;
+    } catch (e) {
+      state = state.copyWith(error: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> addMaintenance(Map<String, dynamic> data) async {
+    try {
+      await ApiService.createMaintenanceRequest(data);
+      await load();
+      return true;
+    } catch (e) {
+      state = state.copyWith(error: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateMaintenanceStatus(String id, String status) async {
+    try {
+      await ApiService.updateMaintenanceStatus(id, status);
       await load();
       return true;
     } catch (e) {

@@ -137,4 +137,38 @@ void main() {
       expect(t.count, 4);
     });
   });
+
+  group('MaintenanceRequest', () {
+    test('parses a maintenance row', () {
+      final m = MaintenanceRequest.fromJson(const {
+        'id': 7,
+        'category': 'تكييف',
+        'title': 'تبريد ضعيف',
+        'description': 'المكيف لا يبرّد',
+        'priority': 'high',
+        'status': 'in_progress',
+        'cost': 350,
+        'propertyTitle': 'شقة حي الورود',
+        'vendorName': 'مؤسسة التبريد',
+      });
+      expect(m.id, '7');
+      expect(m.category, 'تكييف');
+      expect(m.title, 'تبريد ضعيف');
+      expect(m.priorityLabel, 'عالية');
+      expect(m.isInProgress, isTrue);
+      expect(m.statusLabel, 'قيد التنفيذ');
+      expect(m.cost, 350);
+      expect(m.vendorName, 'مؤسسة التبريد');
+    });
+
+    test('status helpers and labels', () {
+      MaintenanceRequest at(String s) => MaintenanceRequest.fromJson({'id': 1, 'status': s});
+      expect(at('pending').isPending, isTrue);
+      expect(at('assigned').isAssigned, isTrue);
+      expect(at('completed').isCompleted, isTrue);
+      expect(at('cancelled').isCancelled, isTrue);
+      expect(at('completed').statusLabel, 'مكتمل');
+      expect(at('pending').statusLabel, 'قيد الانتظار');
+    });
+  });
 }

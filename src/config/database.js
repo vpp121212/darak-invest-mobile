@@ -555,6 +555,70 @@ if (dbUrl) {
   CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages("conversationId");
   CREATE INDEX IF NOT EXISTS idx_conversations_user ON conversations("userOneId");
   CREATE INDEX IF NOT EXISTS idx_conversations_user2 ON conversations("userTwoId");
+
+  CREATE TABLE IF NOT EXISTS roles (
+    id SERIAL PRIMARY KEY,
+    name TEXT UNIQUE NOT NULL,
+    label TEXT NOT NULL,
+    permissions TEXT DEFAULT '[]',
+    "createdAt" TEXT DEFAULT (NOW())
+  );
+
+  INSERT INTO roles (name, label, permissions) VALUES
+    ('user', 'مستخدم', '["view:properties","view:listings"]'),
+    ('agent', 'وسيط', '["view:properties","create:listings","manage:brokerage"]'),
+    ('owner', 'مالك', '["view:properties","create:listings","manage:property"]'),
+    ('admin', 'مدير', '["*"]')
+  ON CONFLICT (name) DO NOTHING;
+
+  CREATE TABLE IF NOT EXISTS maintenance_requests (
+    id SERIAL PRIMARY KEY,
+    "userId" INTEGER NOT NULL REFERENCES users(id),
+    "propertyId" INTEGER REFERENCES properties(id),
+    category TEXT NOT NULL CHECK(category IN ('سباكة','كهرباء','تكييف','عمارة','عام')),
+    title TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    priority TEXT DEFAULT 'medium' CHECK(priority IN ('low','medium','high','urgent')),
+    status TEXT DEFAULT 'pending' CHECK(status IN ('pending','assigned','in_progress','completed','cancelled')),
+    "assignedVendorId" INTEGER REFERENCES vendors(id),
+    cost REAL DEFAULT 0,
+    "scheduledAt" TEXT,
+    "completedAt" TEXT,
+    "createdAt" TEXT DEFAULT (NOW()),
+    "updatedAt" TEXT DEFAULT (NOW())
+  );
+  CREATE INDEX IF NOT EXISTS idx_maintenance_user ON maintenance_requests("userId");
+  CREATE INDEX IF NOT EXISTS idx_maintenance_property ON maintenance_requests("propertyId");
+  CREATE INDEX IF NOT EXISTS idx_maintenance_status ON maintenance_requests(status);
+
+  CREATE TABLE IF NOT EXISTS valuation_reports (
+    id SERIAL PRIMARY KEY,
+    "userId" INTEGER NOT NULL REFERENCES users(id),
+    "propertyId" INTEGER REFERENCES properties(id),
+    title TEXT DEFAULT '',
+    details TEXT DEFAULT '[]',
+    estimate REAL DEFAULT 0,
+    minPrice REAL DEFAULT 0,
+    maxPrice REAL DEFAULT 0,
+    confidence INTEGER DEFAULT 0,
+    "pulseData" TEXT DEFAULT '{}',
+    "createdAt" TEXT DEFAULT (NOW())
+  );
+  CREATE INDEX IF NOT EXISTS idx_valuation_user ON valuation_reports("userId");
+
+  CREATE TABLE IF NOT EXISTS price_index (
+    id SERIAL PRIMARY KEY,
+    city TEXT NOT NULL,
+    district TEXT,
+    indicator_type TEXT NOT NULL DEFAULT 'average_price',
+    period TEXT NOT NULL,
+    value REAL NOT NULL,
+    "unit" TEXT DEFAULT 'ر.س/م²',
+    "createdAt" TEXT DEFAULT (NOW()),
+    UNIQUE(city, district, indicator_type, period)
+  );
+  CREATE INDEX IF NOT EXISTS idx_price_index_city ON price_index(city);
+  CREATE INDEX IF NOT EXISTS idx_price_index_district ON price_index(district);
 `);
   } catch (err) {
     console.error('[db] فشل الاتصال بقاعدة البيانات:', err.message);

@@ -337,4 +337,35 @@ class ApiService {
     final res = await _client.post('/api/realestate/deeds', body: data);
     return res as Map<String, dynamic>;
   }
+
+  /// الصيانة — قائمة الطلبات.
+  static Future<List<MaintenanceRequest>> getMaintenanceRequests() async {
+    final data = await _client.get('/api/maintenance');
+    final list = data is Map ? (data['requests'] ?? []) : (data ?? []);
+    return (list as List)
+        .map((e) => MaintenanceRequest.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  static Future<Map<String, dynamic>> createMaintenanceRequest(Map<String, dynamic> data) async {
+    final res = await _client.post('/api/maintenance', body: data);
+    return res as Map<String, dynamic>;
+  }
+
+  static Future<Map<String, dynamic>> updateMaintenanceStatus(String id, String status) async {
+    final res = await _client.patch('/api/maintenance/$id/status', body: {'status': status});
+    return res as Map<String, dynamic>;
+  }
+
+  /// تقارير التقييم — حفظ تقرير وقراءته.
+  static Future<Map<String, dynamic>> saveValuationReport(Map<String, dynamic> data) async {
+    final res = await _client.post('/api/valuation-reports', body: data);
+    return res as Map<String, dynamic>;
+  }
+
+  static Future<List<Map<String, dynamic>>> getValuationReports() async {
+    final data = await _client.get('/api/valuation-reports');
+    final list = data is Map ? (data['reports'] ?? []) : (data ?? []);
+    return (list as List).map((e) => e as Map<String, dynamic>).toList();
+  }
 }

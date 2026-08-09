@@ -27,7 +27,7 @@ class _ManagementScreenState extends ConsumerState<ManagementScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
   }
 
   @override
@@ -74,6 +74,7 @@ class _ManagementScreenState extends ConsumerState<ManagementScreen>
             Tab(text: 'الفواتير'),
             Tab(text: 'الرخص'),
             Tab(text: 'الصكوك'),
+            Tab(text: 'الصيانة'),
           ],
         ),
       ),
@@ -89,6 +90,7 @@ class _ManagementScreenState extends ConsumerState<ManagementScreen>
                   _invoices(state),
                   _licenses(state),
                   _deeds(state),
+                  _maintenance(state),
                 ],
               ),
             ),
@@ -148,6 +150,7 @@ class _ManagementScreenState extends ConsumerState<ManagementScreen>
         _quickAction(Icons.receipt_long_outlined, 'إصدار فاتورة', () => _addInvoice()),
         _quickAction(Icons.badge_outlined, 'طلب ترخيص', () => _addLicense()),
         _quickAction(Icons.balance_outlined, 'تسجيل صك', () => _addDeed()),
+        _quickAction(Icons.handyman_outlined, 'طلب صيانة', () => _addMaintenance()),
       ],
     );
   }
@@ -452,9 +455,86 @@ class _ManagementScreenState extends ConsumerState<ManagementScreen>
     );
   }
 
+  // ─── الصيانة ────────────────────────────────────────────────
+  Widget _maintenance(ManagementState state) {
+    if (state.isLoading && state.maintenance.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (state.maintenance.isEmpty) return _empty('لا توجد طلبات صيانة', 'أرسل طلباً من الزر أدناه');
+    return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+      itemCount: state.maintenance.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      itemBuilder: (context, index) => _maintenanceCard(state.maintenance[index]),
+    );
+  }
+
+  Widget _maintenanceCard(MaintenanceRequest r) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: glassFill,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: glassBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(r.title,
+                    maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.cairo(color: textLight, fontSize: 14, fontWeight: FontWeight.bold)),
+              ),
+              _badge(r.statusLabel, _maintenanceColor(r.status)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text('${r.category} • أولوية ${r.priorityLabel}',
+              style: GoogleFonts.cairo(color: textMuted, fontSize: 12)),
+          if (r.propertyTitle.isNotEmpty)
+            Text('العقار: ${r.propertyTitle}', maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.cairo(color: textMuted, fontSize: 12)),
+          if (r.vendorName.isNotEmpty)
+            Text('المقاول: ${r.vendorName}', maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.cairo(color: textMuted, fontSize: 12)),
+          if (r.description.isNotEmpty)
+            Text(r.description, maxLines: 2, overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.cairo(color: textMuted, fontSize: 12)),
+          if (r.cost > 0)
+            Text('التكلفة: ${Formatters.number(r.cost)} ر.س',
+                style: GoogleFonts.cairo(color: gold, fontSize: 13, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: [
+              if (r.isPending)
+                _actionBtn('تعيين مقاول', blue, () => _run(() => ref.read(managementProvider.notifier).updateMaintenanceStatus(r.id, 'assigned'), 'تم تحديد الحالة')),
+              if (r.isAssigned)
+                _actionBtn('بدء التنفيذ', cyan, () => _run(() => ref.read(managementProvider.notifier).updateMaintenanceStatus(r.id, 'in_progress'), 'تم البدء')),
+              if (r.isInProgress)
+                _actionBtn('إكمال', success, () => _run(() => ref.read(managementProvider.notifier).updateMaintenanceStatus(r.id, 'completed'), 'تم الإكمال')),
+              if (!r.isCompleted && !r.isCancelled)
+                _actionBtn('إلغاء', red, () => _run(() => ref.read(managementProvider.notifier).updateMaintenanceStatus(r.id, 'cancelled'), 'تم الإلغاء')),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _maintenanceColor(String status) => switch (status) {
+        'completed' => success,
+        'cancelled' => red,
+        'in_progress' => cyan,
+        'assigned' => blue,
+        _ => gold,
+      };
+
   // ─── أدوات مساعدة ────────────────────────────────────────────
-  Widget _empty(String title, String subtitle) {
-    return Center(
+  Widget _empty(String title, String subtitle) {    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -584,6 +664,20 @@ class _ManagementScreenState extends ConsumerState<ManagementScreen>
     if (data == null) return;
     final ok = await ref.read(managementProvider.notifier).addDeed(data);
     _toast(ok ? 'تم تسجيل الصك' : (ref.read(managementProvider).error ?? 'فشل التسجيل'));
+  }
+
+  Future<void> _addMaintenance() async {
+    const priorityLabels = {'منخفضة': 'low', 'متوسطة': 'medium', 'عالية': 'high', 'عاجلة': 'urgent'};
+    final data = await _showFormSheet('طلب صيانة', [
+      _field('category', 'الفئة', initial: 'سباكة', options: const ['سباكة', 'كهرباء', 'تكييف', 'عمارة', 'عام']),
+      _field('title', 'وصف مختصر', required: true),
+      _field('description', 'تفاصيل إضافية'),
+      _field('priority', 'الأولوية', initial: 'متوسطة', options: const ['منخفضة', 'متوسطة', 'عالية', 'عاجلة']),
+    ]);
+    if (data == null) return;
+    data['priority'] = priorityLabels[data['priority']] ?? 'medium';
+    final ok = await ref.read(managementProvider.notifier).addMaintenance(data);
+    _toast(ok ? 'تم إرسال الطلب' : (ref.read(managementProvider).error ?? 'فشل الإرسال'));
   }
 
   _FieldSpec _field(String key, String label,

@@ -49,6 +49,9 @@ import avmRoutes from './routes/avm.js';
 import heatmapRoutes from './routes/heatmap.js';
 import bookingRoutes from './routes/bookings.js';
 import messageRoutes from './routes/messages.js';
+import maintenanceRoutes from './routes/maintenance.js';
+import valuationReportRoutes from './routes/valuationReports.js';
+import priceIndexRoutes from './routes/priceIndex.js';
 
 dotenv.config();
 
@@ -126,7 +129,10 @@ app.use('/api/indicators', indicatorRoutes);
 app.use('/api/avm', avmRoutes);
 app.use('/api/heatmap', heatmapRoutes);
 app.use('/api/bookings', bookingRoutes);
-app.use('/api/messages', messageRoutes);
+  app.use('/api/messages', messageRoutes);
+  app.use('/api/maintenance', maintenanceRoutes);
+  app.use('/api/valuation-reports', valuationReportRoutes);
+  app.use('/api/price-index', priceIndexRoutes);
 app.use('/api/skills', skillRoutes);
 
 app.get('/api/health', (req, res) => {
