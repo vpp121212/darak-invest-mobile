@@ -17,6 +17,7 @@ import '../../screens/finance/finance_screen.dart';
 import '../../screens/legal/legal_screen.dart';
 import '../../screens/map/map_screen.dart';
 import '../../screens/market/market_report_screen.dart';
+import '../../screens/management/management_screen.dart';
 import '../../screens/messages/chat_screen.dart';
 import '../../screens/messages/conversations_screen.dart';
 import '../../screens/neighborhood/neighborhood_detail_screen.dart';
@@ -55,6 +56,7 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: ChatRoute.page),
         AutoRoute(page: NotificationsRoute.page),
         AutoRoute(page: SubscriptionRoute.page),
+        AutoRoute(page: ManagementRoute.page),
       ];
 }
 

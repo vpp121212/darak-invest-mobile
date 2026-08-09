@@ -4,6 +4,7 @@ import '../models/conversation.dart';
 import '../models/notification_item.dart';
 import '../models/offer.dart';
 import '../models/property.dart';
+import '../models/realestate.dart';
 /// Data access layer for the Darak backend.
 ///
 /// Thin, stateless wrappers over [ApiClient]. All network errors are surfaced
@@ -256,5 +257,84 @@ class ApiService {
     final data = await _client.get('/api/payments');
     final list = data is Map ? (data['payments'] ?? []) : (data ?? []);
     return (list as List).map((e) => e as Map<String, dynamic>).toList();
+  }
+
+  /// إدارة العقارات — إحصائيات لوحة الإدارة.
+  static Future<ManagementStats> getManagementStats() async {
+    final res = await _client.get('/api/realestate/dashboard') as Map<String, dynamic>;
+    final stats = (res['stats'] ?? res) as Map<String, dynamic>;
+    return ManagementStats.fromJson(stats);
+  }
+
+  /// إدارة العقارات — العقود.
+  static Future<List<RealEstateContract>> getContracts() async {
+    final data = await _client.get('/api/realestate/contracts');
+    final list = data is Map ? (data['contracts'] ?? []) : (data ?? []);
+    return (list as List)
+        .map((e) => RealEstateContract.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  static Future<Map<String, dynamic>> createContract(Map<String, dynamic> data) async {
+    final res = await _client.post('/api/realestate/contracts', body: data);
+    return res as Map<String, dynamic>;
+  }
+
+  static Future<Map<String, dynamic>> authenticateContract(String id) async {
+    final res = await _client.post('/api/realestate/contracts/$id/authenticate');
+    return res as Map<String, dynamic>;
+  }
+
+  static Future<Map<String, dynamic>> updateContract(String id, Map<String, dynamic> data) async {
+    final res = await _client.put('/api/realestate/contracts/$id', body: data);
+    return res as Map<String, dynamic>;
+  }
+
+  /// إدارة العقارات — الفواتير الإيجارية.
+  static Future<(List<RentalInvoice>, InvoiceTotals)> getInvoices() async {
+    final res = await _client.get('/api/realestate/rental-invoices') as Map<String, dynamic>;
+    final list = (res['invoices'] ?? []) as List;
+    final invoices = list
+        .map((e) => RentalInvoice.fromJson(e as Map<String, dynamic>))
+        .toList();
+    return (invoices, InvoiceTotals.fromJson((res['stats'] ?? {}) as Map<String, dynamic>));
+  }
+
+  static Future<Map<String, dynamic>> createInvoice(Map<String, dynamic> data) async {
+    final res = await _client.post('/api/realestate/rental-invoices', body: data);
+    return res as Map<String, dynamic>;
+  }
+
+  static Future<Map<String, dynamic>> payInvoice(String id) async {
+    final res = await _client.put('/api/realestate/rental-invoices/$id/pay');
+    return res as Map<String, dynamic>;
+  }
+
+  /// إدارة العقارات — الرخص.
+  static Future<List<RealEstateLicense>> getLicenses() async {
+    final data = await _client.get('/api/realestate/licenses');
+    final list = data is Map ? (data['licenses'] ?? []) : (data ?? []);
+    return (list as List)
+        .map((e) => RealEstateLicense.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  static Future<Map<String, dynamic>> createLicense(Map<String, dynamic> data) async {
+    final res = await _client.post('/api/realestate/licenses', body: data);
+    return res as Map<String, dynamic>;
+  }
+
+  /// إدارة العقارات — الصكوك.
+  static Future<List<RealEstateDeed>> getDeeds() async {
+    final data = await _client.get('/api/realestate/deeds');
+    final list = data is Map ? (data['deeds'] ?? []) : (data ?? []);
+    return (list as List)
+        .map((e) => RealEstateDeed.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  static Future<Map<String, dynamic>> createDeed(Map<String, dynamic> data) async {
+    final res = await _client.post('/api/realestate/deeds', body: data);
+    return res as Map<String, dynamic>;
   }
 }
