@@ -15,12 +15,17 @@ class PropertyCard extends StatelessWidget {
   final VoidCallback? onFavorite;
   final bool isFavorite;
 
+  /// Compact layout for horizontal rails (similar properties): shorter image,
+  /// tighter padding and no agent row.
+  final bool compact;
+
   const PropertyCard({
     super.key,
     required this.property,
     this.onTap,
     this.onFavorite,
     this.isFavorite = false,
+    this.compact = false,
   });
 
   @override
@@ -54,22 +59,23 @@ class PropertyCard extends StatelessWidget {
   }
 
   Widget _buildImageSection() {
+    final imageHeight = compact ? 150.0 : 190.0;
     return Stack(
       children: [
         CachedNetworkImage(
           imageUrl: property.mainImage,
-          height: 190,
+          height: imageHeight,
           width: double.infinity,
           fit: BoxFit.cover,
           placeholder: (c, _) => Container(
-            height: 190,
+            height: imageHeight,
             color: bgDark,
             child: const Center(
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
           ),
           errorWidget: (c, _, __) => Container(
-            height: 190,
+            height: imageHeight,
             color: primarySoft,
             child: const Icon(Icons.home_rounded, size: 50, color: textMuted),
           ),
@@ -111,55 +117,29 @@ class PropertyCard extends StatelessWidget {
             ),
           ),
         ),
-        if (property.trust >= 80)
+        if (property.trust >= 80 || property.isDemo)
           Positioned(
             top: 12,
             left: 12,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: glassBorder),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.verified, size: 14, color: primary),
-                  const SizedBox(width: 4),
-                  Text(
-                    'موثق',
-                    style: GoogleFonts.cairo(
-                      color: Colors.white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
+            child: Row(
+              children: [
+                if (property.trust >= 80)
+                  _buildBadge(
+                    icon: Icons.verified,
+                    label: 'موثق',
+                    color: primary,
+                    background: Colors.black.withValues(alpha: 0.55),
+                  ),
+                if (property.isDemo) ...[
+                  if (property.trust >= 80) const SizedBox(width: 6),
+                  _buildBadge(
+                    icon: Icons.science_outlined,
+                    label: 'تجريبي',
+                    color: amber,
+                    background: scrim.withValues(alpha: 0.75),
                   ),
                 ],
-              ),
-            ),
-          ),
-        if (property.isDemo)
-          Positioned(
-            top: 12,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                decoration: BoxDecoration(
-                  color: scrim.withValues(alpha: 0.7),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Text(
-                  'تجريبي',
-                  style: GoogleFonts.cairo(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+              ],
             ),
           ),
         Positioned(
@@ -168,9 +148,9 @@ class PropertyCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.6),
+              color: Colors.black.withValues(alpha: 0.68),
               borderRadius: BorderRadius.circular(30),
-              border: Border.all(color: glassBorder),
+              border: Border.all(color: gold, width: 1.2),
               boxShadow: const [
                 BoxShadow(color: Color(0x40000000), blurRadius: 10),
               ],
@@ -178,8 +158,8 @@ class PropertyCard extends StatelessWidget {
             child: Text(
               '${_formatPrice(property.price)} ر.س${property.purpose == 'إيجار' ? '/شهر' : ''}',
               style: GoogleFonts.cairo(
-                color: primary,
-                fontSize: 15,
+                color: gold,
+                fontSize: compact ? 13 : 15,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -210,10 +190,41 @@ class PropertyCard extends StatelessWidget {
     );
   }
 
+  Widget _buildBadge({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required Color background,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: color.withValues(alpha: 0.7)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: GoogleFonts.cairo(
+              color: color,
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildContentSection() {
     final agent = property.agent;
     return Padding(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(compact ? 12 : 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -221,7 +232,7 @@ class PropertyCard extends StatelessWidget {
             property.title,
             style: GoogleFonts.cairo(
               color: textLight,
-              fontSize: 16,
+              fontSize: compact ? 14 : 16,
               fontWeight: FontWeight.bold,
             ),
             maxLines: 1,
@@ -249,11 +260,12 @@ class PropertyCard extends StatelessWidget {
             children: [
               _buildSpecItem(Icons.king_bed_outlined, '${property.rooms} غرف'),
               _buildSpecItem(Icons.bathtub_outlined, '${property.baths} حمام'),
-              _buildSpecItem(Icons.straighten, '${_formatNumber(property.area)} م²'),
+              _buildSpecItem(
+                  Icons.straighten, '${_formatNumber(property.area)} م²'),
             ],
           ),
           const SizedBox(height: 10),
-          if (agent != null) ...[
+          if (!compact && agent != null) ...[
             Divider(height: 1, color: textMuted.withValues(alpha: 0.15)),
             const SizedBox(height: 10),
             Row(

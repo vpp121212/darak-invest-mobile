@@ -38,6 +38,9 @@ class AppColors {
   /// Danger red.
   static const Color red = Color(0xFFFF4D4F);
 
+  /// Amber — demo/preview badges.
+  static const Color amber = Color(0xFFFFB020);
+
   /// Primary text — near-white.
   static const Color textPrimary = Color(0xFFF4F6F5);
 

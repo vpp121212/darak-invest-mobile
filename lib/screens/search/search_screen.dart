@@ -231,14 +231,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                   decoration: BoxDecoration(
-                    color: _selectedPurpose == chip ? gold : cardDark,
+                    color: _isQuickFilterActive(chip) ? gold : cardDark,
                     borderRadius: BorderRadius.circular(30),
                     border: Border.all(
-                      color: _selectedPurpose == chip
+                      color: _isQuickFilterActive(chip)
                           ? gold
                           : textMuted.withValues(alpha: 0.12),
                     ),
-                    boxShadow: _selectedPurpose == chip
+                    boxShadow: _isQuickFilterActive(chip)
                         ? [
                             BoxShadow(
                                 color: gold.withValues(alpha: 0.35),
@@ -250,7 +250,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     chip,
                     style: GoogleFonts.cairo(
                       color:
-                          _selectedPurpose == chip ? Colors.black : textMuted,
+                          _isQuickFilterActive(chip) ? Colors.black : textMuted,
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
                     ),
@@ -261,6 +261,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         ],
       ),
     );
+  }
+
+  bool _isQuickFilterActive(String chip) {
+    return chip == 'الكل' ? _selectedPurpose == null : _selectedPurpose == chip;
   }
 
   Widget _buildSortRow(int total) {

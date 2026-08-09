@@ -16,6 +16,7 @@ const Color scrim = AppColors.scrim;
 const Color textPrimary = AppColors.textPrimary;
 const Color success = AppColors.success;
 const Color red = AppColors.red;
+const Color amber = AppColors.amber;
 
 /// New design-token aliases.
 const Color primary = AppColors.primary;

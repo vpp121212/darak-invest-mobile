@@ -892,7 +892,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         SizedBox(
-          height: 270,
+          height: 256,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: similar.length,
@@ -901,8 +901,11 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
               final p = similar[index];
               return SizedBox(
                   width: 240,
-                  child:
-                      PropertyCard(property: p, onTap: () => _openSimilar(p)));
+                  child: PropertyCard(
+                    property: p,
+                    compact: true,
+                    onTap: () => _openSimilar(p),
+                  ));
             },
           ),
         ),
