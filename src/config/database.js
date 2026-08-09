@@ -499,6 +499,36 @@ if (dbUrl) {
     "createdAt" TEXT DEFAULT (NOW()),
     "updatedAt" TEXT DEFAULT (NOW())
   );
+
+  CREATE TABLE IF NOT EXISTS appointments (
+    id SERIAL PRIMARY KEY,
+    "userId" INTEGER REFERENCES users(id) NOT NULL,
+    "propertyId" INTEGER REFERENCES properties(id) NOT NULL,
+    "agentUserId" INTEGER REFERENCES users(id),
+    type TEXT DEFAULT 'معاينة' CHECK(type IN ('معاينة','استشارة','توقيع عقد')),
+    "scheduledAt" TEXT NOT NULL,
+    note TEXT DEFAULT '',
+    status TEXT DEFAULT 'pending' CHECK(status IN ('pending','confirmed','completed','cancelled')),
+    "createdAt" TEXT DEFAULT (NOW()),
+    "updatedAt" TEXT DEFAULT (NOW())
+  );
+
+  CREATE TABLE IF NOT EXISTS offers (
+    id SERIAL PRIMARY KEY,
+    "userId" INTEGER REFERENCES users(id) NOT NULL,
+    "propertyId" INTEGER REFERENCES properties(id) NOT NULL,
+    amount REAL NOT NULL,
+    "paymentMethod" TEXT DEFAULT 'نقدي' CHECK("paymentMethod" IN ('نقدي','تمويل بنكي','إيجار منتهي بالتمليك','دفعة واحدة')),
+    note TEXT DEFAULT '',
+    status TEXT DEFAULT 'pending' CHECK(status IN ('pending','accepted','rejected','cancelled')),
+    "createdAt" TEXT DEFAULT (NOW()),
+    "updatedAt" TEXT DEFAULT (NOW())
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_appointments_user ON appointments("userId");
+  CREATE INDEX IF NOT EXISTS idx_appointments_agent ON appointments("agentUserId");
+  CREATE INDEX IF NOT EXISTS idx_offers_user ON offers("userId");
+  CREATE INDEX IF NOT EXISTS idx_offers_property ON offers("propertyId");
 `);
   } catch (err) {
     console.error('[db] فشل الاتصال بقاعدة البيانات:', err.message);

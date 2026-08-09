@@ -43,6 +43,53 @@ class AppShellRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [BookingScreen]
+class BookingRoute extends PageRouteInfo<BookingRouteArgs> {
+  BookingRoute({
+    Key? key,
+    required Property property,
+    List<PageRouteInfo>? children,
+  }) : super(
+          BookingRoute.name,
+          args: BookingRouteArgs(key: key, property: property),
+          initialChildren: children,
+        );
+
+  static const String name = 'BookingRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<BookingRouteArgs>();
+      return BookingScreen(key: args.key, property: args.property);
+    },
+  );
+}
+
+class BookingRouteArgs {
+  const BookingRouteArgs({this.key, required this.property});
+
+  final Key? key;
+
+  final Property property;
+
+  @override
+  String toString() {
+    return 'BookingRouteArgs{key: $key, property: $property}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! BookingRouteArgs) return false;
+    return key == other.key && property == other.property;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ property.hashCode;
+}
+
+/// generated route for
 /// [CompareScreen]
 class CompareRoute extends PageRouteInfo<void> {
   const CompareRoute({List<PageRouteInfo>? children})
@@ -261,6 +308,22 @@ class MarketReportRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [MyBrokerageScreen]
+class MyBrokerageRoute extends PageRouteInfo<void> {
+  const MyBrokerageRoute({List<PageRouteInfo>? children})
+      : super(MyBrokerageRoute.name, initialChildren: children);
+
+  static const String name = 'MyBrokerageRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const MyBrokerageScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [NeighborhoodDetailScreen]
 class NeighborhoodDetailRoute
     extends PageRouteInfo<NeighborhoodDetailRouteArgs> {
@@ -306,6 +369,53 @@ class NeighborhoodDetailRouteArgs {
 
   @override
   int get hashCode => key.hashCode ^ district.hashCode;
+}
+
+/// generated route for
+/// [OfferScreen]
+class OfferRoute extends PageRouteInfo<OfferRouteArgs> {
+  OfferRoute({
+    Key? key,
+    required Property property,
+    List<PageRouteInfo>? children,
+  }) : super(
+          OfferRoute.name,
+          args: OfferRouteArgs(key: key, property: property),
+          initialChildren: children,
+        );
+
+  static const String name = 'OfferRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<OfferRouteArgs>();
+      return OfferScreen(key: args.key, property: args.property);
+    },
+  );
+}
+
+class OfferRouteArgs {
+  const OfferRouteArgs({this.key, required this.property});
+
+  final Key? key;
+
+  final Property property;
+
+  @override
+  String toString() {
+    return 'OfferRouteArgs{key: $key, property: $property}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! OfferRouteArgs) return false;
+    return key == other.key && property == other.property;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ property.hashCode;
 }
 
 /// generated route for

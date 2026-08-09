@@ -834,13 +834,32 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
           children: [
             Expanded(
               child: GestureDetector(
-                onTap: () {
-                  if (hasPhone) {
-                    _call(agent.phone);
-                  } else {
-                    _showMessage('بيانات التواصل غير متوفرة لهذا العقار');
-                  }
-                },
+                onTap: () => context.pushRoute(BookingRoute(property: _property)),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: glassFill,
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(color: gold.withValues(alpha: 0.6)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.calendar_month, color: gold, size: 18),
+                      const SizedBox(width: 6),
+                      Text(
+                        'حجز موعد',
+                        style: GoogleFonts.cairo(color: gold, fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: GestureDetector(
+                onTap: () => context.pushRoute(OfferRoute(property: _property)),
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
@@ -850,17 +869,22 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                       BoxShadow(color: Color(0x66CCFF00), blurRadius: 16, offset: Offset(0, 6)),
                     ],
                   ),
-                  child: Center(
-                    child: Text(
-                      'تواصل مع الوكيل',
-                      style: GoogleFonts.cairo(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.handshake_outlined, color: Colors.black, size: 18),
+                      const SizedBox(width: 6),
+                      Text(
+                        'عرض شراء',
+                        style: GoogleFonts.cairo(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
             if (hasPhone) ...[
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               GestureDetector(
                 onTap: () => _whatsapp(agent.phone),
                 child: Container(

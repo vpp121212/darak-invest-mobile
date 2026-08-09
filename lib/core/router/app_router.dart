@@ -8,6 +8,9 @@ import '../../screens/ai/pulse_screen.dart';
 import '../../screens/ai/roi_screen.dart';
 import '../../screens/auth/login_screen.dart';
 import '../../screens/auth/register_screen.dart';
+import '../../screens/booking/booking_screen.dart';
+import '../../screens/booking/my_brokerage_screen.dart';
+import '../../screens/booking/offer_screen.dart';
 import '../../screens/compare/compare_screen.dart';
 import '../../screens/favorites/favorites_screen.dart';
 import '../../screens/finance/finance_screen.dart';
@@ -41,6 +44,9 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: MarketReportRoute.page),
         AutoRoute(page: AgentsRoute.page),
         AutoRoute(page: LegalRoute.page),
+        AutoRoute(page: BookingRoute.page),
+        AutoRoute(page: OfferRoute.page),
+        AutoRoute(page: MyBrokerageRoute.page),
       ];
 }
 

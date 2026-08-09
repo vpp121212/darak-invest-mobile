@@ -28,6 +28,15 @@ class ProfileScreen extends ConsumerWidget {
         children: [
           _buildUserHeader(context, ref, auth),
           const SizedBox(height: 24),
+          Text('وساطة', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          _buildMenuItem(Icons.event_available_outlined, 'وساطتي', 'مواعيد المعاينة وعروض الشراء', () {
+            context.pushRoute(const MyBrokerageRoute());
+          }),
+          _buildMenuItem(Icons.support_agent, 'الوكلاء', 'التواصل مع الوكلاء المعتمدين', () {
+            context.pushRoute(const AgentsRoute());
+          }),
+          const SizedBox(height: 24),
           Text('أدوات ذكية', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           _buildMenuItem(Icons.calculate_outlined, 'تقدير السعر الذكي', 'نموذج AI لتقييم العقار', () {
