@@ -18,8 +18,24 @@ class SearchScreen extends ConsumerStatefulWidget {
 }
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
-  static const _cities = ['الرياض', 'جدة', 'مكة', 'المدينة', 'الدمام', 'الخبر', 'حائل'];
-  static const _types = ['فيلا', 'شقة', 'دوبلكس', 'مكتب', 'استوديو', 'أرض', 'عمارة'];
+  static const _cities = [
+    'الرياض',
+    'جدة',
+    'مكة',
+    'المدينة',
+    'الدمام',
+    'الخبر',
+    'حائل'
+  ];
+  static const _types = [
+    'فيلا',
+    'شقة',
+    'دوبلكس',
+    'مكتب',
+    'استوديو',
+    'أرض',
+    'عمارة'
+  ];
   static const _purposes = ['بيع', 'إيجار'];
   static const _facings = ['شرقية', 'غربية', 'شمالية', 'جنوبية'];
 
@@ -62,7 +78,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   void _search({Duration debounce = Duration.zero}) {
-    ref.read(searchProvider.notifier).search(_buildFilters(), debounce: debounce);
+    ref
+        .read(searchProvider.notifier)
+        .search(_buildFilters(), debounce: debounce);
   }
 
   SearchFilters _buildFilters() {
@@ -111,12 +129,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         centerTitle: true,
         title: Text(
           'بحث العقارات',
-          style: GoogleFonts.cairo(color: gold, fontSize: 22, fontWeight: FontWeight.bold),
+          style: GoogleFonts.cairo(
+              color: gold, fontSize: 22, fontWeight: FontWeight.bold),
         ),
       ),
       body: Column(
         children: [
           _buildSearchBar(),
+          _buildQuickFilters(),
           _buildSortRow(state.total),
           if (_showAdvanced) _buildAdvancedFilters(),
           Expanded(child: _buildResults(state)),
@@ -146,7 +166,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   prefixIcon: const Icon(Icons.search, color: textMuted),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.close, color: textMuted, size: 18),
+                          icon: const Icon(Icons.close,
+                              color: textMuted, size: 18),
                           onPressed: () {
                             _searchController.clear();
                             _search();
@@ -154,7 +175,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         )
                       : null,
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 ),
               ),
             ),
@@ -189,6 +211,58 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
+  Widget _buildQuickFilters() {
+    const chips = ['الكل', 'بيع', 'إيجار'];
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Row(
+        children: [
+          for (final chip in chips)
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: GestureDetector(
+                onTap: () {
+                  setState(
+                      () => _selectedPurpose = chip == 'الكل' ? null : chip);
+                  _search();
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 220),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: _selectedPurpose == chip ? gold : cardDark,
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                      color: _selectedPurpose == chip
+                          ? gold
+                          : textMuted.withValues(alpha: 0.12),
+                    ),
+                    boxShadow: _selectedPurpose == chip
+                        ? [
+                            BoxShadow(
+                                color: gold.withValues(alpha: 0.35),
+                                blurRadius: 10)
+                          ]
+                        : softShadow,
+                  ),
+                  child: Text(
+                    chip,
+                    style: GoogleFonts.cairo(
+                      color:
+                          _selectedPurpose == chip ? Colors.black : textMuted,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSortRow(int total) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -205,7 +279,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               _search();
             },
             color: cardDark,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
@@ -216,7 +291,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('ترتيب: $_sortLabel', style: GoogleFonts.cairo(color: textLight, fontSize: 12)),
+                  Text('ترتيب: $_sortLabel',
+                      style: GoogleFonts.cairo(color: textLight, fontSize: 12)),
                   const Icon(Icons.arrow_drop_down, color: textMuted, size: 18),
                 ],
               ),
@@ -236,7 +312,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   PopupMenuItem<String> _buildSortItem(String label, String value) {
     return PopupMenuItem(
       value: value,
-      child: Text(label, style: GoogleFonts.cairo(color: textLight, fontSize: 13)),
+      child:
+          Text(label, style: GoogleFonts.cairo(color: textLight, fontSize: 13)),
     );
   }
 
@@ -255,23 +332,33 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('فلاتر متقدمة', style: GoogleFonts.cairo(color: primary, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('فلاتر متقدمة',
+                  style: GoogleFonts.cairo(
+                      color: primary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold)),
               TextButton(
                 onPressed: _resetAdvanced,
-                child: Text('مسح الكل', style: GoogleFonts.cairo(color: Colors.red, fontSize: 12)),
+                child: Text('مسح الكل',
+                    style: GoogleFonts.cairo(color: Colors.red, fontSize: 12)),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          _buildFilterDropdown('المدينة', _selectedCity, _cities, (val) => setState(() => _selectedCity = val)),
+          _buildFilterDropdown('المدينة', _selectedCity, _cities,
+              (val) => setState(() => _selectedCity = val)),
           const SizedBox(height: 10),
-          _buildFilterDropdown('نوع العقار', _selectedType, _types, (val) => setState(() => _selectedType = val)),
+          _buildFilterDropdown('نوع العقار', _selectedType, _types,
+              (val) => setState(() => _selectedType = val)),
           const SizedBox(height: 10),
-          _buildFilterDropdown('الغرض', _selectedPurpose, _purposes, (val) => setState(() => _selectedPurpose = val)),
+          _buildFilterDropdown('الغرض', _selectedPurpose, _purposes,
+              (val) => setState(() => _selectedPurpose = val)),
           const SizedBox(height: 10),
-          _buildFilterDropdown('الواجهة', _selectedFacing, _facings, (val) => setState(() => _selectedFacing = val)),
+          _buildFilterDropdown('الواجهة', _selectedFacing, _facings,
+              (val) => setState(() => _selectedFacing = val)),
           const SizedBox(height: 14),
-          Text('نطاق السعر', style: GoogleFonts.cairo(color: textLight, fontSize: 13)),
+          Text('نطاق السعر',
+              style: GoogleFonts.cairo(color: textLight, fontSize: 13)),
           RangeSlider(
             values: _priceRange,
             min: 0,
@@ -286,7 +373,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             onChanged: (val) => setState(() => _priceRange = val),
           ),
           const SizedBox(height: 10),
-          Text('نطاق المساحة (م²)', style: GoogleFonts.cairo(color: textLight, fontSize: 13)),
+          Text('نطاق المساحة (م²)',
+              style: GoogleFonts.cairo(color: textLight, fontSize: 13)),
           RangeSlider(
             values: _areaRange,
             min: 0,
@@ -294,11 +382,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             divisions: 100,
             activeColor: gold,
             inactiveColor: textMuted.withValues(alpha: 0.3),
-            labels: RangeLabels('${_areaRange.start.round()}', '${_areaRange.end.round()}'),
+            labels: RangeLabels(
+                '${_areaRange.start.round()}', '${_areaRange.end.round()}'),
             onChanged: (val) => setState(() => _areaRange = val),
           ),
           const SizedBox(height: 10),
-          Text('عدد الغرف', style: GoogleFonts.cairo(color: textLight, fontSize: 13)),
+          Text('عدد الغرف',
+              style: GoogleFonts.cairo(color: textLight, fontSize: 13)),
           const SizedBox(height: 8),
           Row(
             children: List.generate(7, (index) {
@@ -306,23 +396,23 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               final isSelected = _rooms == roomCount;
               final isAny = roomCount == 0;
               return Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => _rooms = roomCount),
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 2),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        gradient: isSelected
-                            ? const LinearGradient(colors: brandGradient)
-                            : null,
-                        color: isSelected ? null : bgDark,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSelected
-                              ? Colors.transparent
-                              : textMuted.withValues(alpha: 0.18),
-                        ),
+                child: GestureDetector(
+                  onTap: () => setState(() => _rooms = roomCount),
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      gradient: isSelected
+                          ? const LinearGradient(colors: brandGradient)
+                          : null,
+                      color: isSelected ? null : bgDark,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected
+                            ? Colors.transparent
+                            : textMuted.withValues(alpha: 0.18),
                       ),
+                    ),
                     child: Center(
                       child: Text(
                         isAny ? 'الكل' : '$roomCount',
@@ -349,7 +439,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 borderRadius: BorderRadius.circular(30),
               ),
               child: Center(
-                child: Text('تطبيق الفلاتر', style: GoogleFonts.cairo(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)),
+                child: Text('تطبيق الفلاتر',
+                    style: GoogleFonts.cairo(
+                        color: Colors.black,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold)),
               ),
             ),
           ),
@@ -358,7 +452,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  Widget _buildFilterDropdown(String label, String? value, List<String> items, Function(String) onTap) {
+  Widget _buildFilterDropdown(
+      String label, String? value, List<String> items, Function(String) onTap) {
     return GestureDetector(
       onTap: () => _showPicker(label, items, onTap),
       child: Container(
@@ -378,7 +473,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 fontSize: 14,
               ),
             ),
-            Icon(Icons.arrow_drop_down, color: value != null ? gold : textMuted, size: 22),
+            Icon(Icons.arrow_drop_down,
+                color: value != null ? gold : textMuted, size: 22),
           ],
         ),
       ),
@@ -399,11 +495,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             margin: const EdgeInsets.only(top: 12),
             width: 40,
             height: 4,
-            decoration: BoxDecoration(color: textMuted, borderRadius: BorderRadius.circular(2)),
+            decoration: BoxDecoration(
+                color: textMuted, borderRadius: BorderRadius.circular(2)),
           ),
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Text('اختر $label', style: GoogleFonts.cairo(color: gold, fontSize: 18, fontWeight: FontWeight.bold)),
+            child: Text('اختر $label',
+                style: GoogleFonts.cairo(
+                    color: gold, fontSize: 18, fontWeight: FontWeight.bold)),
           ),
           ...items.map((item) => ListTile(
                 title: Text(item, style: GoogleFonts.cairo(color: textLight)),
@@ -430,7 +529,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             color: cardDark,
             borderRadius: BorderRadius.circular(16),
           ),
-          child: Center(child: CircularProgressIndicator(color: gold.withValues(alpha: 0.3), strokeWidth: 2)),
+          child: Center(
+              child: CircularProgressIndicator(
+                  color: gold.withValues(alpha: 0.3), strokeWidth: 2)),
         ),
       );
     }
@@ -462,7 +563,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  Widget _buildMessage({required IconData icon, required String title, required String subtitle}) {
+  Widget _buildMessage(
+      {required IconData icon,
+      required String title,
+      required String subtitle}) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -473,7 +577,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: Text(subtitle, textAlign: TextAlign.center, style: GoogleFonts.cairo(color: textMuted, fontSize: 14)),
+            child: Text(subtitle,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.cairo(color: textMuted, fontSize: 14)),
           ),
         ],
       ),

@@ -38,6 +38,9 @@ void main() {
       200,
       scrollable: find.byType(Scrollable).first,
     );
+    // ensureVisible jumps the scroll position without a frame; pump so the
+    // header sliver below the banner is built before the next scroll.
+    await tester.pump();
     expect(find.text('تعذّر تحديث البيانات — تعرض نسخة محفوظة/تجريبية'), findsOneWidget);
     await tester.scrollUntilVisible(
       find.text('أحدث العقارات'),

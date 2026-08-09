@@ -29,7 +29,8 @@ class PropertyDetailScreen extends ConsumerStatefulWidget {
   const PropertyDetailScreen({super.key, required this.property});
 
   @override
-  ConsumerState<PropertyDetailScreen> createState() => _PropertyDetailScreenState();
+  ConsumerState<PropertyDetailScreen> createState() =>
+      _PropertyDetailScreenState();
 }
 
 class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
@@ -128,7 +129,8 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
       ),
       actions: [
         GestureDetector(
-          onTap: () => ref.read(favoritesProvider.notifier).toggle(_property.id),
+          onTap: () =>
+              ref.read(favoritesProvider.notifier).toggle(_property.id),
           child: Container(
             margin: const EdgeInsets.all(8),
             padding: const EdgeInsets.all(8),
@@ -156,59 +158,69 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
         ),
       ],
       flexibleSpace: FlexibleSpaceBar(
-        background: Stack(
-          children: [
-            PageView.builder(
-              itemCount: _images.length,
-              onPageChanged: (i) => setState(() => _currentImage = i),
-              itemBuilder: (context, index) {
-                return CachedNetworkImage(
-                  imageUrl: _images[index],
-                  fit: BoxFit.cover,
-                  placeholder: (c, _) => Container(color: cardDark, child: const Center(child: CircularProgressIndicator(strokeWidth: 2))),
-                  errorWidget: (c, _, __) => Container(
-                    color: cardDark,
-                    child: const Icon(Icons.home, size: 60, color: textMuted),
-                  ),
-                );
-              },
-            ),
-            Positioned(
-              bottom: 16,
-              left: 0,
-              right: 0,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(_images.length, (index) {
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
-                    width: _currentImage == index ? 24 : 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: _currentImage == index ? gold : textMuted.withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(4),
+        background: ClipRRect(
+          borderRadius:
+              const BorderRadius.vertical(bottom: Radius.circular(28)),
+          child: Stack(
+            children: [
+              PageView.builder(
+                itemCount: _images.length,
+                onPageChanged: (i) => setState(() => _currentImage = i),
+                itemBuilder: (context, index) {
+                  return CachedNetworkImage(
+                    imageUrl: _images[index],
+                    fit: BoxFit.cover,
+                    placeholder: (c, _) => Container(
+                        color: cardDark,
+                        child: const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2))),
+                    errorWidget: (c, _, __) => Container(
+                      color: cardDark,
+                      child: const Icon(Icons.home, size: 60, color: textMuted),
                     ),
                   );
-                }),
+                },
               ),
-            ),
-            Positioned(
-              bottom: 16,
-              left: 16,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: scrim.withValues(alpha: 0.8),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '${_currentImage + 1} / ${_images.length}',
-                  style: GoogleFonts.cairo(color: Colors.white, fontSize: 13),
+              Positioned(
+                bottom: 16,
+                left: 0,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(_images.length, (index) {
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      width: _currentImage == index ? 24 : 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: _currentImage == index
+                            ? gold
+                            : textMuted.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    );
+                  }),
                 ),
               ),
-            ),
-          ],
+              Positioned(
+                bottom: 16,
+                left: 16,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: scrim.withValues(alpha: 0.8),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${_currentImage + 1} / ${_images.length}',
+                    style: GoogleFonts.cairo(color: Colors.white, fontSize: 13),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -225,7 +237,10 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
             Expanded(
               child: Text(
                 _property.title,
-                style: GoogleFonts.cairo(color: textLight, fontSize: 22, fontWeight: FontWeight.bold),
+                style: GoogleFonts.cairo(
+                    color: textLight,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold),
               ),
             ),
             Container(
@@ -271,7 +286,11 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                   children: [
                     const Icon(Icons.verified, size: 14, color: Colors.black),
                     const SizedBox(width: 4),
-                    Text('موثّق ${_property.trust}%', style: GoogleFonts.cairo(color: Colors.black, fontSize: 11, fontWeight: FontWeight.bold)),
+                    Text('موثّق ${_property.trust}%',
+                        style: GoogleFonts.cairo(
+                            color: Colors.black,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -280,7 +299,8 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
         const SizedBox(height: 12),
         Text(
           '${Formatters.number(_property.price)} ر.س${isRent ? '/شهر' : ''}',
-          style: GoogleFonts.cairo(color: gold, fontSize: 28, fontWeight: FontWeight.bold),
+          style: GoogleFonts.cairo(
+              color: gold, fontSize: 28, fontWeight: FontWeight.bold),
         ),
       ],
     );
@@ -294,7 +314,11 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
       (Icons.garage_outlined, 'المواقف', '${_property.cars} مواقف'),
       (Icons.home_outlined, 'النوع', _property.type),
       (Icons.explore_outlined, 'الواجهة', _property.facing),
-      (Icons.calendar_today_outlined, 'سنة البناء', _property.year > 0 ? '${_property.year}' : '-'),
+      (
+        Icons.calendar_today_outlined,
+        'سنة البناء',
+        _property.year > 0 ? '${_property.year}' : '-'
+      ),
       (Icons.route_outlined, 'العرض', '${_property.streetW} م'),
     ];
 
@@ -323,10 +347,14 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.cairo(color: textLight, fontSize: 13, fontWeight: FontWeight.bold),
+                style: GoogleFonts.cairo(
+                    color: textLight,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 2),
-              Text(s.$2, style: GoogleFonts.cairo(color: textMuted, fontSize: 11)),
+              Text(s.$2,
+                  style: GoogleFonts.cairo(color: textMuted, fontSize: 11)),
             ],
           ),
         );
@@ -422,7 +450,9 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
             children: [
               const Icon(Icons.auto_awesome, color: gold, size: 18),
               const SizedBox(width: 6),
-              Text('أدوات الذكاء', style: GoogleFonts.cairo(color: gold, fontSize: 15, fontWeight: FontWeight.bold)),
+              Text('أدوات الذكاء',
+                  style: GoogleFonts.cairo(
+                      color: gold, fontSize: 15, fontWeight: FontWeight.bold)),
             ],
           ),
           const SizedBox(height: 12),
@@ -432,7 +462,8 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 child: _buildAiToolButton(
                   icon: Icons.calculate_outlined,
                   label: 'تقدير السعر',
-                  onTap: () => context.pushRoute(EstimateRoute(property: _property)),
+                  onTap: () =>
+                      context.pushRoute(EstimateRoute(property: _property)),
                 ),
               ),
               const SizedBox(width: 8),
@@ -440,7 +471,8 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 child: _buildAiToolButton(
                   icon: Icons.location_city,
                   label: 'نبض الحي',
-                  onTap: () => context.pushRoute(PulseRoute(district: _property.district)),
+                  onTap: () => context
+                      .pushRoute(PulseRoute(district: _property.district)),
                 ),
               ),
               const SizedBox(width: 8),
@@ -476,7 +508,12 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
           children: [
             Icon(icon, color: gold, size: 22),
             const SizedBox(height: 6),
-            Text(label, textAlign: TextAlign.center, style: GoogleFonts.cairo(color: textLight, fontSize: 12, fontWeight: FontWeight.bold)),
+            Text(label,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.cairo(
+                    color: textLight,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold)),
           ],
         ),
       ),
@@ -487,20 +524,26 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('المميزات', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
+        Text('المميزات',
+            style: GoogleFonts.cairo(
+                color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: _property.features.map((f) => Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: glassFill,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: gold.withValues(alpha: 0.35)),
-                ),
-                child: Text(f, style: GoogleFonts.cairo(color: gold, fontSize: 13)),
-              )).toList(),
+          children: _property.features
+              .map((f) => Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: glassFill,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: gold.withValues(alpha: 0.35)),
+                    ),
+                    child: Text(f,
+                        style: GoogleFonts.cairo(color: gold, fontSize: 13)),
+                  ))
+              .toList(),
         ),
       ],
     );
@@ -513,7 +556,9 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('الوصف', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
+        Text('الوصف',
+            style: GoogleFonts.cairo(
+                color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         Text(
           desc,
@@ -525,7 +570,8 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
 
   Widget _buildMapSection() {
     final hasCoords = _property.lat != 0 || _property.lng != 0;
-    final center = LatLng(hasCoords ? _property.lat : 24.7136, hasCoords ? _property.lng : 46.6753);
+    final center = LatLng(hasCoords ? _property.lat : 24.7136,
+        hasCoords ? _property.lng : 46.6753);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -533,17 +579,27 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
           children: [
             const Icon(Icons.map_outlined, color: gold, size: 20),
             const SizedBox(width: 6),
-            Text('الموقع على الخريطة', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('الموقع على الخريطة',
+                style: GoogleFonts.cairo(
+                    color: textLight,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold)),
             const Spacer(),
             GestureDetector(
-              onTap: () => context.pushRoute(MapRoute(initialProperty: _property)),
+              onTap: () =>
+                  context.pushRoute(MapRoute(initialProperty: _property)),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: gold,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Text('الخريطة الكاملة', style: GoogleFonts.cairo(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold)),
+                child: Text('الخريطة الكاملة',
+                    style: GoogleFonts.cairo(
+                        color: Colors.black,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold)),
               ),
             ),
           ],
@@ -565,7 +621,8 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                   ),
                   children: [
                     TileLayer(
-                      urlTemplate: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                      urlTemplate:
+                          'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
                       subdomains: const ['a', 'b', 'c', 'd'],
                       userAgentPackageName: 'com.darakwaheyk.mobile',
                     ),
@@ -586,7 +643,8 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                   left: 8,
                   bottom: 6,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       color: scrim.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(8),
@@ -602,7 +660,8 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                     right: 8,
                     top: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: scrim.withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(8),
@@ -613,7 +672,11 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                         children: [
                           const Icon(Icons.info_outline, size: 12, color: gold),
                           const SizedBox(width: 4),
-                          Text('موقع تقريبي', style: GoogleFonts.cairo(color: gold, fontSize: 10, fontWeight: FontWeight.bold)),
+                          Text('موقع تقريبي',
+                              style: GoogleFonts.cairo(
+                                  color: gold,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
@@ -658,7 +721,10 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                   p.title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.cairo(color: textLight, fontSize: 12, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.cairo(
+                      color: textLight,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -677,7 +743,9 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
             color: color,
             shape: BoxShape.circle,
             border: Border.all(color: Colors.black, width: 2),
-            boxShadow: [BoxShadow(color: color.withValues(alpha: 0.6), blurRadius: 12)],
+            boxShadow: [
+              BoxShadow(color: color.withValues(alpha: 0.6), blurRadius: 12)
+            ],
           ),
           child: Icon(
             isRent ? Icons.real_estate_agent : Icons.home_rounded,
@@ -702,7 +770,9 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('الوكيل العقاري', style: GoogleFonts.cairo(color: gold, fontSize: 16, fontWeight: FontWeight.bold)),
+          Text('الوكيل العقاري',
+              style: GoogleFonts.cairo(
+                  color: gold, fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -711,7 +781,8 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 backgroundColor: gold.withValues(alpha: 0.2),
                 child: Text(
                   agent.name.isNotEmpty ? agent.name.substring(0, 1) : '؟',
-                  style: GoogleFonts.cairo(color: gold, fontSize: 22, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.cairo(
+                      color: gold, fontSize: 22, fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(width: 12),
@@ -721,15 +792,21 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                   children: [
                     Text(
                       agent.name.isNotEmpty ? agent.name : 'وكيل دارك وحيك',
-                      style: GoogleFonts.cairo(color: textLight, fontSize: 16, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.cairo(
+                          color: textLight,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
                     ),
-                    Text('وكيل عقاري معتمد', style: GoogleFonts.cairo(color: textMuted, fontSize: 13)),
+                    Text('وكيل عقاري معتمد',
+                        style:
+                            GoogleFonts.cairo(color: textMuted, fontSize: 13)),
                   ],
                 ),
               ),
               if (_property.trust > 50)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: success,
                     borderRadius: BorderRadius.circular(8),
@@ -739,7 +816,11 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                     children: [
                       const Icon(Icons.verified, size: 14, color: Colors.black),
                       const SizedBox(width: 4),
-                      Text('موثق', style: GoogleFonts.cairo(color: Colors.black, fontSize: 11, fontWeight: FontWeight.bold)),
+                      Text('موثق',
+                          style: GoogleFonts.cairo(
+                              color: Colors.black,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
@@ -793,7 +874,9 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
           children: [
             Icon(icon, color: color, size: 22),
             const SizedBox(height: 4),
-            Text(label, style: GoogleFonts.cairo(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
+            Text(label,
+                style: GoogleFonts.cairo(
+                    color: color, fontSize: 12, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
@@ -804,7 +887,9 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('عقارات مشابهة', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
+        Text('عقارات مشابهة',
+            style: GoogleFonts.cairo(
+                color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         SizedBox(
           height: 270,
@@ -814,7 +899,10 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
             separatorBuilder: (_, __) => const SizedBox(width: 12),
             itemBuilder: (context, index) {
               final p = similar[index];
-              return SizedBox(width: 240, child: PropertyCard(property: p, onTap: () => _openSimilar(p)));
+              return SizedBox(
+                  width: 240,
+                  child:
+                      PropertyCard(property: p, onTap: () => _openSimilar(p)));
             },
           ),
         ),
@@ -829,14 +917,16 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: const Color(0xF00A0A0A),
-        border: Border(top: BorderSide(color: textMuted.withValues(alpha: 0.15))),
+        border:
+            Border(top: BorderSide(color: textMuted.withValues(alpha: 0.15))),
       ),
       child: SafeArea(
         child: Row(
           children: [
             Expanded(
               child: GestureDetector(
-                onTap: () => context.pushRoute(BookingRoute(property: _property)),
+                onTap: () =>
+                    context.pushRoute(BookingRoute(property: _property)),
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
@@ -851,7 +941,10 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                       const SizedBox(width: 6),
                       Text(
                         'حجز موعد',
-                        style: GoogleFonts.cairo(color: gold, fontSize: 14, fontWeight: FontWeight.bold),
+                        style: GoogleFonts.cairo(
+                            color: gold,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -868,17 +961,24 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                     gradient: const LinearGradient(colors: brandGradient),
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: const [
-                      BoxShadow(color: Color(0x66CCFF00), blurRadius: 16, offset: Offset(0, 6)),
+                      BoxShadow(
+                          color: Color(0x66CCFF00),
+                          blurRadius: 16,
+                          offset: Offset(0, 6)),
                     ],
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.handshake_outlined, color: Colors.black, size: 18),
+                      const Icon(Icons.handshake_outlined,
+                          color: Colors.black, size: 18),
                       const SizedBox(width: 6),
                       Text(
                         'عرض شراء',
-                        style: GoogleFonts.cairo(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold),
+                        style: GoogleFonts.cairo(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -894,9 +994,11 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                   decoration: BoxDecoration(
                     color: glassFill,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFF25D366).withValues(alpha: 0.4)),
+                    border: Border.all(
+                        color: const Color(0xFF25D366).withValues(alpha: 0.4)),
                   ),
-                  child: const Icon(Icons.chat, color: Color(0xFF25D366), size: 24),
+                  child: const Icon(Icons.chat,
+                      color: Color(0xFF25D366), size: 24),
                 ),
               ),
             ],
@@ -924,7 +1026,8 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
   }
 
   Future<void> _share() async {
-    final text = '${_property.title} — ${Formatters.number(_property.price)} ر.س — ${_property.district}، ${_property.city}';
+    final text =
+        '${_property.title} — ${Formatters.number(_property.price)} ر.س — ${_property.district}، ${_property.city}';
     await Share.share(text);
   }
 
@@ -966,6 +1069,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
   }
 
   void _showMessage(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg, style: GoogleFonts.cairo())));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg, style: GoogleFonts.cairo())));
   }
 }

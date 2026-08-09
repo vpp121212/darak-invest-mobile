@@ -243,12 +243,12 @@ class PropertyCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          Row(
+          Wrap(
+            spacing: 14,
+            runSpacing: 6,
             children: [
               _buildSpecItem(Icons.king_bed_outlined, '${property.rooms} غرف'),
-              const SizedBox(width: 14),
               _buildSpecItem(Icons.bathtub_outlined, '${property.baths} حمام'),
-              const SizedBox(width: 14),
               _buildSpecItem(Icons.straighten, '${_formatNumber(property.area)} م²'),
             ],
           ),

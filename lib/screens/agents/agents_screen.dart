@@ -35,7 +35,8 @@ class AgentsScreen extends ConsumerWidget {
         centerTitle: true,
         title: Text(
           'الوكلاء (${list.length})',
-          style: GoogleFonts.cairo(color: primary, fontSize: 17, fontWeight: FontWeight.bold),
+          style: GoogleFonts.cairo(
+              color: primary, fontSize: 17, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_forward, color: textLight),
@@ -74,9 +75,21 @@ class AgentsScreen extends ConsumerWidget {
   }
 
   static final _demoAgents = [
-    AgentInfo(id: 'a1', name: 'م. خالد العتيبي', phone: '+966551234567', email: 'khaled@darak-whayk.sa'),
-    AgentInfo(id: 'a2', name: 'أ. نورة القحطاني', phone: '+966552345678', email: 'noura@darak-whayk.sa'),
-    AgentInfo(id: 'a3', name: 'م. فهد الدوسري', phone: '+966553456789', email: 'fahad@darak-whayk.sa'),
+    AgentInfo(
+        id: 'a1',
+        name: 'م. خالد العتيبي',
+        phone: '+966551234567',
+        email: 'khaled@darak-whayk.sa'),
+    AgentInfo(
+        id: 'a2',
+        name: 'أ. نورة القحطاني',
+        phone: '+966552345678',
+        email: 'noura@darak-whayk.sa'),
+    AgentInfo(
+        id: 'a3',
+        name: 'م. فهد الدوسري',
+        phone: '+966553456789',
+        email: 'fahad@darak-whayk.sa'),
   ];
 
   Widget _agentCard(BuildContext context, AgentInfo a) {
@@ -85,7 +98,7 @@ class AgentsScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: glassFill,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: glassBorder),
         boxShadow: softShadow,
       ),
@@ -95,16 +108,19 @@ class AgentsScreen extends ConsumerWidget {
           Row(
             children: [
               Container(
-                width: 46,
-                height: 46,
+                width: 52,
+                height: 52,
                 decoration: BoxDecoration(
-                  color: primary,
-                  borderRadius: BorderRadius.circular(14),
+                  shape: BoxShape.circle,
+                  border:
+                      Border.all(color: gold.withValues(alpha: 0.8), width: 2),
+                  color: gold.withValues(alpha: 0.15),
                 ),
-                child: Icon(
-                  a.avatar?.isNotEmpty == true ? Icons.person : Icons.person,
-                  color: Colors.black,
-                  size: 26,
+                alignment: Alignment.center,
+                child: Text(
+                  a.name.isNotEmpty ? a.name.substring(0, 1) : '؟',
+                  style: GoogleFonts.cairo(
+                      color: gold, fontSize: 22, fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(width: 12),
@@ -112,22 +128,66 @@ class AgentsScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      a.name,
-                      style: GoogleFonts.cairo(color: textLight, fontSize: 15, fontWeight: FontWeight.bold),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            a.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.cairo(
+                                color: textLight,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: success.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                                color: success.withValues(alpha: 0.4)),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.verified, size: 12, color: success),
+                              SizedBox(width: 3),
+                              Text('معتمد',
+                                  style: TextStyle(
+                                      color: success,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        for (var i = 0; i < 5; i++)
+                          Icon(Icons.star,
+                              size: 14,
+                              color: i < 4
+                                  ? gold
+                                  : textMuted.withValues(alpha: 0.3)),
+                        const SizedBox(width: 6),
+                        Text('4.8',
+                            style: GoogleFonts.cairo(
+                                color: textLight,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
+                      ],
                     ),
                     const SizedBox(height: 2),
                     Text(
                       a.phone,
                       style: GoogleFonts.cairo(color: textMuted, fontSize: 12),
                     ),
-                    if (a.email != null) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        a.email!,
-                        style: GoogleFonts.cairo(color: textMuted, fontSize: 11),
-                      ),
-                    ],
                   ],
                 ),
               ),
@@ -150,7 +210,8 @@ class AgentsScreen extends ConsumerWidget {
                   icon: Icons.chat,
                   label: 'واتساب',
                   filled: false,
-                  onTap: () => _launch('https://wa.me/${a.phone.replaceAll('+', '').replaceAll(' ', '')}'),
+                  onTap: () => _launch(
+                      'https://wa.me/${a.phone.replaceAll('+', '').replaceAll(' ', '')}'),
                 ),
               ),
             ],
