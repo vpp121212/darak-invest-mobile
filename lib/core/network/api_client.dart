@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate' show Isolate;
 
 import 'package:http/http.dart' as http;
 
@@ -85,7 +86,7 @@ class ApiClient {
   Future<dynamic> _send(Future<http.Response> Function() request) async {
     try {
       final response = await request().timeout(timeout);
-      return _decode(response);
+      return await _decode(response);
     } on TimeoutException {
       throw const AppTimeoutException();
     } on SocketException {
@@ -95,13 +96,15 @@ class ApiClient {
     }
   }
 
-  dynamic _decode(http.Response response) {
+  Future<dynamic> _decode(http.Response response) async {
     final status = response.statusCode;
     final body = response.body.isEmpty ? '{}' : response.body;
 
+    // فك ترميز JSON في Isolate منفصل حتى لا يحجب واجهة المستخدم مع الحمولات
+    // الكبيرة (قائمة العقارات، تقارير السوق، النبض). يعمل بأمان على الويب.
     if (status >= 200 && status < 300) {
       try {
-        return jsonDecode(body);
+        return await Isolate.run(() => jsonDecode(body));
       } catch (_) {
         throw const ParseException();
       }
@@ -109,6 +112,8 @@ class ApiClient {
 
     var message = 'حدث خطأ ($status)';
     try {
+      // رسائل الخطأ صغيرة — فك الترميز المباشر لا يحجب الواجهة ويظل متوافقاً
+      // مع بيئة الاختبارات.
       final decoded = jsonDecode(body);
       message = (decoded is Map && decoded['message'] != null)
           ? decoded['message'].toString()

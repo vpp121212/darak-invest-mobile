@@ -52,20 +52,24 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
       ),
       body: !auth.isLoggedIn
           ? _loggedOut()
-          : ListView(
+          : ListView.builder(
               padding: const EdgeInsets.all(16),
-              children: [
-                _currentPlan(auth.user),
-                const SizedBox(height: 20),
-                _testModeBanner(state),
-                const SizedBox(height: 20),
-                ...subscriptionPackages.map((p) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: _planCard(p, auth.user?.package ?? 'basic', state),
-                    )),
-                const SizedBox(height: 8),
-                _history(auth.user, state),
-              ],
+              itemCount: subscriptionPackages.length + 6,
+              itemBuilder: (context, index) {
+                if (index == 0) return _currentPlan(auth.user);
+                if (index == 1) return const SizedBox(height: 20);
+                if (index == 2) return _testModeBanner(state);
+                if (index == 3) return const SizedBox(height: 20);
+                final pi = index - 4;
+                if (pi < subscriptionPackages.length) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _planCard(subscriptionPackages[pi], auth.user?.package ?? 'basic', state),
+                  );
+                }
+                if (pi == subscriptionPackages.length) return const SizedBox(height: 8);
+                return _history(auth.user, state);
+              },
             ),
     );
   }
@@ -93,27 +97,27 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
         gradient: const LinearGradient(colors: brandGradient),
         borderRadius: BorderRadius.circular(18),
         boxShadow: const [
-          BoxShadow(color: Color(0x40CCFF00), blurRadius: 20, offset: Offset(0, 8)),
+          BoxShadow(color: Color(0x40E50914), blurRadius: 20, offset: Offset(0, 8)),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('باقتك الحالية', style: GoogleFonts.cairo(color: Colors.black87, fontSize: 13)),
+          Text('باقتك الحالية', style: GoogleFonts.cairo(color: Colors.white70, fontSize: 13)),
           const SizedBox(height: 6),
           Row(
             children: [
-              const Icon(Icons.workspace_premium, color: Colors.black, size: 26),
+              const Icon(Icons.workspace_premium, color: Colors.white, size: 26),
               const SizedBox(width: 8),
               Text(package.name,
-                  style: GoogleFonts.cairo(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold)),
+                  style: GoogleFonts.cairo(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
             ],
           ),
           if (expiry != null && expiry.isAfter(DateTime.now()))
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Text('ساري حتى ${DateFormat('d MMM yyyy').format(expiry)}',
-                  style: GoogleFonts.cairo(color: Colors.black87, fontSize: 12)),
+                  style: GoogleFonts.cairo(color: Colors.white70, fontSize: 12)),
             ),
         ],
       ),
@@ -174,7 +178,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text('باقتك الحالية',
-                      style: GoogleFonts.cairo(color: Colors.black, fontSize: 11, fontWeight: FontWeight.bold)),
+                      style: GoogleFonts.cairo(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                 ),
             ],
           ),
@@ -221,8 +225,8 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                   child: processing
                       ? const SizedBox(
                           width: 18, height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
-                      : Text('اشترك الآن', style: GoogleFonts.cairo(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold)),
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : Text('اشترك الآن', style: GoogleFonts.cairo(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
                 ),
               ),
             ),
@@ -322,7 +326,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: gold),
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('تفعيل تجريبي', style: GoogleFonts.cairo(color: Colors.black, fontWeight: FontWeight.bold)),
+            child: Text('تفعيل تجريبي', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),

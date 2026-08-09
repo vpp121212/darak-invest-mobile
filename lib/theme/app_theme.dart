@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
 
-/// Backwards-compatible aliases (mapped to the athletic dark palette).
+/// Backwards-compatible aliases (mapped to the Homerch dark palette).
 const Color bgDark = AppColors.bg;
 const Color cardDark = AppColors.card;
 const Color gold = AppColors.primary;
@@ -32,7 +32,7 @@ const Color glassFill = Color(0x14FFFFFF);
 /// Frosted-glass border: subtle white hairline.
 const Color glassBorder = Color(0x1FFFFFFF);
 
-/// Shared soft shadow for dark surfaces — black base with a faint lime glow.
+/// Shared soft shadow for dark surfaces — black base with a faint red glow.
 const List<BoxShadow> softShadow = [
   BoxShadow(
     color: Color(0x4D000000),
@@ -40,7 +40,7 @@ const List<BoxShadow> softShadow = [
     offset: Offset(0, 10),
   ),
   BoxShadow(
-    color: Color(0x14CCFF00),
+    color: Color(0x1FE50914),
     blurRadius: 18,
     offset: Offset(0, 0),
   ),
@@ -54,8 +54,8 @@ class AppTheme {
       primary: primary,
       secondary: cyan,
       surface: cardDark,
-      onPrimary: Colors.black,
-      onSecondary: Colors.black,
+      onPrimary: Colors.white,
+      onSecondary: Colors.white,
       onSurface: textLight,
     ),
     appBarTheme: const AppBarTheme(
@@ -99,7 +99,7 @@ class AppTheme {
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: primary,
-        foregroundColor: Colors.black,
+        foregroundColor: Colors.white,
         elevation: 0,
         shape: const StadiumBorder(),
         padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
@@ -116,9 +116,9 @@ class AppTheme {
     progressIndicatorTheme: const ProgressIndicatorThemeData(color: primary),
     sliderTheme: const SliderThemeData(
       activeTrackColor: primary,
-      inactiveTrackColor: Color(0x33CCFF00),
+      inactiveTrackColor: Color(0x33E50914),
       thumbColor: primary,
-      overlayColor: Color(0x2BCCFF00),
+      overlayColor: Color(0x2BE50914),
     ),
     bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: cardDark,

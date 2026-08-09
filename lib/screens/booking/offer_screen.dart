@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -139,7 +140,7 @@ class _OfferScreenState extends ConsumerState<OfferScreen> {
                   child: Text(
                     m,
                     style: GoogleFonts.cairo(
-                      color: selected ? Colors.black : textLight,
+                      color: selected ? Colors.white : textLight,
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
                     ),
@@ -164,7 +165,7 @@ class _OfferScreenState extends ConsumerState<OfferScreen> {
                 ? const Center(child: CircularProgressIndicator())
                 : ElevatedButton(
                     onPressed: _submit,
-                    child: Text('إرسال العرض', style: GoogleFonts.cairo(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold)),
+                    child: Text('إرسال العرض', style: GoogleFonts.cairo(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                   ),
           ),
           const SizedBox(height: 12),
@@ -195,8 +196,9 @@ class _OfferScreenState extends ConsumerState<OfferScreen> {
               width: 84,
               height: 84,
               child: _property.mainImage.isNotEmpty
-                  ? Image.network(_property.mainImage, fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const _OfferPlaceholder())
+                  ? CachedNetworkImage(imageUrl: _property.mainImage, fit: BoxFit.cover,
+                      placeholder: (_, __) => Container(color: cardDark),
+                      errorWidget: (_, __, ___) => const _OfferPlaceholder())
                   : const _OfferPlaceholder(),
             ),
           ),

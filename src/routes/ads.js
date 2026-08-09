@@ -59,7 +59,7 @@ router.get('/search', async (req, res) => {
     }
 
     const ads = await sql.unsafe(
-      `SELECT id, title, type, purpose, price, area, rooms, baths, description, city, district, lat, lng, images, features, trust FROM properties WHERE ${conditions.join(' AND ')} ORDER BY "createdAt" DESC LIMIT 100`,
+      `SELECT id, title, type, purpose, price, area, rooms, baths, description, city, district, lat, lng, images, features, trust FROM properties WHERE ${conditions.join(' AND ')} ORDER BY CASE WHEN "isFeatured" = 1 AND ("featuredExpiresAt" IS NULL OR "featuredExpiresAt" = '' OR ("featuredExpiresAt")::timestamptz > NOW()) THEN 0 ELSE 1 END, "createdAt" DESC LIMIT 100`,
       params
     );
     res.json({ success: true, ads: ads.map(a => ({
@@ -91,7 +91,7 @@ router.get('/in-bounds', async (req, res) => {
       WHERE status = 'active' AND lat IS NOT NULL AND lng IS NOT NULL
         AND lat BETWEEN ${Math.min(swLat, neLat)} AND ${Math.max(swLat, neLat)}
         AND lng BETWEEN ${Math.min(swLng, neLng)} AND ${Math.max(swLng, neLng)}
-      ORDER BY "createdAt" DESC LIMIT 200
+      ORDER BY CASE WHEN "isFeatured" = 1 AND ("featuredExpiresAt" IS NULL OR "featuredExpiresAt" = '' OR ("featuredExpiresAt")::timestamptz > NOW()) THEN 0 ELSE 1 END, "createdAt" DESC LIMIT 200
     `;
     res.json({ success: true, ads: ads.map(a => ({
       ...a,

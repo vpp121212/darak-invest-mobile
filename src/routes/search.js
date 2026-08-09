@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import sql from '../config/database.js';
+import { cacheGet, cacheSet } from '../services/cache.js';
 
 const router = Router();
+const SEARCH_TTL = 30000;
 
 router.get('/', async (req, res) => {
   await handleSearch(req, res);
@@ -11,6 +13,13 @@ async function handleSearch(req, res) {
   try {
     console.log('SEARCH HIT:', req.originalUrl, req.path);
     const start = Date.now();
+    const cacheKey = `search:${req.originalUrl}`;
+    const cached = await cacheGet(cacheKey);
+    if (cached) {
+      cached.cached = true;
+      return res.json(cached);
+    }
+
     const { q, city, type, purpose, minPrice, maxPrice, minArea, maxArea,
       rooms, baths, apartments, facing, trust, sort, age, minStreetWidth, minCars,
       features, page = 1, limit = 50 } = req.query;
@@ -66,7 +75,7 @@ async function handleSearch(req, res) {
       });
     }
 
-    let orderBy = '"createdAt" DESC';
+    let orderBy = 'CASE WHEN "isFeatured" = 1 AND ("featuredExpiresAt" IS NULL OR "featuredExpiresAt" = \'\' OR ("featuredExpiresAt")::timestamptz > NOW()) THEN 0 ELSE 1 END, "createdAt" DESC';
     if (sort === 'price_asc') orderBy = 'price ASC';
     if (sort === 'price_desc') orderBy = 'price DESC';
     if (sort === 'area_desc') orderBy = 'area DESC';
@@ -92,7 +101,9 @@ async function handleSearch(req, res) {
       loc: `${p.district}، ${p.city}`,
     }));
 
-    res.json({ success: true, properties: formatted, total, pages: Math.ceil(total / Number(limit)), page: Number(page), ms: Date.now() - start });
+    const payload = { success: true, properties: formatted, total, pages: Math.ceil(total / Number(limit)), page: Number(page), ms: Date.now() - start };
+    await cacheSet(cacheKey, payload, SEARCH_TTL);
+    res.json(payload);
   } catch (err) {
     console.error(err);
     res.status(503).json({ error: 'البحث غير متاح مؤقتاً', fallback: true, message: err.message });

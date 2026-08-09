@@ -2,14 +2,9 @@ import { Router } from 'express';
 import sql from '../config/database.js';
 import { protect } from '../middleware/auth.js';
 import { Errors } from '../utils/errors.js';
+import { createCheckout, fulfill, productForPackage, PRODUCTS } from '../services/monetization.js';
 
 const router = Router();
-
-const PACKAGES = {
-  basic: { name: 'الأساسي', price: 0 },
-  pro: { name: 'الاحترافي', price: 99 },
-  enterprise: { name: 'المؤسسات', price: 299 }
-};
 
 router.get('/config', (req, res) => {
   res.json({
@@ -21,7 +16,7 @@ router.get('/config', (req, res) => {
 router.get('/', protect, async (req, res) => {
   try {
     const payments = await sql`
-      SELECT id, amount, currency, status, "packageId", description, "paymentMethod", "paidAt", "createdAt"
+      SELECT id, amount, currency, status, "packageId", "productType", "productRef", description, "paymentMethod", "paidAt", "createdAt"
       FROM payments WHERE "userId" = ${req.user.id}
       ORDER BY "createdAt" DESC LIMIT 30
     `;
@@ -32,56 +27,20 @@ router.get('/', protect, async (req, res) => {
   }
 });
 
+// Accepts productId (e.g. featured:listing, advertiser:starter, valuation:report, photography:premium)
+// OR legacy packageId (basic/pro/enterprise) for subscription purchases.
 router.post('/create-intent', protect, async (req, res) => {
   try {
-    const { packageId } = req.body;
-    const pkg = PACKAGES[packageId];
-    if (!pkg) return res.status(400).json(Errors.custom('INVALID_PACKAGE', 'الباقة غير موجودة').toJSON());
-    if (pkg.price === 0) return res.status(400).json(Errors.custom('FREE_PACKAGE', 'الباقة مجانية لا تتطلب دفع').toJSON());
+    const { packageId, productId, propertyId, productRef } = req.body;
+    let pid = productId;
+    if (!pid && packageId) pid = productForPackage(packageId);
+    if (!pid) return res.status(400).json(Errors.custom('INVALID_PRODUCT', 'المنتج غير موجود').toJSON());
 
-    const [user] = await sql`SELECT name, email, phone FROM users WHERE id = ${req.user.id}`;
-    if (!user) return res.status(404).json(Errors.custom('USER_NOT_FOUND', 'المستخدم غير موجود').toJSON());
-
-    const amount = pkg.price * 100;
-    if (process.env.MOYASAR_SECRET_KEY) {
-      try {
-        const moyasarRes = await fetch('https://api.moyasar.com/v1/invoices', {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Basic ' + Buffer.from(process.env.MOYASAR_SECRET_KEY + ':').toString('base64'),
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            amount,
-            currency: 'SAR',
-            description: `باقة ${pkg.name} - شهر واحد`,
-            callback_url: process.env.MOYASAR_CALLBACK_URL || 'https://darak-invest-backend-j6hy.onrender.com/api/payments/callback',
-            metadata: { userId: String(req.user.id), packageId }
-          })
-        });
-        const invoice = await moyasarRes.json();
-        if (!moyasarRes.ok) throw new Error(invoice.message || 'Moyasar error');
-
-        await sql`
-          INSERT INTO payments ("userId", amount, currency, status, "packageId", "moyasarId", description)
-          VALUES (${req.user.id}, ${pkg.price}, 'SAR', 'pending', ${packageId}, ${invoice.id}, ${`باقة ${pkg.name}`})
-        `;
-        return res.json({ success: true, invoiceUrl: invoice.url, id: invoice.id, testMode: false });
-      } catch (e) {
-        console.error('Moyasar error:', e);
-        return res.status(502).json(Errors.custom('PAYMENT_GATEWAY_ERROR', 'فشل الاتصال ببوابة الدفع').toJSON());
-      }
-    }
-
-    const [payment] = await sql`
-      INSERT INTO payments ("userId", amount, currency, status, "packageId", description)
-      VALUES (${req.user.id}, ${pkg.price}, 'SAR', 'pending', ${packageId}, ${`باقة ${pkg.name}`})
-      RETURNING id
-    `;
-    res.json({ success: true, paymentId: payment.id, amount: pkg.price, testMode: true });
+    const result = await createCheckout({ userId: req.user.id, productId: pid, propertyId, productRef });
+    return res.json({ success: true, ...result });
   } catch (err) {
-    console.error('Create intent error:', err);
-    res.status(500).json(Errors.internal().toJSON());
+    const map = { 400: 'INVALID_PRODUCT', 403: 'FORBIDDEN', 404: 'NOT_FOUND', 502: 'PAYMENT_GATEWAY_ERROR' };
+    res.status(err.status || 500).json(Errors.custom(map[err.status] || 'INTERNAL', err.message || 'خطأ داخلي').toJSON());
   }
 });
 
@@ -95,18 +54,16 @@ router.post('/test-complete', protect, async (req, res) => {
     const [payment] = await sql`SELECT * FROM payments WHERE id = ${paymentId} AND "userId" = ${req.user.id} AND status = 'pending'`;
     if (!payment) return res.status(404).json(Errors.custom('PAYMENT_NOT_FOUND', 'الدفعة غير موجودة').toJSON());
 
-    const pkg = PACKAGES[payment.packageId];
-    if (!pkg) return res.status(400).json(Errors.custom('INVALID_PACKAGE', 'الباقة غير موجودة').toJSON());
-
+    await fulfill(payment);
     await sql`
       UPDATE payments SET status = 'paid', "paymentMethod" = 'test', "paidAt" = NOW() WHERE id = ${paymentId}
     `;
 
-    await sql`
-      UPDATE users SET package = ${payment.packageId}, "packageExpiry" = ${new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]} WHERE id = ${req.user.id}
-    `;
-
-    res.json({ success: true, message: 'تم تفعيل الباقة تجريبياً ✓', package: pkg });
+    res.json({
+      success: true,
+      message: 'تم إتمام العملية تجريبياً ✓',
+      product: PRODUCTS[payment.productType] || { name: 'المنتج' }
+    });
   } catch (err) {
     console.error('Complete test payment error:', err);
     res.status(500).json(Errors.internal().toJSON());
@@ -132,8 +89,8 @@ router.all('/callback', async (req, res) => {
     if (paid) {
       const [payment] = await sql`SELECT * FROM payments WHERE "moyasarId" = ${id} AND status = 'pending'`;
       if (payment) {
+        await fulfill(payment);
         await sql`UPDATE payments SET status = 'paid', "paidAt" = NOW() WHERE id = ${payment.id}`;
-        await sql`UPDATE users SET package = ${payment.packageId}, "packageExpiry" = ${new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]} WHERE id = ${payment.userId}`;
       } else {
         paid = false;
       }

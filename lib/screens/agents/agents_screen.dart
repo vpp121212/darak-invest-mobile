@@ -239,12 +239,12 @@ class AgentsScreen extends ConsumerWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: filled ? Colors.black : primary, size: 18),
+            Icon(icon, color: filled ? Colors.white : primary, size: 18),
             const SizedBox(width: 6),
             Text(
               label,
               style: GoogleFonts.cairo(
-                color: filled ? Colors.black : primary,
+                color: filled ? Colors.white : primary,
                 fontSize: 13,
                 fontWeight: FontWeight.bold,
               ),

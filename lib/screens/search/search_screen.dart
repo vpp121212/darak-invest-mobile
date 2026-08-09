@@ -201,7 +201,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
               child: Icon(
                 Icons.tune,
-                color: _showAdvanced ? Colors.black : primary,
+                color: _showAdvanced ? Colors.white : primary,
                 size: 22,
               ),
             ),
@@ -250,7 +250,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     chip,
                     style: GoogleFonts.cairo(
                       color:
-                          _isQuickFilterActive(chip) ? Colors.black : textMuted,
+                          _isQuickFilterActive(chip) ? Colors.white : textMuted,
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
                     ),
@@ -421,7 +421,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       child: Text(
                         isAny ? 'الكل' : '$roomCount',
                         style: GoogleFonts.cairo(
-                          color: isSelected ? Colors.black : textMuted,
+                          color: isSelected ? Colors.white : textMuted,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
@@ -445,7 +445,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               child: Center(
                 child: Text('تطبيق الفلاتر',
                     style: GoogleFonts.cairo(
-                        color: Colors.black,
+                        color: Colors.white,
                         fontSize: 15,
                         fontWeight: FontWeight.bold)),
               ),
@@ -554,10 +554,40 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       );
     }
     final properties = state.properties;
+    final showLoader = state.isLoadingMore || state.hasMore;
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: properties.length,
+      itemCount: properties.length + (showLoader ? 1 : 0),
       itemBuilder: (context, index) {
+        if (index == properties.length) {
+          if (state.isLoadingMore) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2.5),
+                ),
+              ),
+            );
+          }
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: TextButton.icon(
+                onPressed: () =>
+                    ref.read(searchProvider.notifier).loadMore(),
+                icon: const Icon(Icons.expand_more, color: gold),
+                label: Text(
+                  'عرض المزيد',
+                  style: GoogleFonts.cairo(
+                      color: gold, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          );
+        }
         final property = properties[index];
         return PropertyCard(
           property: property,

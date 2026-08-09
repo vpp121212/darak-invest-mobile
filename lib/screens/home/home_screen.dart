@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,7 +14,6 @@ import '../../providers/notifications_provider.dart';
 import '../../providers/properties_provider.dart';
 import '../../providers/tab_provider.dart';
 import '../../theme/app_theme.dart';
-import '../../widgets/property_card.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -24,10 +24,8 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   String _purpose = 'الكل';
-  String? _selectedCity;
   String? _selectedType;
   final List<String> _purposes = ['الكل', 'بيع', 'إيجار'];
-  static const _cities = ['الرياض', 'جدة', 'مكة', 'الدمام', 'الخبر', 'حائل'];
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +44,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildBody(PropertyCatalogueState catalogue) {
     final slivers = <Widget>[
-      _brandBar(),
+      _headerBar(),
+      _searchBar(),
     ];
     if (catalogue.isLoading) {
       slivers.add(const SliverToBoxAdapter(child: _HomeSkeleton()));
@@ -73,109 +72,135 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     final filtered = _applyFilters(catalogue.properties);
-    return CustomScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      slivers: [
-        ...slivers,
-        SliverToBoxAdapter(child: _buildHero()),
-        SliverToBoxAdapter(child: _buildPurposeTabs()),
-        SliverToBoxAdapter(child: _buildCategoryChips()),
-        SliverToBoxAdapter(child: _buildFilterRow()),
-        SliverToBoxAdapter(child: _buildAiToolsGrid()),
-        SliverToBoxAdapter(child: _buildNeighborhoodsRail()),
-        if (catalogue.error != null) ...[
-          SliverToBoxAdapter(child: _buildOfflineBanner(catalogue.error!)),
-        ],
-        SliverToBoxAdapter(
-            child: _buildHeader('أحدث العقارات', catalogue.properties.length,
-                onSeeAll: () => context.pushRoute(const SearchRoute()))),
-        SliverToBoxAdapter(
-            child: _InfinitePropertyLoop(properties: catalogue.properties)),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'جميع العقارات',
-                  style: GoogleFonts.cairo(
-                    color: textLight,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: primarySoft,
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Text(
-                    '${filtered.length} عقار',
-                    style: GoogleFonts.cairo(
-                        color: primary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        if (notification.metrics.axis == Axis.vertical &&
+            notification.metrics.extentAfter < 800) {
+          ref.read(propertiesProvider.notifier).loadMore();
+        }
+        return false;
+      },
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          ...slivers,
+          SliverToBoxAdapter(
+            child: _buildSectionTitle(
+              'التصنيفات',
+              onSeeAll: () => context.pushRoute(const SearchRoute()),
             ),
           ),
-        ),
-        if (filtered.isEmpty)
-          const SliverToBoxAdapter(child: _EmptyState())
-        else
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) => Consumer(
-                  builder: (context, ref, _) {
-                    final favorites = ref.watch(favoritesProvider);
-                    return PropertyCard(
-                      property: filtered[index],
-                      onTap: () => _openDetail(filtered[index]),
-                      onFavorite: () => ref
-                          .read(favoritesProvider.notifier)
-                          .toggle(filtered[index].id),
-                      isFavorite: favorites.contains(filtered[index].id),
-                    );
-                  },
+          _buildCategoryChips(),
+          _buildPurposeTabs(),
+          if (catalogue.error != null) ...[
+            _buildOfflineBanner(catalogue.error!),
+          ],
+          SliverToBoxAdapter(
+            child: _buildHeader('أحدث العقارات', filtered.length,
+                onSeeAll: () => context.pushRoute(const SearchRoute())),
+          ),
+          if (filtered.isEmpty)
+            const SliverToBoxAdapter(child: _EmptyState())
+          else
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) => Consumer(
+                    builder: (context, ref, _) {
+                      final favorites = ref.watch(favoritesProvider);
+                      final p = filtered[index];
+                      return _HeroCard(
+                        property: p,
+                        isFavorite: favorites.contains(p.id),
+                        onTap: () => _openDetail(p),
+                        onFavorite: () => ref
+                            .read(favoritesProvider.notifier)
+                            .toggle(p.id),
+                      );
+                    },
+                  ),
+                  childCount: filtered.length,
                 ),
-                childCount: filtered.length,
               ),
             ),
-          ),
-        const SliverToBoxAdapter(child: SizedBox(height: 120)),
-      ],
+          if (catalogue.isLoadingMore)
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Center(
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: primary,
+                      strokeWidth: 2.5,
+                    ),
+                  ),
+                ),
+              ),
+            )
+          else if (catalogue.hasMore)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Center(
+                  child: TextButton.icon(
+                    onPressed: () =>
+                        ref.read(propertiesProvider.notifier).loadMore(),
+                    icon: const Icon(Icons.expand_more, color: primary),
+                    label: Text(
+                      'عرض المزيد',
+                      style: GoogleFonts.cairo(
+                          color: primary, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          SliverToBoxAdapter(child: _buildAiToolsGrid()),
+          SliverToBoxAdapter(child: _buildNeighborhoodsRail()),
+          const SliverToBoxAdapter(child: SizedBox(height: 120)),
+        ],
+      ),
     );
   }
 
-  Widget _brandBar() {
+  Widget _headerBar() {
     final auth = ref.watch(authProvider);
     final name = (auth.user?.name ?? '').trim();
+    final initial = name.isNotEmpty ? String.fromCharCode(name.runes.first) : 'ز';
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
         child: Row(
           children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: primary,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: const [
-                  BoxShadow(
-                      color: Color(0x66CCFF00),
+            GestureDetector(
+              onTap: () => ref.read(activeTabProvider.notifier).state = 4,
+              child: Container(
+                width: 46,
+                height: 46,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(colors: brandGradient),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0x66E50914),
                       blurRadius: 14,
-                      offset: Offset(0, 4)),
-                ],
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    initial,
+                    style: GoogleFonts.cairo(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
               ),
-              child: const Icon(Icons.home_work_rounded,
-                  color: Colors.black, size: 24),
             ),
             const SizedBox(width: 12),
             Column(
@@ -185,38 +210,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   'دارك وحيك',
                   style: GoogleFonts.cairo(
                     color: textLight,
-                    fontSize: 20,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(
-                  name.isNotEmpty
-                      ? 'مرحباً بك، $name 👋'
-                      : 'سوقك العقاري الذكي',
-                  style: GoogleFonts.cairo(color: textMuted, fontSize: 11),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on, size: 13, color: primary),
+                    const SizedBox(width: 2),
+                    Text(
+                      'الرياض، السعودية',
+                      style: GoogleFonts.cairo(color: textMuted, fontSize: 12),
+                    ),
+                  ],
                 ),
               ],
             ),
             const Spacer(),
-            GestureDetector(
-              onTap: () => ref.read(activeTabProvider.notifier).state = 4,
-              child: Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border:
-                      Border.all(color: gold.withValues(alpha: 0.7), width: 2),
-                  boxShadow: softShadow,
-                ),
-                child: Icon(
-                  name.isNotEmpty ? Icons.person : Icons.person_outline,
-                  color: gold,
-                  size: 24,
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
             Stack(
               clipBehavior: Clip.none,
               children: [
@@ -249,14 +260,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: gold,
+                        color: primary,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: bgDark, width: 2),
                       ),
                       child: Text(
                         '${ref.watch(notificationsProvider).unreadCount}',
                         style: GoogleFonts.cairo(
-                            color: Colors.black,
+                            color: Colors.white,
                             fontSize: 10,
                             fontWeight: FontWeight.bold),
                       ),
@@ -270,195 +281,81 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildHero() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      child: Container(
-        height: 200,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF161616), Color(0xFF1C1C1C)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+  Widget _searchBar() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+        child: GestureDetector(
+          onTap: () => context.pushRoute(const SearchRoute()),
+          child: Container(
+            height: 52,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(
+              color: glassFill,
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: glassBorder),
+              boxShadow: softShadow,
+            ),
+            child: Row(
+              children: [
+                const SizedBox(width: 8),
+                const Icon(Icons.search, color: textMuted, size: 22),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'ابحث عن عقارك المثالي...',
+                    style: GoogleFonts.cairo(color: textMuted, fontSize: 13),
+                  ),
+                ),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    color: primary,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                          color: Color(0x66E50914),
+                          blurRadius: 12,
+                          offset: Offset(0, 4)),
+                    ],
+                  ),
+                  child: const Icon(Icons.tune, color: Colors.white, size: 20),
+                ),
+              ],
+            ),
           ),
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: glassBorder),
-          boxShadow: const [
-            BoxShadow(
-                color: Color(0x4D000000),
-                blurRadius: 26,
-                offset: Offset(0, 12)),
-            BoxShadow(color: Color(0x24CCFF00), blurRadius: 30),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          children: [
-            Positioned(
-              top: -40,
-              right: -30,
-              child: Container(
-                width: 140,
-                height: 140,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: primary.withValues(alpha: 0.10),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: -50,
-              left: -20,
-              child: Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: cyan.withValues(alpha: 0.08),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 16,
-              right: 16,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: primarySoft,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Text(
-                  'تطوّرك يبدأ من هنا',
-                  style: GoogleFonts.cairo(
-                      color: primary,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 6),
-                  Text(
-                    'اعثر على بيت أحلامك',
-                    style: GoogleFonts.cairo(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'عقارات موثّقة وأدوات ذكية لتقدير الأسعار والاستثمار',
-                    style: GoogleFonts.cairo(
-                      color: textMuted,
-                      fontSize: 12,
-                    ),
-                  ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: () => context.pushRoute(const SearchRoute()),
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(16, 6, 6, 6),
-                      decoration: BoxDecoration(
-                        color: glassFill,
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: glassBorder),
-                        boxShadow: const [
-                          BoxShadow(
-                              color: Color(0x4D000000),
-                              blurRadius: 14,
-                              offset: Offset(0, 6)),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.search, color: primary, size: 22),
-                          const SizedBox(width: 10),
-                          Text(
-                            'ابحث عن عقارك المثالي...',
-                            style: GoogleFonts.cairo(
-                                color: textMuted, fontSize: 14),
-                          ),
-                          const Spacer(),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 18, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: primary,
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: Text(
-                              'بحث',
-                              style: GoogleFonts.cairo(
-                                color: Colors.black,
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ),
       ),
     );
   }
 
-  Widget _buildPurposeTabs() {
+  Widget _buildSectionTitle(String title, {VoidCallback? onSeeAll}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: glassFill,
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: glassBorder),
-          boxShadow: softShadow,
-        ),
-        child: Row(
-          children: List.generate(_purposes.length, (index) {
-            final purpose = _purposes[index];
-            final isSelected = _purpose == purpose;
-            return Expanded(
-              child: GestureDetector(
-                onTap: () => setState(() => _purpose = purpose),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: isSelected ? primary : Colors.transparent,
-                    borderRadius: BorderRadius.circular(26),
-                    boxShadow: isSelected
-                        ? const [
-                            BoxShadow(color: Color(0x66CCFF00), blurRadius: 12)
-                          ]
-                        : null,
-                  ),
-                  child: Center(
-                    child: Text(
-                      purpose,
-                      style: GoogleFonts.cairo(
-                        color: isSelected ? Colors.black : textMuted,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
+      padding: const EdgeInsets.fromLTRB(16, 22, 16, 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: GoogleFonts.cairo(
+                color: textLight, fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          if (onSeeAll != null)
+            GestureDetector(
+              onTap: onSeeAll,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                child: Text(
+                  'عرض الكل',
+                  style: GoogleFonts.cairo(
+                      color: primary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
-            );
-          }),
-        ),
+            ),
+        ],
       ),
     );
   }
@@ -474,168 +371,185 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ('استوديو', Icons.king_bed_outlined),
       ('عمارة', Icons.location_city_outlined),
     ];
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            for (final c in all)
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
+    return SliverToBoxAdapter(
+      child: SizedBox(
+        height: 92,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: all.length,
+          separatorBuilder: (_, __) => const SizedBox(width: 8),
+          itemBuilder: (context, index) {
+            final c = all[index];
+            final isSelected = _selectedType == c.$1;
+            return GestureDetector(
+              onTap: () => setState(
+                  () => _selectedType = c.$1 == 'الكل' ? null : c.$1),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                width: 76,
+                decoration: BoxDecoration(
+                  color: isSelected ? primary : glassFill,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSelected ? primary : glassBorder,
+                  ),
+                  boxShadow: isSelected
+                      ? const [
+                          BoxShadow(
+                              color: Color(0x66E50914), blurRadius: 14)
+                        ]
+                      : softShadow,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      c.$2,
+                      size: 24,
+                      color: isSelected ? Colors.white : primary,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      c.$1,
+                      style: GoogleFonts.cairo(
+                        color: isSelected ? Colors.white : textLight,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPurposeTabs() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+        child: Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: glassFill,
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(color: glassBorder),
+            boxShadow: softShadow,
+          ),
+          child: Row(
+            children: List.generate(_purposes.length, (index) {
+              final purpose = _purposes[index];
+              final isSelected = _purpose == purpose;
+              return Expanded(
                 child: GestureDetector(
-                  onTap: () => setState(
-                      () => _selectedType = c.$1 == 'الكل' ? null : c.$1),
+                  onTap: () => setState(() => _purpose = purpose),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 220),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 10),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
-                      color: _selectedType == c.$1 ? primary : glassFill,
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(
-                        color: _selectedType == c.$1 ? primary : glassBorder,
-                      ),
-                      boxShadow: _selectedType == c.$1
+                      color: isSelected ? primary : Colors.transparent,
+                      borderRadius: BorderRadius.circular(26),
+                      boxShadow: isSelected
                           ? const [
-                              BoxShadow(
-                                  color: Color(0x66CCFF00), blurRadius: 12)
+                              BoxShadow(color: Color(0x66E50914), blurRadius: 12)
                             ]
-                          : softShadow,
+                          : null,
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          c.$2,
-                          size: 18,
-                          color: _selectedType == c.$1 ? Colors.black : primary,
+                    child: Center(
+                      child: Text(
+                        purpose,
+                        style: GoogleFonts.cairo(
+                          color: isSelected ? Colors.white : textMuted,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
                         ),
-                        const SizedBox(width: 6),
-                        Text(
-                          c.$1,
-                          style: GoogleFonts.cairo(
-                            color: _selectedType == c.$1
-                                ? Colors.black
-                                : textLight,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-          ],
+              );
+            }),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildFilterRow() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            _buildFilterChip(
-              icon: Icons.location_city,
-              label: _selectedCity ?? 'المدينة',
-              onTap: () => _showPicker('اختر المدينة', _cities,
-                  (v) => setState(() => _selectedCity = v)),
-            ),
-            if (_selectedCity != null) ...[
+  Widget _buildOfflineBanner(String error) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: red.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: red.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.cloud_off, color: red, size: 18),
               const SizedBox(width: 8),
-              _buildClearFiltersChip(),
+              Expanded(
+                child: Text(
+                  'تعذّر تحديث البيانات — تعرض نسخة محفوظة/تجريبية',
+                  style: GoogleFonts.cairo(color: red, fontSize: 12),
+                ),
+              ),
             ],
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildFilterChip({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: glassFill,
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: glassBorder),
-          boxShadow: softShadow,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 18, color: primary),
-            const SizedBox(width: 6),
-            Text(label,
-                style: GoogleFonts.cairo(color: textLight, fontSize: 13)),
-            const SizedBox(width: 4),
-            const Icon(Icons.arrow_drop_down, size: 18, color: textMuted),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildClearFiltersChip() {
-    return GestureDetector(
-      onTap: () => setState(() {
-        _selectedCity = null;
-        _selectedType = null;
-      }),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: red.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: red.withValues(alpha: 0.35)),
-        ),
-        child: Text('مسح الفلاتر',
-            style: GoogleFonts.cairo(color: red, fontSize: 13)),
-      ),
-    );
-  }
-
-  void _showPicker(
-      String title, List<String> items, ValueChanged<String> onSelected) {
-    showModalBottomSheet(
-      context: context,
-      builder: (ctx) => Column(
-        mainAxisSize: MainAxisSize.min,
+  Widget _buildHeader(String title, int count, {VoidCallback? onSeeAll}) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            margin: const EdgeInsets.only(top: 12),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-                color: textMuted, borderRadius: BorderRadius.circular(2)),
+          Text(
+            title,
+            style: GoogleFonts.cairo(
+                color: textLight, fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(title,
-                style: GoogleFonts.cairo(
-                    color: primary, fontSize: 18, fontWeight: FontWeight.bold)),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (onSeeAll != null)
+                GestureDetector(
+                  onTap: onSeeAll,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: Text(
+                      'عرض الكل',
+                      style: GoogleFonts.cairo(
+                          color: primary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: primarySoft,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Text('$count عقار',
+                    style: GoogleFonts.cairo(
+                        color: primary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold)),
+              ),
+            ],
           ),
-          ...items.map((item) => ListTile(
-                title: Text(item, style: GoogleFonts.cairo(color: textLight)),
-                trailing: _selectedCity == item || _selectedType == item
-                    ? const Icon(Icons.check, color: primary)
-                    : null,
-                onTap: () {
-                  onSelected(item);
-                  context.pop();
-                },
-              )),
-          const SizedBox(height: 16),
         ],
       ),
     );
@@ -677,55 +591,61 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         () => context.pushRoute(const AgentsRoute())
       ),
     ];
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: tools.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
-          childAspectRatio: 0.95,
-        ),
-        itemBuilder: (context, index) {
-          final tool = tools[index];
-          return GestureDetector(
-            onTap: tool.$3,
-            child: Container(
-              decoration: BoxDecoration(
-                color: glassFill,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: glassBorder),
-                boxShadow: softShadow,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: primary,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(tool.$2, color: Colors.black, size: 20),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    tool.$1,
-                    style: GoogleFonts.cairo(
-                      color: textLight,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('أدوات ذكية'),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: tools.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: 0.95,
             ),
-          );
-        },
-      ),
+            itemBuilder: (context, index) {
+              final tool = tools[index];
+              return GestureDetector(
+                onTap: tool.$3,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: glassFill,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: glassBorder),
+                    boxShadow: softShadow,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: primary,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Icon(tool.$2, color: Colors.white, size: 20),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        tool.$1,
+                        style: GoogleFonts.cairo(
+                          color: textLight,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -826,84 +746,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildOfflineBanner(String error) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: red.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: red.withValues(alpha: 0.3)),
-        ),
-        child: Row(
-          children: [
-            const Icon(Icons.cloud_off, color: red, size: 18),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'تعذّر تحديث البيانات — تعرض نسخة محفوظة/تجريبية',
-                style: GoogleFonts.cairo(color: red, fontSize: 12),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(String title, int count, {VoidCallback? onSeeAll}) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: GoogleFonts.cairo(
-                color: textLight, fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (onSeeAll != null)
-                GestureDetector(
-                  onTap: onSeeAll,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: Text(
-                      'عرض الكل',
-                      style: GoogleFonts.cairo(
-                          color: gold,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: primarySoft,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Text('$count عقار',
-                    style: GoogleFonts.cairo(
-                        color: primary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
   List<Property> _applyFilters(List<Property> all) {
     return all.where((p) {
       if (_purpose != 'الكل' && p.purpose != _purpose) return false;
-      if (_selectedCity != null && p.city != _selectedCity) return false;
       if (_selectedType != null && p.type != _selectedType) return false;
       return true;
     }).toList();
@@ -914,84 +759,244 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-/// Seamless endless horizontal loop of property cards — scrolls continuously
-/// in either direction by wrapping around a repeated set.
-class _InfinitePropertyLoop extends StatefulWidget {
-  final List<Property> properties;
+/// Large image-forward property card — the Homerch home hero.
+class _HeroCard extends StatelessWidget {
+  final Property property;
+  final bool isFavorite;
+  final VoidCallback onTap;
+  final VoidCallback onFavorite;
 
-  const _InfinitePropertyLoop({required this.properties});
+  const _HeroCard({
+    required this.property,
+    required this.isFavorite,
+    required this.onTap,
+    required this.onFavorite,
+  });
 
-  @override
-  State<_InfinitePropertyLoop> createState() => _InfinitePropertyLoopState();
-}
-
-class _InfinitePropertyLoopState extends State<_InfinitePropertyLoop> {
-  static const _cardWidth = 280.0;
-  static const _gap = 4.0;
-  static const _cycles = 200;
-
-  late final ScrollController _controller;
-
-  double get _cycleExtent => widget.properties.length * (_cardWidth + _gap);
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = ScrollController(initialScrollOffset: _cycleExtent);
-    _controller.addListener(_wrap);
+  String get _rating {
+    final score = (property.trust / 20).clamp(0, 5).toDouble();
+    return score.toStringAsFixed(1);
   }
 
-  @override
-  void dispose() {
-    _controller
-      ..removeListener(_wrap)
-      ..dispose();
-    super.dispose();
-  }
-
-  void _wrap() {
-    if (!_controller.hasClients) return;
-    final position = _controller.position;
-    final total = position.maxScrollExtent;
-    if (total <= 0) return;
-    if (position.pixels >= total - _cycleExtent) {
-      _controller.jumpTo(position.pixels - _cycleExtent);
-    } else if (position.pixels < _cycleExtent) {
-      _controller.jumpTo(position.pixels + _cycleExtent);
-    }
+  String get _priceLabel {
+    final suffix = property.purpose == 'إيجار' ? '/شهر' : '';
+    return '${Formatters.compactPrice(property.price)} ر.س$suffix';
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.properties.isEmpty) return const SizedBox.shrink();
-    return SizedBox(
-      height: 360,
-      child: ListView.separated(
-        controller: _controller,
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-        scrollDirection: Axis.horizontal,
-        itemCount: widget.properties.length * _cycles,
-        separatorBuilder: (_, __) => const SizedBox(width: _gap),
-        itemBuilder: (context, index) {
-          final p = widget.properties[index % widget.properties.length];
-          return SizedBox(
-            width: _cardWidth,
-            child: Consumer(
-              builder: (context, ref, _) {
-                final favorites = ref.watch(favoritesProvider);
-                return PropertyCard(
-                  property: p,
-                  onTap: () =>
-                      context.pushRoute(PropertyDetailRoute(property: p)),
-                  onFavorite: () =>
-                      ref.read(favoritesProvider.notifier).toggle(p.id),
-                  isFavorite: favorites.contains(p.id),
-                );
-              },
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        height: 290,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: softShadow,
+          color: cardDark,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            CachedNetworkImage(
+              imageUrl: property.mainImage,
+              fit: BoxFit.cover,
+              placeholder: (c, _) => Container(
+                color: bgDark,
+                child: const Center(
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+              errorWidget: (c, _, __) => Container(
+                color: primarySoft,
+                child: const Icon(Icons.home_rounded,
+                    size: 60, color: textMuted),
+              ),
             ),
-          );
-        },
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 190,
+              child: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Color(0xE6000000),
+                      Color(0xFF000000),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 12,
+              left: 12,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: primary,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: const [
+                    BoxShadow(
+                        color: Color(0x66E50914), blurRadius: 12),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.star, size: 13, color: Colors.white),
+                    const SizedBox(width: 4),
+                    Text(
+                      _rating,
+                      style: GoogleFonts.cairo(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (property.isDemo)
+              Positioned(
+                top: 12,
+                right: 12,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: primary,
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(color: Colors.white, width: 0.5),
+                    boxShadow: const [
+                      BoxShadow(
+                          color: Color(0x66E50914), blurRadius: 12),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.bolt, size: 13, color: Colors.white),
+                      const SizedBox(width: 4),
+                      Text(
+                        'عرض محدود!',
+                        style: GoogleFonts.cairo(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            Positioned(
+              bottom: 12,
+              left: 12,
+              child: GestureDetector(
+                onTap: onFavorite,
+                child: Container(
+                  padding: const EdgeInsets.all(9),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.5),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: glassBorder),
+                  ),
+                  child: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: isFavorite ? red : Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 48, 52, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      property.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.cairo(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on,
+                            size: 14, color: Color(0xFFB3B3B8)),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            '${property.district}، ${property.city}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                color: Color(0xFFB3B3B8),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Text(
+                          _priceLabel,
+                          style: GoogleFonts.cairo(
+                            color: primary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(),
+                        _specItem(Icons.king_bed_outlined, '${property.rooms}'),
+                        const SizedBox(width: 12),
+                        _specItem(Icons.bathtub_outlined, '${property.baths}'),
+                        const SizedBox(width: 12),
+                        _specItem(Icons.straighten, '${property.area}'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _specItem(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 15, color: Colors.white),
+        const SizedBox(width: 3),
+        Text(
+          text,
+          style: GoogleFonts.cairo(
+              color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+        ),
+      ],
     );
   }
 }
@@ -1008,10 +1013,10 @@ class _HomeSkeleton extends StatelessWidget {
           for (var i = 0; i < 3; i++)
             Container(
               margin: const EdgeInsets.only(bottom: 16),
-              height: 280,
+              height: 290,
               decoration: BoxDecoration(
                 color: glassFill,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(28),
                 border: Border.all(color: glassBorder),
                 boxShadow: softShadow,
               ),
@@ -1064,7 +1069,7 @@ class _HomeError extends StatelessWidget {
               ),
               child: Text('إعادة المحاولة',
                   style: GoogleFonts.cairo(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 15,
                       fontWeight: FontWeight.bold)),
             ),

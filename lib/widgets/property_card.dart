@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -43,15 +41,12 @@ class PropertyCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildImageSection(),
-                _buildContentSection(),
-              ],
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildImageSection(),
+              _buildContentSection(),
+            ],
           ),
         ),
       ),
@@ -104,13 +99,13 @@ class PropertyCard extends StatelessWidget {
               color: property.purpose == 'بيع' ? primary : cyan,
               borderRadius: BorderRadius.circular(30),
               boxShadow: const [
-                BoxShadow(color: Color(0x66CCFF00), blurRadius: 12),
+                BoxShadow(color: Color(0x66E50914), blurRadius: 12),
               ],
             ),
             child: Text(
               property.purpose,
               style: GoogleFonts.cairo(
-                color: Colors.black,
+                color: Colors.white,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),

@@ -15,6 +15,9 @@ import crypto from 'crypto';
 import './config/database.js';
 import { securityMiddleware } from './middleware/security.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { initCache } from './services/cache.js';
+import { initQueue } from './services/queue.js';
+import './jobs/index.js';
 import propertyRoutes from './routes/properties.js';
 import authRoutes from './routes/auth.js';
 import signupRoute from './routes/signup.js';
@@ -41,8 +44,9 @@ import pulseRoutes from './routes/pulse.js';
 import panoramaRoutes from './routes/panorama.js';
 import realestateRoutes from './routes/realestate.js';
 import paymentRoutes from './routes/payments.js';
-import dashboardRoutes from './routes/dashboard.js';
-import reportRoutes from './routes/reports.js';
+import featuredRoutes from './routes/featured.js';
+import photographyRoutes from './routes/photography.js';
+import dashboardRoutes from './routes/dashboard.js';import reportRoutes from './routes/reports.js';
 import ratingRoutes from './routes/ratings.js';
 import indicatorRoutes from './routes/indicators.js';
 import avmRoutes from './routes/avm.js';
@@ -60,10 +64,31 @@ import adminRoutes from './routes/admin.js';
 
 dotenv.config();
 
+// Redis cache (falls back to in-memory when unavailable).
+initCache();
+
+// Background job queue (BullMQ when REDIS_URL set, else inline).
+initQueue();
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: { origin: '*' } });
+
+// Redis-backed socket.io adapter for multi-instance chat (falls back to in-memory).
+if (process.env.REDIS_URL) {
+  try {
+    const { createAdapter } = await import('@socket.io/redis-adapter');
+    const { default: Redis } = await import('ioredis');
+    const pubClient = new Redis(process.env.REDIS_URL, { lazyConnect: true, connectTimeout: 2000 });
+    const subClient = pubClient.duplicate();
+    await Promise.allSettled([pubClient.connect(), subClient.connect()]);
+    io.adapter(createAdapter(pubClient, subClient));
+    console.log('🟢 socket.io Redis adapter enabled');
+  } catch (err) {
+    console.log('🟡 socket.io Redis adapter unavailable:', err.message);
+  }
+}
 
   // Body parser (must be before security middleware)
   app.use(express.json());
@@ -127,6 +152,8 @@ app.use('/api/ads', adRoutes);
 app.use('/api/pulse', pulseRoutes);
 app.use('/api/realestate', realestateRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/featured', featuredRoutes);
+app.use('/api/photography', photographyRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/ratings', ratingRoutes);

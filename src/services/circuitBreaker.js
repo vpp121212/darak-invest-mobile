@@ -1,18 +1,8 @@
 import CircuitBreaker from 'opossum';
 import sql from '../config/database.js';
+import { cacheGet, cacheSet } from './cache.js';
 
-const cache = new Map();
 const CACHE_TTL = 60000;
-
-function getCached(key) {
-  const item = cache.get(key);
-  if (item && Date.now() - item.ts < CACHE_TTL) return item.data;
-  return null;
-}
-
-function setCache(key, data) {
-  cache.set(key, { data, ts: Date.now() });
-}
 
 const breakerOptions = {
   timeout: 3000,
@@ -23,7 +13,7 @@ const breakerOptions = {
 
 async function fetchProperties(filters) {
   const cacheKey = `props:${JSON.stringify(filters)}`;
-  const cached = getCached(cacheKey);
+  const cached = await cacheGet(cacheKey);
   if (cached) return cached;
 
   let conditions = ['status = $1'];
@@ -36,28 +26,28 @@ async function fetchProperties(filters) {
   const sql_query = `SELECT * FROM properties WHERE ${conditions.join(' AND ')} ORDER BY "createdAt" DESC LIMIT $${idx++} OFFSET $${idx++}`;
   params.push(Number(filters.limit || 20), Number(filters.offset || 0));
   const result = await sql.unsafe(sql_query, params);
-  setCache(cacheKey, result);
+  await cacheSet(cacheKey, result, CACHE_TTL);
   return result;
 }
 
 async function fetchSearch(query) {
   const cacheKey = `search:${query}`;
-  const cached = getCached(cacheKey);
+  const cached = await cacheGet(cacheKey);
   if (cached) return cached;
 
   const result = await sql`SELECT * FROM properties WHERE status='active' AND (title ILIKE ${'%' + query + '%'} OR district ILIKE ${'%' + query + '%'} OR city ILIKE ${'%' + query + '%'}) LIMIT 20`;
-  setCache(cacheKey, result);
+  await cacheSet(cacheKey, result, CACHE_TTL);
   return result;
 }
 
 async function fetchStats() {
-  const cached = getCached('stats');
+  const cached = await cacheGet('stats');
   if (cached) return cached;
 
   const [{ c: total }] = await sql`SELECT COUNT(*)::int as c FROM properties`;
   const [{ c: active }] = await sql`SELECT COUNT(*)::int as c FROM properties WHERE status='active'`;
   const result = { total, active };
-  setCache('stats', result);
+  await cacheSet('stats', result, CACHE_TTL);
   return result;
 }
 
@@ -65,17 +55,17 @@ const propertiesBreaker = new CircuitBreaker(fetchProperties, breakerOptions);
 const searchBreaker = new CircuitBreaker(fetchSearch, breakerOptions);
 const statsBreaker = new CircuitBreaker(fetchStats, breakerOptions);
 
-propertiesBreaker.fallback((filters) => {
+propertiesBreaker.fallback(async (filters) => {
   const cacheKey = `props:${JSON.stringify(filters)}`;
-  return getCached(cacheKey) || [];
+  return (await cacheGet(cacheKey)) || [];
 });
 
-searchBreaker.fallback((query) => {
-  return getCached(`search:${query}`) || [];
+searchBreaker.fallback(async (query) => {
+  return (await cacheGet(`search:${query}`)) || [];
 });
 
-statsBreaker.fallback(() => {
-  return getCached('stats') || { total: 0, active: 0 };
+statsBreaker.fallback(async () => {
+  return (await cacheGet('stats')) || { total: 0, active: 0 };
 });
 
 propertiesBreaker.on('open', () => console.log('🔴 Properties circuit OPEN'));
@@ -88,4 +78,4 @@ searchBreaker.on('close', () => console.log('🟢 Search circuit CLOSED'));
 statsBreaker.on('open', () => console.log('🔴 Stats circuit OPEN'));
 statsBreaker.on('close', () => console.log('🟢 Stats circuit CLOSED'));
 
-export { propertiesBreaker, searchBreaker, statsBreaker, cache };
+export { propertiesBreaker, searchBreaker, statsBreaker };

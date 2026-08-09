@@ -32,6 +32,75 @@ class NeighborhoodDetailScreen extends ConsumerWidget {
         .where((o) => o.district == 'حي $district' || o.district == district)
         .toList();
 
+    final header = <Widget>[
+      _buildHeader(info),
+      const SizedBox(height: 16),
+      Row(
+        children: [
+          Expanded(child: _metric('متوسط البيع', Formatters.compactPrice(info.avgPrice), Icons.payments_outlined)),
+          const SizedBox(width: 10),
+          Expanded(child: _metric('متوسط الإيجار', '${Formatters.compactPrice(info.avgRent)}/سنة', Icons.receipt_long_outlined)),
+        ],
+      ),
+      const SizedBox(height: 10),
+      Row(
+        children: [
+          Expanded(child: _metric('العائد', '${info.roi}٪', Icons.trending_up)),
+          const SizedBox(width: 10),
+          Expanded(child: _metric('النمو', '+${info.growth}٪ سنوياً', Icons.auto_graph)),
+        ],
+      ),
+      const SizedBox(height: 16),
+      GestureDetector(
+        onTap: () => context.pushRoute(MapRoute()),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            color: primary,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: const [
+              BoxShadow(color: Color(0x4DE50914), blurRadius: 14),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.map_outlined, color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'عرض عقارات $district على الخريطة',
+                style: GoogleFonts.cairo(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      if (opportunity.isNotEmpty) ...[
+        const SizedBox(height: 20),
+        Text(
+          'فرصة استثمارية',
+          style: GoogleFonts.cairo(color: primary, fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        NeighborhoodRadarCard(
+          opportunity: opportunity.first,
+          onViewDistrict: () {},
+          onInvest: () => _snack(context, 'الاستثمار الجماعي في $district قريباً'),
+        ),
+      ],
+      const SizedBox(height: 12),
+      Text(
+        'عقارات في $district (${properties.length})',
+        style: GoogleFonts.cairo(color: textLight, fontSize: 17, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 10),
+      if (properties.isEmpty) _emptyState(),
+    ];
+
     return Scaffold(
       backgroundColor: bgDark,
       appBar: AppBar(
@@ -46,84 +115,25 @@ class NeighborhoodDetailScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _buildHeader(info),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(child: _metric('متوسط البيع', Formatters.compactPrice(info.avgPrice), Icons.payments_outlined)),
-              const SizedBox(width: 10),
-              Expanded(child: _metric('متوسط الإيجار', '${Formatters.compactPrice(info.avgRent)}/سنة', Icons.receipt_long_outlined)),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(child: _metric('العائد', '${info.roi}٪', Icons.trending_up)),
-              const SizedBox(width: 10),
-              Expanded(child: _metric('النمو', '+${info.growth}٪ سنوياً', Icons.auto_graph)),
-            ],
-          ),
-          const SizedBox(height: 16),
-          GestureDetector(
-            onTap: () => context.pushRoute(MapRoute()),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              decoration: BoxDecoration(
-                color: primary,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: const [
-                  BoxShadow(color: Color(0x4DCCFF00), blurRadius: 14),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.map_outlined, color: Colors.black, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    'عرض عقارات $district على الخريطة',
-                    style: GoogleFonts.cairo(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          if (opportunity.isNotEmpty) ...[
-            const SizedBox(height: 20),
-            Text(
-              'فرصة استثمارية',
-              style: GoogleFonts.cairo(color: primary, fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            NeighborhoodRadarCard(
-              opportunity: opportunity.first,
-              onViewDistrict: () {},
-              onInvest: () => _snack(context, 'الاستثمار الجماعي في $district قريباً'),
-            ),
-          ],
-          const SizedBox(height: 12),
-          Text(
-            'عقارات في $district (${properties.length})',
-            style: GoogleFonts.cairo(color: textLight, fontSize: 17, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-          if (properties.isEmpty)
-            _emptyState()
-          else
-            ...properties.map((p) => PropertyCard(
+      body: properties.isEmpty
+          ? ListView(
+              padding: const EdgeInsets.all(16),
+              children: [...header, const SizedBox(height: 24)],
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: header.length + properties.length + 1,
+              itemBuilder: (context, index) {
+                if (index < header.length) return header[index];
+                final pi = index - header.length;
+                if (pi == properties.length) return const SizedBox(height: 24);
+                final p = properties[pi];
+                return PropertyCard(
                   property: p,
                   onTap: () => context.pushRoute(PropertyDetailRoute(property: p)),
-                )),
-          const SizedBox(height: 24),
-        ],
-      ),
+                );
+              },
+            ),
     );
   }
 
@@ -150,10 +160,10 @@ class NeighborhoodDetailScreen extends ConsumerWidget {
               color: primary,
               borderRadius: BorderRadius.circular(18),
               boxShadow: const [
-                BoxShadow(color: Color(0x66CCFF00), blurRadius: 16),
+                BoxShadow(color: Color(0x66E50914), blurRadius: 16),
               ],
             ),
-            child: const Icon(Icons.location_city, color: Colors.black, size: 32),
+            child: const Icon(Icons.location_city, color: Colors.white, size: 32),
           ),
           const SizedBox(height: 12),
           Text(

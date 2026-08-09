@@ -1,8 +1,86 @@
 import { Router } from 'express';
 import sql from '../config/database.js';
+import { analyzeListing, duplicateCheck, recommend, buyerAssistant, sellerAssistant, valuationSummary } from '../services/ai.js';
 
 const router = Router();
 
+const num = (v) => (v !== undefined && v !== null && v !== '' ? Number(v) : undefined);
+
+// AI Listing Analyzer — evaluates listing completeness, marketing quality and pricing.
+router.post('/listing/analyze', async (req, res) => {
+  try {
+    const analysis = await analyzeListing(req.body);
+    res.json({ success: true, analysis });
+  } catch (err) {
+    if (err.status === 404) return res.status(404).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'خطأ داخلي' });
+  }
+});
+
+// AI Duplicate Detection — finds near-duplicate listings.
+router.post('/listing/duplicate-check', async (req, res) => {
+  try {
+    const result = await duplicateCheck(req.body);
+    res.json(result);
+  } catch (err) {
+    if (err.status === 404) return res.status(404).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'خطأ داخلي' });
+  }
+});
+
+// AI Valuation Engine — estimate + natural-language summary.
+router.post('/valuation/estimate', async (req, res) => {
+  try {
+    const result = await valuationSummary(req.body);
+    res.json(result);
+  } catch (err) {
+    if (err.status === 400) return res.status(400).json({ error: err.message });
+    if (err.status === 404) return res.status(404).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'خطأ داخلي' });
+  }
+});
+
+// AI Recommendation Engine — personalized ranked matches.
+router.post('/recommendations', async (req, res) => {
+  try {
+    const { budget, area, rooms, baths, type, purpose, city, districts, features, limit } = req.body;
+    const result = await recommend({
+      budget: num(budget), area: num(area), rooms: num(rooms), baths: num(baths),
+      type, purpose, city, districts, features, limit: num(limit)
+    });
+    res.json(result);
+  } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
+});
+
+// AI Buyer Assistant — query in natural language + structured filters.
+router.post('/assistant/buyer', async (req, res) => {
+  try {
+    const result = await buyerAssistant({
+      query: req.body.query || '',
+      budget: num(req.body.budget), area: num(req.body.area), rooms: num(req.body.rooms),
+      type: req.body.type, city: req.body.city, purpose: req.body.purpose,
+      districts: req.body.districts, features: req.body.features
+    });
+    res.json(result);
+  } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
+});
+
+// AI Seller Assistant — pricing guidance + listing improvements.
+router.post('/assistant/seller', async (req, res) => {
+  try {
+    const result = await sellerAssistant(req.body);
+    res.json({ success: true, ...result });
+  } catch (err) {
+    if (err.status === 404) return res.status(404).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'خطأ داخلي' });
+  }
+});
+
+// Backward-compatible legacy estimate (heuristic fallback, no comparables engine).
 router.post('/estimate', async (req, res) => {
   try {
     const { city, district, type, purpose, area, rooms, baths, features = [] } = req.body;
@@ -33,6 +111,7 @@ router.post('/estimate', async (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ error: 'خطأ داخلي' }); }
 });
 
+// Backward-compatible legacy match.
 router.post('/match', async (req, res) => {
   try {
     const { budget, area, rooms, type } = req.body;

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:isolate' show Isolate;
 import 'dart:math' as math;
 import 'dart:typed_data' show Float64List;
 import 'dart:ui' as ui;
@@ -78,6 +79,7 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
   void initState() {
     super.initState();
     _scenes = _normalizeScenes();
+    _SpherePainter.precompute();
     _load();
   }
 
@@ -646,6 +648,11 @@ class _FullscreenTour extends StatelessWidget {
 }
 
 /// يرسم كرة بانورامية (شبكة رؤوس) مع تحويل كاميرا (ياو/بيتش/حقل رؤية).
+///
+/// الشبكة الهندسية (اتجاهات الرؤوس + الإحداثيات النسيجية + الفهارس) تُحسب
+/// مرة واحدة وتُحفظ في [grid] بدلاً من إعادة توليدها في كل إطار — وهي أغلى
+/// جزء في المعالجة وتُولَّد في Isolate خلفي عبر [precompute] لتجنّب أي تأتأة
+/// عند فتح الجولة. إطار الرسم بعد ذلك ينفّذ فقط دوران/إسقاط الكاميرا.
 class _SpherePainter extends CustomPainter {
   _SpherePainter({
     required this.image,
@@ -659,15 +666,31 @@ class _SpherePainter extends CustomPainter {
   final double pitch;
   final double fov;
 
+  static _SphereGrid? _grid;
+  static Future<void>? _precomputeFuture;
+
+  /// يبدأ توليد الشبكة في Isolate في الخلفية (استدعِ مرة واحدة من initState).
+  static Future<void> precompute() {
+    return _precomputeFuture ??= Isolate.run(_buildSphereGrid).then((g) {
+      _grid = g;
+    });
+  }
+
+  static _SphereGrid get grid {
+    final cached = _grid;
+    if (cached != null) return cached;
+    // حساب متزامن عند أول إطار قبل اكتمال الـ Isolate (مرة واحدة فقط).
+    final g = _buildSphereGrid();
+    _grid = g;
+    return g;
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
-    const nYaw = 90;
-    const nPitch = 30;
-    const vertCount = (nYaw + 1) * (nPitch + 1);
-
-    final positions = List<Offset>.filled(vertCount, Offset.zero, growable: false);
-    final uv = List<Offset>.filled(vertCount, Offset.zero, growable: false);
-    final colors = List<Color>.filled(vertCount, const Color(0xFFFFFFFF), growable: false);
+    final g = grid;
+    final positions = List<Offset>.filled(_sphereVertCount, Offset.zero, growable: false);
+    final uv = List<Offset>.filled(_sphereVertCount, Offset.zero, growable: false);
+    final colors = List<Color>.filled(_sphereVertCount, const Color(0xFFFFFFFF), growable: false);
 
     final cx = size.width / 2;
     final cy = size.height / 2;
@@ -680,65 +703,33 @@ class _SpherePainter extends CustomPainter {
     final cosPitch = math.cos(pitchRad);
     final sinPitch = math.sin(pitchRad);
 
-    var vi = 0;
-    for (var i = 0; i <= nYaw; i++) {
-      final yawV = (i / nYaw) * 2 * math.pi;
-      final u = i / nYaw;
-      for (var j = 0; j <= nPitch; j++) {
-        final pitchV = ((j / nPitch) - 0.5) * (178 * math.pi / 180);
-        final v = 0.5 - pitchV / math.pi;
+    for (var vi = 0; vi < _sphereVertCount; vi++) {
+      var x = g.dirX[vi];
+      final y = g.dirY[vi];
+      final z = g.dirZ[vi];
 
-        // اتجاه النقطة على الكرة.
-        final cosp = math.cos(pitchV);
-        final sinp = math.sin(pitchV);
-        final cosy = math.cos(yawV);
-        final siny = math.sin(yawV);
-        double x = cosp * cosy;
-        final y = sinp;
-        double z = cosp * siny;
+      // دوران الكاميرا (ياو ثم بيتش).
+      final x1 = x * cosYaw + z * sinYaw;
+      final z1 = -x * sinYaw + z * cosYaw;
+      final y2 = y * cosPitch - z1 * sinPitch;
+      final z2 = y * sinPitch + z1 * cosPitch;
+      x = x1;
 
-        // دوران الكاميرا (ياو ثم بيتش).
-        final x1 = x * cosYaw + z * sinYaw;
-        final z1 = -x * sinYaw + z * cosYaw;
-        final y2 = y * cosPitch - z1 * sinPitch;
-        final z2 = y * sinPitch + z1 * cosPitch;
-        x = x1;
-
-        // عرض منظوري فقط أمام الكاميرا.
-        final depth = z2;
-        if (depth > 0.001) {
-          positions[vi] = Offset(
-            cx + focal * x / depth,
-            cy - focal * y2 / depth,
-          );
-        } else {
-          const hidden = Offset(-100000, -100000);
-          positions[vi] = hidden;
-        }
-
-        // شفافية ناعمة عند الأفق لإخفاء النصف الخلفي.
-        final alpha = (depth.clamp(0.0, 1.0) * 255).round();
-        colors[vi] = Color.fromARGB(alpha, 255, 255, 255);
-        uv[vi] = Offset(u, v);
-        vi++;
+      // عرض منظوري فقط أمام الكاميرا.
+      final depth = z2;
+      if (depth > 0.001) {
+        positions[vi] = Offset(
+          cx + focal * x / depth,
+          cy - focal * y2 / depth,
+        );
+      } else {
+        positions[vi] = _hiddenOffset;
       }
-    }
 
-    final indices = <int>[];
-    for (var i = 0; i < nYaw; i++) {
-      for (var j = 0; j < nPitch; j++) {
-        final a = i * (nPitch + 1) + j;
-        final b = a + 1;
-        final c = (i + 1) * (nPitch + 1) + j;
-        final d = c + 1;
-        indices
-          ..add(a)
-          ..add(c)
-          ..add(b)
-          ..add(b)
-          ..add(c)
-          ..add(d);
-      }
+      // شفافية ناعمة عند الأفق لإخفاء النصف الخلفي.
+      final alpha = (depth.clamp(0.0, 1.0) * 255).round();
+      colors[vi] = Color.fromARGB(alpha, 255, 255, 255);
+      uv[vi] = Offset(g.u[vi], g.v[vi]);
     }
 
     final vertices = ui.Vertices(
@@ -746,7 +737,7 @@ class _SpherePainter extends CustomPainter {
       positions,
       textureCoordinates: uv,
       colors: colors,
-      indices: indices,
+      indices: g.indices,
     );
 
     final paint = Paint()
@@ -773,4 +764,83 @@ class _SpherePainter extends CustomPainter {
         oldDelegate.pitch != pitch ||
         oldDelegate.fov != fov;
   }
+}
+
+const int _nYaw = 90;
+const int _nPitch = 30;
+const int _sphereVertCount = (_nYaw + 1) * (_nPitch + 1);
+const Offset _hiddenOffset = Offset(-100000, -100000);
+
+/// شبكة اتجاهات الرؤوس والإحداثيات النسيجية والفهارس — بيانات خالصة قابلة
+/// للإرسال إلى Isolate والعكس.
+class _SphereGrid {
+  final List<double> dirX;
+  final List<double> dirY;
+  final List<double> dirZ;
+  final List<double> u;
+  final List<double> v;
+  final List<int> indices;
+
+  const _SphereGrid({
+    required this.dirX,
+    required this.dirY,
+    required this.dirZ,
+    required this.u,
+    required this.v,
+    required this.indices,
+  });
+}
+
+/// يبني شبكة الكرة مرة واحدة — لا تعتمد على yaw/pitch/fov ولا على مقاس الرسم.
+_SphereGrid _buildSphereGrid() {
+  final dirX = List<double>.filled(_sphereVertCount, 0, growable: false);
+  final dirY = List<double>.filled(_sphereVertCount, 0, growable: false);
+  final dirZ = List<double>.filled(_sphereVertCount, 0, growable: false);
+  final u = List<double>.filled(_sphereVertCount, 0, growable: false);
+  final v = List<double>.filled(_sphereVertCount, 0, growable: false);
+
+  var vi = 0;
+  for (var i = 0; i <= _nYaw; i++) {
+    final yawV = (i / _nYaw) * 2 * math.pi;
+    final uV = i / _nYaw;
+    for (var j = 0; j <= _nPitch; j++) {
+      final pitchV = ((j / _nPitch) - 0.5) * (178 * math.pi / 180);
+      final cosp = math.cos(pitchV);
+      final sinp = math.sin(pitchV);
+      final cosy = math.cos(yawV);
+      final siny = math.sin(yawV);
+      dirX[vi] = cosp * cosy;
+      dirY[vi] = sinp;
+      dirZ[vi] = cosp * siny;
+      u[vi] = uV;
+      v[vi] = 0.5 - pitchV / math.pi;
+      vi++;
+    }
+  }
+
+  final indices = <int>[];
+  for (var i = 0; i < _nYaw; i++) {
+    for (var j = 0; j < _nPitch; j++) {
+      final a = i * (_nPitch + 1) + j;
+      final b = a + 1;
+      final c = (i + 1) * (_nPitch + 1) + j;
+      final d = c + 1;
+      indices
+        ..add(a)
+        ..add(c)
+        ..add(b)
+        ..add(b)
+        ..add(c)
+        ..add(d);
+    }
+  }
+
+  return _SphereGrid(
+    dirX: dirX,
+    dirY: dirY,
+    dirZ: dirZ,
+    u: u,
+    v: v,
+    indices: indices,
+  );
 }

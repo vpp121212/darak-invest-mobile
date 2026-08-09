@@ -4,9 +4,11 @@ import { protect } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { createPropertySchema, updatePropertySchema, propertyQuerySchema } from '../validators/property.js';
 import { propertiesBreaker } from '../services/circuitBreaker.js';
+import { cacheGet, cacheSet, cacheDelPrefix } from '../services/cache.js';
 import { Errors } from '../utils/errors.js';
 
 const router = Router();
+const ALL_TTL = 30000;
 
 router.get('/', validate.query(propertyQuerySchema), async (req, res) => {
   try {
@@ -30,40 +32,35 @@ router.get('/', validate.query(propertyQuerySchema), async (req, res) => {
 
 router.get('/all', async (req, res) => {
   try {
-    const properties = await sql`SELECT * FROM properties WHERE status = 'active'`;
-    const formatted = properties.map(p => ({
-      id: p.id,
-      title: p.title,
-      type: p.type,
-      loc: `${p.district}، ${p.city}`,
-      district: p.district,
-      city: p.city,
-      price: p.price,
-      rooms: p.rooms,
-      baths: p.baths,
-      cars: p.cars,
-      area: p.area,
-      year: p.year,
-      age: p.age,
-      status: p.isFeatured ? 'حصري' : 'متاح',
-      lat: p.lat,
-      lng: p.lng,
-      street: p.street,
-      streetW: p.streetWidth,
-      facing: p.facing,
-      purpose: p.purpose,
-      desc: p.description,
-      images: JSON.parse(p.images || '[]').length > 0
-        ? JSON.parse(p.images || '[]')
-        : [],
-      pano: p.panoramicImage || null,
-      panoramicImage: p.panoramicImage || null,
-      features: JSON.parse(p.features || '[]'),
-      guarantees: [],
-      trust: p.trust || 'direct',
-      agent: { name: p.agentName || 'مكتب الديار العقارية', role: 'وسيط مرخص', phone: p.agentPhone || '+966501234567' }
-    }));
-    res.json(formatted);
+    const { page, limit } = req.query;
+    const paged = page !== undefined || limit !== undefined;
+    const cacheKey = paged
+      ? `propsall:${Math.max(1, Number(page) || 1)}:${Math.min(100, Math.max(1, Number(limit) || 20))}`
+      : 'propsall:all';
+    const cached = await cacheGet(cacheKey);
+    if (cached) return res.json(cached);
+
+    let payload;
+    if (!paged) {
+      const properties = await sql`
+        SELECT * FROM properties WHERE status = 'active'
+        ORDER BY CASE WHEN "isFeatured" = 1 AND ("featuredExpiresAt" IS NULL OR "featuredExpiresAt" = '' OR ("featuredExpiresAt")::timestamptz > NOW()) THEN 0 ELSE 1 END, "createdAt" DESC, id DESC
+      `;
+      payload = properties.map(formatAllProperty);
+    } else {
+      const p = Math.max(1, Number(page) || 1);
+      const l = Math.min(100, Math.max(1, Number(limit) || 20));
+      const offset = (p - 1) * l;
+      const properties = await sql`
+        SELECT * FROM properties WHERE status = 'active'
+        ORDER BY CASE WHEN "isFeatured" = 1 AND ("featuredExpiresAt" IS NULL OR "featuredExpiresAt" = '' OR ("featuredExpiresAt")::timestamptz > NOW()) THEN 0 ELSE 1 END, "createdAt" DESC, id DESC
+        LIMIT ${l} OFFSET ${offset}
+      `;
+      const [{ total }] = await sql`SELECT COUNT(*)::int as total FROM properties WHERE status = 'active'`;
+      payload = { success: true, properties: properties.map(formatAllProperty), total, pages: Math.ceil(total / l), page: p };
+    }
+    await cacheSet(cacheKey, payload, ALL_TTL);
+    return res.json(payload);
   } catch (err) { console.error(err); res.status(500).json([]); }
 });
 
@@ -93,6 +90,7 @@ router.post('/', protect, validate.body(createPropertySchema), async (req, res) 
       req.user.name, req.user.phone, '', req.user.id
     ]);
     const [property] = await sql`SELECT * FROM properties WHERE id = ${result.id}`;
+    await cacheDelPrefix('propsall');
     res.status(201).json({ success: true, property: formatProperty(property) });
   } catch (err) { console.error(err); res.status(500).json(Errors.internal().toJSON()); }
 });
@@ -119,6 +117,7 @@ router.put('/:id', protect, validate.body(updatePropertySchema), async (req, res
       JSON.stringify(p.features || JSON.parse(existing.features || '[]')), p.trust || existing.trust, req.params.id
     ]);
     const [property] = await sql`SELECT * FROM properties WHERE id = ${req.params.id}`;
+    await cacheDelPrefix('propsall');
     res.json({ success: true, property: formatProperty(property) });
   } catch (err) { console.error(err); res.status(500).json(Errors.internal().toJSON()); }
 });
@@ -131,6 +130,7 @@ router.delete('/:id', protect, async (req, res) => {
       return res.status(403).json(Errors.forbidden('غير مصرح بالحذف').toJSON());
     }
     await sql`DELETE FROM properties WHERE id = ${req.params.id}`;
+    await cacheDelPrefix('propsall');
     res.json({ success: true, message: 'تم حذف العقار' });
   } catch (err) { res.status(500).json(Errors.internal().toJSON()); }
 });
@@ -152,6 +152,40 @@ function formatProperty(p) {
     isFeatured: !!p.isFeatured,
     isActive: !!p.isActive,
     agent: { name: p.agentName, phone: p.agentPhone, office: p.agentOffice }
+  };
+}
+
+function formatAllProperty(p) {
+  const images = JSON.parse(p.images || '[]');
+  return {
+    id: p.id,
+    title: p.title,
+    type: p.type,
+    loc: `${p.district}، ${p.city}`,
+    district: p.district,
+    city: p.city,
+    price: p.price,
+    rooms: p.rooms,
+    baths: p.baths,
+    cars: p.cars,
+    area: p.area,
+    year: p.year,
+    age: p.age,
+    status: p.isFeatured ? 'حصري' : 'متاح',
+    lat: p.lat,
+    lng: p.lng,
+    street: p.street,
+    streetW: p.streetWidth,
+    facing: p.facing,
+    purpose: p.purpose,
+    desc: p.description,
+    images,
+    pano: p.panoramicImage || null,
+    panoramicImage: p.panoramicImage || null,
+    features: JSON.parse(p.features || '[]'),
+    guarantees: [],
+    trust: p.trust || 'direct',
+    agent: { name: p.agentName || 'مكتب الديار العقارية', role: 'وسيط مرخص', phone: p.agentPhone || '+966501234567' }
   };
 }
 

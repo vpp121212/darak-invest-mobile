@@ -35,7 +35,29 @@ if (dbUrl) {
   ALTER TABLE users ADD COLUMN IF NOT EXISTS "otpCode" TEXT;
   ALTER TABLE users ADD COLUMN IF NOT EXISTS "otpExpires" TEXT;
 
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS "adCredits" INTEGER DEFAULT 0;
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS "adPackage" TEXT;
+
   ALTER TABLE properties ADD COLUMN IF NOT EXISTS apartments INTEGER DEFAULT 0;
+  ALTER TABLE properties ADD COLUMN IF NOT EXISTS "featuredAt" TEXT;
+  ALTER TABLE properties ADD COLUMN IF NOT EXISTS "featuredExpiresAt" TEXT;
+
+  ALTER TABLE payments ADD COLUMN IF NOT EXISTS "productType" TEXT DEFAULT 'subscription';
+  ALTER TABLE payments ADD COLUMN IF NOT EXISTS "productRef" TEXT;
+
+  CREATE TABLE IF NOT EXISTS photography_bookings (
+    id SERIAL PRIMARY KEY,
+    "userId" INTEGER NOT NULL REFERENCES users(id),
+    "propertyId" INTEGER REFERENCES properties(id),
+    "packageId" TEXT,
+    date TEXT NOT NULL,
+    address TEXT,
+    status TEXT DEFAULT 'pending' CHECK(status IN ('pending','confirmed','completed','cancelled')),
+    "confirmedAt" TEXT,
+    "createdAt" TEXT DEFAULT (NOW())
+  );
+  CREATE INDEX IF NOT EXISTS idx_photography_user ON photography_bookings("userId");
+  CREATE INDEX IF NOT EXISTS idx_photography_property ON photography_bookings("propertyId");
 
   CREATE TABLE IF NOT EXISTS properties (
     id SERIAL PRIMARY KEY,

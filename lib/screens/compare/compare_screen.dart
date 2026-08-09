@@ -44,82 +44,88 @@ class _CompareScreenState extends ConsumerState<CompareScreen> {
   }
 
   Widget _picker(List<Property> properties) {
-    return ListView(
+    return ListView.builder(
       padding: const EdgeInsets.all(16),
-      children: [
-        Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: primarySoft,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: primary.withValues(alpha: 0.3)),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.tune, color: primary, size: 20),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'اختر عقارين أو أكثر (${_selected.length}/3) للمقارنة جنباً إلى جنب',
-                  style: GoogleFonts.cairo(color: textLight, fontSize: 13),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        ...properties.map((p) {
-          final isSel = _selected.contains(p.id);
-          final disabled = !isSel && _selected.length >= 3;
-          return GestureDetector(
-            onTap: disabled
-                ? null
-                : () => setState(() {
-                      if (!_selected.add(p.id)) _selected.remove(p.id);
-                    }),
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: glassFill,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: isSel ? primary : glassBorder,
-                  width: isSel ? 1.5 : 1,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    isSel ? Icons.check_circle : Icons.radio_button_unchecked,
-                    color: isSel ? primary : textMuted,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          p.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.cairo(color: textLight, fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${p.district} — ${Formatters.price(p.price)}',
-                          style: GoogleFonts.cairo(color: textMuted, fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+      itemCount: properties.length + 2,
+      itemBuilder: (context, index) {
+        if (index == 0) return _pickerBanner();
+        if (index == properties.length + 1) return const SizedBox(height: 24);
+        final p = properties[index - 1];
+        final isSel = _selected.contains(p.id);
+        final disabled = !isSel && _selected.length >= 3;
+        return GestureDetector(
+          onTap: disabled
+              ? null
+              : () => setState(() {
+                    if (!_selected.add(p.id)) _selected.remove(p.id);
+                  }),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: glassFill,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: isSel ? primary : glassBorder,
+                width: isSel ? 1.5 : 1,
               ),
             ),
-          );
-        }),
-        const SizedBox(height: 24),
-      ],
+            child: Row(
+              children: [
+                Icon(
+                  isSel ? Icons.check_circle : Icons.radio_button_unchecked,
+                  color: isSel ? primary : textMuted,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        p.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.cairo(color: textLight, fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${p.district} — ${Formatters.price(p.price)}',
+                        style: GoogleFonts.cairo(color: textMuted, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _pickerBanner() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: primarySoft,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: primary.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.tune, color: primary, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'اختر عقارين أو أكثر (${_selected.length}/3) للمقارنة جنباً إلى جنب',
+                style: GoogleFonts.cairo(color: textLight, fontSize: 13),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

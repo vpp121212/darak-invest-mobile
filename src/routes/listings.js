@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
     const [{ total }] = await sql.unsafe(`SELECT COUNT(*)::int as total FROM properties WHERE ${conditions.join(' AND ')}`, params);
     params.push(Number(limit), (Number(page) - 1) * Number(limit));
     const rows = await sql.unsafe(
-      `SELECT * FROM properties WHERE ${conditions.join(' AND ')} ORDER BY "createdAt" DESC LIMIT $${idx++} OFFSET $${idx++}`,
+      `SELECT * FROM properties WHERE ${conditions.join(' AND ')} ORDER BY CASE WHEN "isFeatured" = 1 AND ("featuredExpiresAt" IS NULL OR "featuredExpiresAt" = '' OR ("featuredExpiresAt")::timestamptz > NOW()) THEN 0 ELSE 1 END, "createdAt" DESC LIMIT $${idx++} OFFSET $${idx++}`,
       params
     );
     res.json({ success: true, listings: rows.map(formatListing), total, pages: Math.ceil(total / Number(limit)), page: Number(page) });

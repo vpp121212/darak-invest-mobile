@@ -108,7 +108,7 @@ class _ManagementScreenState extends ConsumerState<ManagementScreen>
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () => context.pushRoute(const LoginRoute()),
-            child: Text('دخول', style: GoogleFonts.cairo(color: Colors.black, fontWeight: FontWeight.bold)),
+            child: Text('دخول', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -783,7 +783,7 @@ class _ManagementScreenState extends ConsumerState<ManagementScreen>
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Center(
-                        child: Text('حفظ', style: GoogleFonts.cairo(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)),
+                        child: Text('حفظ', style: GoogleFonts.cairo(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ),

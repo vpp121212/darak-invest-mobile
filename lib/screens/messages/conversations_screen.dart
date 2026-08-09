@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -68,7 +69,7 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () => context.pushRoute(const LoginRoute()),
-            child: Text('دخول', style: GoogleFonts.cairo(color: Colors.black, fontWeight: FontWeight.bold)),
+            child: Text('دخول', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -170,7 +171,7 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
                           constraints: const BoxConstraints(minWidth: 18),
                           child: Text('${c.unread}',
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.cairo(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold)),
+                              style: GoogleFonts.cairo(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ],
@@ -209,8 +210,10 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
         height: 48,
         child: url.isEmpty
             ? Container(color: cardDark, child: const Icon(Icons.home, color: textMuted, size: 20))
-            : Image.network(url, fit: BoxFit.cover, errorBuilder: (_, __, ___) =>
-                Container(color: cardDark, child: const Icon(Icons.home, color: textMuted, size: 20))),
+            : CachedNetworkImage(imageUrl: url, fit: BoxFit.cover,
+                placeholder: (_, __) => Container(color: cardDark),
+                errorWidget: (_, __, ___) =>
+                    Container(color: cardDark, child: const Icon(Icons.home, color: textMuted, size: 20))),
       ),
     );
   }

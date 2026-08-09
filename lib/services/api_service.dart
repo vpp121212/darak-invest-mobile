@@ -32,9 +32,19 @@ class ApiService {
     }).toList();
   }
 
-  static Future<List<Property>> getProperties({int limit = 50}) async {
-    final data = await _client.get('/api/properties/all', query: {'limit': limit});
-    return _parseProperties(data);
+  static Future<PropertyPage> getProperties({int page = 1, int limit = 50}) async {
+    final data = await _client.get('/api/properties/all', query: {'page': page, 'limit': limit});
+    if (data is List) {
+      final list = _parseProperties(data);
+      return PropertyPage(properties: list, total: list.length, pages: 1);
+    }
+    final map = data is Map<String, dynamic> ? data : const <String, dynamic>{};
+    final list = _parseProperties(map);
+    return PropertyPage(
+      properties: list,
+      total: (map['total'] as num?)?.toInt() ?? list.length,
+      pages: (map['pages'] as num?)?.toInt() ?? 1,
+    );
   }
 
   /// Publishes a property owned by the logged-in advertiser.
@@ -368,4 +378,17 @@ class ApiService {
     final list = data is Map ? (data['reports'] ?? []) : (data ?? []);
     return (list as List).map((e) => e as Map<String, dynamic>).toList();
   }
+}
+
+/// One page of the property catalogue returned by a paginated API call.
+class PropertyPage {
+  final List<Property> properties;
+  final int total;
+  final int pages;
+
+  const PropertyPage({
+    required this.properties,
+    required this.total,
+    required this.pages,
+  });
 }

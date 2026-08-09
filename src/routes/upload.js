@@ -1,8 +1,11 @@
 import { Router } from 'express';
 import multer from 'multer';
-import sharp from 'sharp';
-import { protect } from '../middleware/auth.js';
 import { randomUUID } from 'crypto';
+import os from 'os';
+import path from 'path';
+import fs from 'fs/promises';
+import { protect } from '../middleware/auth.js';
+import { processJob } from '../services/queue.js';
 
 const router = Router();
 const upload = multer({
@@ -14,12 +17,23 @@ const upload = multer({
   }
 });
 
+async function stageImage(buffer) {
+  const dir = fs.mkdtemp(path.join(os.tmpdir(), 'darak-img-'));
+  const inputPath = path.join(dir, `${randomUUID()}.bin`);
+  await fs.writeFile(inputPath, buffer);
+  return inputPath;
+}
+
 router.post('/image', protect, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'لم يتم اختيار ملف' });
-    const filename = `${randomUUID()}.webp`;
-    await sharp(req.file.buffer).resize(1200, 800, { fit: 'cover' }).webp({ quality: 85 }).toFile(`src/uploads/images/${filename}`);
-    res.json({ success: true, url: `/uploads/images/${filename}` });
+    const inputPath = await stageImage(req.file.buffer);
+    const result = await processJob('image:process', {
+      inputPath,
+      filename: `${randomUUID()}.webp`,
+      dir: 'images'
+    });
+    res.json({ success: true, url: result.url });
   } catch (err) { res.status(500).json({ error: 'خطأ في الرفع' }); }
 });
 
@@ -27,9 +41,12 @@ router.post('/images', protect, upload.array('images', 20), async (req, res) => 
   try {
     if (!req.files?.length) return res.status(400).json({ error: 'لم يتم اختيار ملفات' });
     const uploads = await Promise.all(req.files.map(async (file) => {
-      const filename = `${randomUUID()}.webp`;
-      await sharp(file.buffer).resize(1200, 800, { fit: 'cover' }).webp({ quality: 85 }).toFile(`src/uploads/images/${filename}`);
-      return { url: `/uploads/images/${filename}` };
+      const inputPath = await stageImage(file.buffer);
+      return processJob('image:process', {
+        inputPath,
+        filename: `${randomUUID()}.webp`,
+        dir: 'images'
+      });
     }));
     res.json({ success: true, images: uploads });
   } catch (err) { res.status(500).json({ error: 'خطأ في الرفع' }); }
@@ -38,9 +55,13 @@ router.post('/images', protect, upload.array('images', 20), async (req, res) => 
 router.post('/panoramic', protect, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'لم يتم اختيار ملف' });
-    const filename = `${randomUUID()}.webp`;
-    await sharp(req.file.buffer).resize(4000, 2000, { fit: 'cover' }).webp({ quality: 90 }).toFile(`src/uploads/panoramic/${filename}`);
-    res.json({ success: true, url: `/uploads/panoramic/${filename}` });
+    const inputPath = await stageImage(req.file.buffer);
+    const result = await processJob('image:process', {
+      inputPath,
+      filename: `${randomUUID()}.webp`,
+      dir: 'panoramic'
+    });
+    res.json({ success: true, url: result.url });
   } catch (err) { res.status(500).json({ error: 'خطأ في الرفع' }); }
 });
 

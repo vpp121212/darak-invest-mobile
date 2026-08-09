@@ -249,13 +249,13 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 color: isRent ? cyan : primary,
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: const [
-                  BoxShadow(color: Color(0x66CCFF00), blurRadius: 10),
+                  BoxShadow(color: Color(0x66E50914), blurRadius: 10),
                 ],
               ),
               child: Text(
                 _property.purpose,
                 style: GoogleFonts.cairo(
-                  color: Colors.black,
+                  color: Colors.white,
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
                 ),
@@ -284,11 +284,11 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.verified, size: 14, color: Colors.black),
+                    const Icon(Icons.verified, size: 14, color: Colors.white),
                     const SizedBox(width: 4),
                     Text('موثّق ${_property.trust}%',
                         style: GoogleFonts.cairo(
-                            color: Colors.black,
+                            color: Colors.white,
                             fontSize: 11,
                             fontWeight: FontWeight.bold)),
                   ],
@@ -597,7 +597,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 ),
                 child: Text('الخريطة الكاملة',
                     style: GoogleFonts.cairo(
-                        color: Colors.black,
+                        color: Colors.white,
                         fontSize: 12,
                         fontWeight: FontWeight.bold)),
               ),
@@ -742,14 +742,14 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
           decoration: BoxDecoration(
             color: color,
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.black, width: 2),
+            border: Border.all(color: Colors.white, width: 2),
             boxShadow: [
               BoxShadow(color: color.withValues(alpha: 0.6), blurRadius: 12)
             ],
           ),
           child: Icon(
             isRent ? Icons.real_estate_agent : Icons.home_rounded,
-            color: Colors.black,
+            color: Colors.white,
             size: 18,
           ),
         ),
@@ -814,11 +814,11 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.verified, size: 14, color: Colors.black),
+                      const Icon(Icons.verified, size: 14, color: Colors.white),
                       const SizedBox(width: 4),
                       Text('موثق',
                           style: GoogleFonts.cairo(
-                              color: Colors.black,
+                              color: Colors.white,
                               fontSize: 11,
                               fontWeight: FontWeight.bold)),
                     ],
@@ -965,7 +965,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: const [
                       BoxShadow(
-                          color: Color(0x66CCFF00),
+                          color: Color(0x66E50914),
                           blurRadius: 16,
                           offset: Offset(0, 6)),
                     ],
@@ -974,12 +974,12 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(Icons.handshake_outlined,
-                          color: Colors.black, size: 18),
+                          color: Colors.white, size: 18),
                       const SizedBox(width: 6),
                       Text(
                         'عرض شراء',
                         style: GoogleFonts.cairo(
-                            color: Colors.black,
+                            color: Colors.white,
                             fontSize: 14,
                             fontWeight: FontWeight.bold),
                       ),

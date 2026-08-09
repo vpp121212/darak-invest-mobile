@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { cacheGet, cacheSet } from '../services/cache.js';
 
 const router = Router();
 
@@ -267,12 +268,18 @@ async function fetchIndices() {
 router.get('/overview', async (req, res) => {
   try {
     const now = Date.now();
+    const shared = await cacheGet('market:overview');
+    if (shared && now - shared.lastUpdate < CACHE_TTL) {
+      const { sama, tasi, cma, gold, oil, indices } = shared;
+      return res.json({ success: true, sama, tasi, cma, gold, oil, indices, cached: true });
+    }
     if (cache.lastUpdate && (now - cache.lastUpdate) < CACHE_TTL && cache.sama && cache.tasi && cache.gold) {
       return res.json({ success: true, sama: cache.sama, tasi: cache.tasi, cma: cache.cma, gold: cache.gold, oil: cache.oil, indices: cache.indices, cached: true });
     }
 
     const [sama, tasi, cma, gold, oil, indices] = await Promise.all([fetchSAMA(), fetchTASI(), fetchCMAStats(), fetchGold(), fetchOil(), fetchIndices()]);
     cache = { sama, tasi, cma, gold, oil, indices, lastUpdate: now };
+    await cacheSet('market:overview', { sama, tasi, cma, gold, oil, indices, lastUpdate: now }, CACHE_TTL);
 
     res.json({ success: true, sama, tasi, cma, gold, oil, indices, cached: false });
   } catch (err) {

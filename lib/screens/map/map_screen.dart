@@ -69,7 +69,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               initialZoom: zoom,
               minZoom: 5,
               maxZoom: 18,
-              backgroundColor: const Color(0xFF0A0A0A),
+              backgroundColor: const Color(0xFF18181A),
               interactionOptions: const InteractionOptions(
                 flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
               ),
@@ -146,7 +146,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ),
           child: Icon(
             isRent ? Icons.real_estate_agent : Icons.home_rounded,
-            color: Colors.black,
+            color: Colors.white,
             size: 20,
           ),
         ),
@@ -250,7 +250,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     ),
                     child: Icon(
                       isRent ? Icons.real_estate_agent : Icons.home_rounded,
-                      color: Colors.black,
+                      color: Colors.white,
                       size: 26,
                     ),
                   ),
@@ -301,7 +301,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     child: Text(
                       p.purpose,
                       style: GoogleFonts.cairo(
-                        color: Colors.black,
+                        color: Colors.white,
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
@@ -330,7 +330,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       child: Text(
                         'التفاصيل',
                         style: GoogleFonts.cairo(
-                          color: Colors.black,
+                          color: Colors.white,
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),

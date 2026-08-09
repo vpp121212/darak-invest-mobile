@@ -35,6 +35,32 @@ class MarketReportScreen extends ConsumerWidget {
         ? 0.0
         : properties.fold<double>(0, (sum, p) => sum + p.price) / properties.length;
 
+    final header = <Widget>[
+      _summaryRow(properties.length, overallAvg, _topDistrict(sorted)),
+      const SizedBox(height: 16),
+      Row(
+        children: [
+          Text(
+            'الأحياء المتاحة',
+            style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const Spacer(),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: primarySoft,
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Text(
+              '${sorted.length} حي',
+              style: GoogleFonts.cairo(color: primary, fontSize: 12, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 12),
+    ];
+
     return Scaffold(
       backgroundColor: bgDark,
       appBar: AppBar(
@@ -49,49 +75,34 @@ class MarketReportScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _summaryRow(properties.length, overallAvg, _topDistrict(sorted)),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Text(
-                'الأحياء المتاحة',
-                style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: primarySoft,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Text(
-                  '${sorted.length} حي',
-                  style: GoogleFonts.cairo(color: primary, fontSize: 12, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          if (sorted.isEmpty) ...[
-            _offlineNote(context),
-            const SizedBox(height: 12),
-            ...kNeighborhoods.map((n) {
-              final s = _DistrictStats(name: n.name)
-                ..avgPrice = n.avgPrice
-                ..avgArea = 0;
-              return _marketCard(n, s);
-            }),
-          ] else
-            ...sorted.map((s) {
-              final info = kNeighborhoods.where((n) => n.name == s.name).firstOrNull;
-              return _marketCard(info, s);
-            }),
-          const SizedBox(height: 24),
-        ],
-      ),
+      body: sorted.isEmpty
+          ? ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                ...header,
+                _offlineNote(context),
+                const SizedBox(height: 12),
+                ...kNeighborhoods.map((n) {
+                  final s = _DistrictStats(name: n.name)
+                    ..avgPrice = n.avgPrice
+                    ..avgArea = 0;
+                  return _marketCard(n, s);
+                }),
+                const SizedBox(height: 24),
+              ],
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: header.length + sorted.length + 1,
+              itemBuilder: (context, index) {
+                if (index < header.length) return header[index];
+                final pi = index - header.length;
+                if (pi == sorted.length) return const SizedBox(height: 24);
+                final s = sorted[pi];
+                final info = kNeighborhoods.where((n) => n.name == s.name).firstOrNull;
+                return _marketCard(info, s);
+              },
+            ),
     );
   }
 
@@ -186,7 +197,7 @@ class MarketReportScreen extends ConsumerWidget {
                   color: primary,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.location_city, color: Colors.black, size: 20),
+                child: const Icon(Icons.location_city, color: Colors.white, size: 20),
               ),
               const SizedBox(width: 10),
               Expanded(

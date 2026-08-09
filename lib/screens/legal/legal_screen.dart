@@ -83,7 +83,7 @@ class _LegalScreenState extends State<LegalScreen> {
             label,
             textAlign: TextAlign.center,
             style: GoogleFonts.cairo(
-              color: selected ? Colors.black : textMuted,
+              color: selected ? Colors.white : textMuted,
               fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
@@ -98,7 +98,7 @@ class _LegalScreenState extends State<LegalScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0x26CCFF00), Color(0x1F00F0A0)],
+          colors: [Color(0x26E50914), Color(0x1FFF4757)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

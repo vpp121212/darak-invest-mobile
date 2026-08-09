@@ -156,15 +156,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(m.body, style: GoogleFonts.cairo(color: mine ? Colors.black : textLight, fontSize: 14, height: 1.4)),
+            Text(m.body, style: GoogleFonts.cairo(color: mine ? Colors.white : textLight, fontSize: 14, height: 1.4)),
             const SizedBox(height: 4),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(time, style: GoogleFonts.cairo(color: mine ? Colors.black54 : textMuted, fontSize: 10)),
+                Text(time, style: GoogleFonts.cairo(color: mine ? Colors.white54 : textMuted, fontSize: 10)),
                 if (mine) ...[
                   const SizedBox(width: 4),
-                  Icon(m.isRead ? Icons.done_all : Icons.done, size: 13, color: mine ? Colors.black54 : textMuted),
+                  Icon(m.isRead ? Icons.done_all : Icons.done, size: 13, color: mine ? Colors.white54 : textMuted),
                 ],
               ],
             ),
@@ -216,9 +216,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               child: sending
                   ? const Padding(
                       padding: EdgeInsets.all(12),
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                     )
-                  : const Icon(Icons.send_rounded, color: Colors.black, size: 20),
+                  : const Icon(Icons.send_rounded, color: Colors.white, size: 20),
             ),
           ),
         ],

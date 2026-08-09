@@ -15,41 +15,61 @@ import '../services/local_properties_store.dart';
 class PropertyCatalogueState {
   final List<Property> properties;
   final bool isLoading;
+  final bool isLoadingMore;
   final String? error;
+  final int total;
 
   const PropertyCatalogueState({
     this.properties = const [],
     this.isLoading = false,
+    this.isLoadingMore = false,
     this.error,
+    this.total = 0,
   });
+
+  bool get hasMore => properties.length < total;
 
   PropertyCatalogueState copyWith({
     List<Property>? properties,
     bool? isLoading,
+    bool? isLoadingMore,
     String? error,
+    int? total,
     bool clearError = false,
   }) {
     return PropertyCatalogueState(
       properties: properties ?? this.properties,
       isLoading: isLoading ?? this.isLoading,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       error: clearError ? null : (error ?? this.error),
+      total: total ?? this.total,
     );
   }
 }
 
-/// Loads the property catalogue once and keeps it in memory.
+/// Loads the property catalogue one page at a time and keeps it in memory.
 class PropertiesNotifier extends StateNotifier<PropertyCatalogueState> {
   PropertiesNotifier() : super(const PropertyCatalogueState(isLoading: true)) {
     load();
   }
 
+  int _page = 0;
+  int _totalPages = 1;
+
   Future<void> load() async {
-    state = state.copyWith(isLoading: true, clearError: true);
+    _page = 0;
+    _totalPages = 1;
+    state = state.copyWith(isLoading: true, isLoadingMore: false, clearError: true);
 
     List<Property> apiList = const [];
+    int total = 0;
     String? error;
     try {
-      apiList = await ApiService.getProperties();
+      final result = await ApiService.getProperties(page: 1);
+      apiList = result.properties;
+      total = result.total;
+      _page = 1;
+      _totalPages = result.pages;
     } catch (e) {
       error = e.toString();
     }
@@ -74,8 +94,32 @@ class PropertiesNotifier extends StateNotifier<PropertyCatalogueState> {
         ...apiList,
         ...localList,
       ],
+      total: fallback ? (demo.length + localList.length) : total,
       error: fallback ? error : null,
     );
+  }
+
+  /// Fetches the next page of the catalogue and appends it to the list.
+  Future<void> loadMore() async {
+    if (state.isLoading || state.isLoadingMore) return;
+    if (state.properties.isEmpty || _page >= _totalPages) return;
+    final next = _page + 1;
+    state = state.copyWith(isLoadingMore: true);
+    try {
+      final result = await ApiService.getProperties(page: next);
+      if (next <= _page) return;
+      final seen = state.properties.map((p) => p.id).toSet();
+      final fresh = result.properties.where((p) => !seen.contains(p.id)).toList();
+      _page = next;
+      _totalPages = result.pages;
+      state = state.copyWith(
+        properties: [...state.properties, ...fresh],
+        isLoadingMore: false,
+        total: result.total,
+      );
+    } catch (_) {
+      state = state.copyWith(isLoadingMore: false);
+    }
   }
 }
 

@@ -2,11 +2,13 @@
 class Formatters {
   Formatters._();
 
+  static final RegExp _thousandsRe = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
+
   /// Formats a number with thousands separators: 1234567 -> 1,234,567
   static String number(num value) {
     final s = value.toStringAsFixed(0);
     return s.replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      _thousandsRe,
       (Match m) => '${m[1]},',
     );
   }

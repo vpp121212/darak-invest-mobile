@@ -64,7 +64,7 @@ class SearchFilters {
     );
   }
 
-  Map<String, dynamic> toParams() {
+  Map<String, dynamic> toParams({int page = 1}) {
     final sortValue = switch (sort) {
       'price_asc' => 'price_asc',
       'price_desc' => 'price_desc',
@@ -84,24 +84,28 @@ class SearchFilters {
       'rooms': rooms,
       'sort': sortValue,
       'limit': 50,
+      'page': page,
     }..removeWhere((_, v) => v == null || v == '');
   }
 }
 
 class SearchState {
   final bool isSearching;
+  final bool isLoadingMore;
   final List<Property> properties;
   final int total;
   final String? error;
 
   const SearchState({
     this.isSearching = false,
+    this.isLoadingMore = false,
     this.properties = const [],
     this.total = 0,
     this.error,
   });
 
   bool get isEmpty => !isSearching && properties.isEmpty && error == null;
+  bool get hasMore => properties.length < total;
 }
 
 class SearchNotifier extends StateNotifier<SearchState> {
@@ -109,6 +113,8 @@ class SearchNotifier extends StateNotifier<SearchState> {
 
   Timer? _debounce;
   int _requestId = 0;
+  int _page = 0;
+  SearchFilters? _filters;
 
   void search(SearchFilters filters, {Duration debounce = Duration.zero}) {
     _debounce?.cancel();
@@ -117,15 +123,12 @@ class SearchNotifier extends StateNotifier<SearchState> {
 
   Future<void> _run(SearchFilters filters) async {
     final id = ++_requestId;
-    state = state.copyWith(isSearching: true, error: null);
+    _filters = filters;
+    _page = 1;
+    state = state.copyWith(isSearching: true, isLoadingMore: false, error: null);
     try {
-      final res = await ApiService.search(filters.toParams());
-      final list = (res['properties'] as List? ?? const [])
-          .map((e) {
-            final p = Property.fromJson(e as Map<String, dynamic>);
-            return p.copyWith(images: p.images.map(ApiService.resolveImage).toList());
-          })
-          .toList();
+      final res = await ApiService.search(filters.toParams(page: 1));
+      final list = _parse(res);
       if (id != _requestId) return; // stale response
       state = SearchState(
         isSearching: false,
@@ -138,6 +141,42 @@ class SearchNotifier extends StateNotifier<SearchState> {
     }
   }
 
+  /// Fetches the next results page and appends it to the current list.
+  Future<void> loadMore() async {
+    final filters = _filters;
+    if (filters == null) return;
+    if (state.isSearching || state.isLoadingMore || state.properties.isEmpty) return;
+    if (!state.hasMore) return;
+    final id = _requestId;
+    final next = _page + 1;
+    state = state.copyWith(isLoadingMore: true);
+    try {
+      final res = await ApiService.search(filters.toParams(page: next));
+      if (id != _requestId) return;
+      final fresh = _parse(res);
+      final seen = state.properties.map((p) => p.id).toSet();
+      _page = next;
+      state = SearchState(
+        isSearching: false,
+        isLoadingMore: false,
+        properties: [...state.properties, ...fresh.where((p) => !seen.contains(p.id))],
+        total: res['total'] ?? state.total,
+      );
+    } catch (_) {
+      if (id != _requestId) return;
+      state = state.copyWith(isLoadingMore: false);
+    }
+  }
+
+  List<Property> _parse(Map<String, dynamic> res) {
+    return (res['properties'] as List? ?? const [])
+        .map((e) {
+          final p = Property.fromJson(e as Map<String, dynamic>);
+          return p.copyWith(images: p.images.map(ApiService.resolveImage).toList());
+        })
+        .toList();
+  }
+
   @override
   void dispose() {
     _debounce?.cancel();
@@ -148,12 +187,14 @@ class SearchNotifier extends StateNotifier<SearchState> {
 extension on SearchState {
   SearchState copyWith({
     bool? isSearching,
+    bool? isLoadingMore,
     List<Property>? properties,
     int? total,
     String? error,
   }) {
     return SearchState(
       isSearching: isSearching ?? this.isSearching,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       properties: properties ?? this.properties,
       total: total ?? this.total,
       error: error ?? this.error,

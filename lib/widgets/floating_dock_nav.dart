@@ -5,8 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../theme/app_theme.dart';
 
-/// Floating frosted-glass pill dock — dark surface with an electric-lime
-/// active state, Nike Training Club style.
+/// Floating frosted-glass pill dock — dark surface with a brand-red
+/// active state, Homerch style.
 class FloatingDockNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -102,7 +102,7 @@ class _DockItem extends StatelessWidget {
               ),
               child: Icon(
                 icon,
-                color: active ? Colors.black : textMuted,
+                color: active ? Colors.white : textMuted,
                 size: 20,
               ),
             ),
@@ -145,13 +145,13 @@ class _AddButton extends StatelessWidget {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Color(0x66CCFF00),
+              color: Color(0x66E50914),
               blurRadius: 16,
               offset: Offset(0, 6),
             ),
           ],
         ),
-        child: const Icon(Icons.add, color: Colors.black, size: 32),
+        child: const Icon(Icons.add, color: Colors.white, size: 32),
       ),
     );
   }
