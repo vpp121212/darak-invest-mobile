@@ -19,12 +19,12 @@ class FloatingDockNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const labels = ['الرئيسية', 'بحث', '', 'السوق', 'حسابي'];
+    const labels = ['الرئيسية', 'الخريطة', '', 'الرسائل', 'حسابي'];
     const icons = [
       Icons.home_rounded,
-      Icons.search_rounded,
+      Icons.map_outlined,
       Icons.add_rounded,
-      Icons.insert_chart_rounded,
+      Icons.chat_bubble_outline,
       Icons.person_rounded,
     ];
 
@@ -49,11 +49,13 @@ class FloatingDockNav extends StatelessWidget {
               if (index == 2) {
                 return _AddButton(onTap: () => onTap(index));
               }
-              return _DockItem(
-                icon: icons[index],
-                label: labels[index],
-                active: currentIndex == index,
-                onTap: () => onTap(index),
+              return Expanded(
+                child: _DockItem(
+                  icon: icons[index],
+                  label: labels[index],
+                  active: currentIndex == index,
+                  onTap: () => onTap(index),
+                ),
               );
             }),
           ),
