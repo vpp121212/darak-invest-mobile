@@ -5,8 +5,8 @@ import '../core/theme/app_colors.dart';
 /// Backwards-compatible aliases (follow the active palette).
 Color get bgDark => AppColors.bg;
 Color get cardDark => AppColors.card;
-Color get gold => AppColors.primary;
-Color get goldLight => AppColors.primaryLight;
+Color get gold => AppColors.gold;
+Color get goldLight => AppColors.gold;
 Color get green => AppColors.success;
 Color get blue => AppColors.blue;
 Color get textLight => AppColors.textPrimary;
@@ -32,7 +32,7 @@ Color get glassFill => AppColors.glassFill;
 /// Frosted-glass border: subtle white hairline.
 Color get glassBorder => AppColors.glassBorder;
 
-/// Shared soft shadow — black base with a faint red glow.
+/// Shared soft shadow — black base with a faint emerald glow.
 List<BoxShadow> get softShadow => [
       BoxShadow(
         color: AppColors.scrim.withValues(alpha: 0.3),
@@ -40,7 +40,7 @@ List<BoxShadow> get softShadow => [
         offset: const Offset(0, 10),
       ),
       const BoxShadow(
-        color: Color(0x1FE50914),
+        color: Color(0x1F10B981),
         blurRadius: 18,
         offset: Offset(0, 0),
       ),
@@ -60,7 +60,7 @@ class AppTheme {
               secondary: BrandColors.cyan,
               surface: Color(0xFF242426),
               onPrimary: Colors.white,
-              onSecondary: Colors.white,
+              onSecondary: Color(0xFF1D1D1F),
               onSurface: Color(0xFFF5F5F7),
             )
           : const ColorScheme.light(
@@ -68,7 +68,7 @@ class AppTheme {
               secondary: BrandColors.cyan,
               surface: Color(0xFFFFFFFF),
               onPrimary: Colors.white,
-              onSecondary: Colors.white,
+              onSecondary: Color(0xFF1D1D1F),
               onSurface: Color(0xFF1D1D1F),
             ),
       appBarTheme: AppBarTheme(
@@ -134,9 +134,9 @@ class AppTheme {
           color: BrandColors.primary),
       sliderTheme: SliderThemeData(
         activeTrackColor: BrandColors.primary,
-        inactiveTrackColor: const Color(0x33E50914),
+        inactiveTrackColor: const Color(0x33D4AF37),
         thumbColor: BrandColors.primary,
-        overlayColor: const Color(0x2BE50914),
+        overlayColor: const Color(0x2BD4AF37),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: palette.card,

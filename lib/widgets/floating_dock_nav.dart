@@ -141,7 +141,7 @@ class _AddButton extends StatelessWidget {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Color(0x66E50914),
+              color: Color(0x6610B981),
               blurRadius: 16,
               offset: Offset(0, 6),
             ),

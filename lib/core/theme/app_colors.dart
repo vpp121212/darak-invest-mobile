@@ -40,23 +40,45 @@ class AppPalette {
 
 /// Theme-agnostic brand colors shared by both dark and light modes.
 abstract final class BrandColors {
-  static const Color primary = Color(0xFFE50914);
-  static const Color cyan = Color(0xFFFF4757);
-  static const Color primaryLight = Color(0xFFFF5A61);
-  static const Color primarySoft = Color(0x26E50914);
-  static const Color cyanSoft = Color(0x1FFF4757);
-  static const Color gradientA = Color(0xFFFF1F2A);
-  static const Color gradientB = Color(0xFFB20710);
-  static const Color success = Color(0xFF34D399);
+  /// Primary — deep emerald (identity, CTAs, active states).
+  static const Color primary = Color(0xFF10B981);
+
+  /// Secondary accent — royal gold (premium highlights, rent markers).
+  static const Color cyan = Color(0xFFD4AF37);
+
+  /// Lighter emerald (badges, hints).
+  static const Color primaryLight = Color(0xFF34D399);
+
+  /// Soft emerald tint (selected states, icon chips).
+  static const Color primarySoft = Color(0x1A10B981);
+
+  /// Soft gold tint.
+  static const Color cyanSoft = Color(0x1AD4AF37);
+
+  /// Brand gradient: bright emerald → deep emerald.
+  static const Color gradientA = Color(0xFF10B981);
+  static const Color gradientB = Color(0xFF065F46);
+
+  /// Success green.
+  static const Color success = Color(0xFF22C55E);
+
+  /// Secondary sky blue.
   static const Color blue = Color(0xFF38BDF8);
+
+  /// Danger red (distinct from the brand red).
   static const Color red = Color(0xFFFF453A);
+
+  /// Amber — demo/preview badges.
   static const Color amber = Color(0xFFFFB020);
+
+  /// Royal gold accent.
+  static const Color gold = Color(0xFFD4AF37);
 }
 
-/// Homerch palette — Netflix-style red identity.
+/// Emerald + royal gold palette.
 ///
-/// Near-black background with a brand red (#E50914) primary, muted grey text
-/// and solid dark surfaces (#242426) for a premium real-estate feel.
+/// Deep charcoal backgrounds with a premium emerald (#10B981) primary and
+/// royal gold (#D4AF37) accents for a luxurious real-estate feel.
 class AppColors {
   /// Dark-mode palette.
   static const AppPalette dark = AppPalette(
@@ -94,22 +116,22 @@ class AppColors {
   /// Slightly elevated surface.
   static Color get surface => current.surface;
 
-  /// Primary — Homerch brand red.
+  /// Primary — emerald.
   static Color get primary => BrandColors.primary;
 
-  /// Secondary accent — lighter coral red.
+  /// Secondary accent — royal gold.
   static Color get cyan => BrandColors.cyan;
 
-  /// Lighter red (badges, hints).
+  /// Lighter emerald (badges, hints).
   static Color get primaryLight => BrandColors.primaryLight;
 
-  /// Soft red tint (selected states, icon chips).
+  /// Soft emerald tint (selected states, icon chips).
   static Color get primarySoft => BrandColors.primarySoft;
 
-  /// Soft coral tint.
+  /// Soft gold tint.
   static Color get cyanSoft => BrandColors.cyanSoft;
 
-  /// Brand gradient: bright red → deep red.
+  /// Brand gradient: bright emerald → deep emerald.
   static List<Color> get gradient =>
       const [BrandColors.gradientA, BrandColors.gradientB];
 
@@ -124,6 +146,9 @@ class AppColors {
 
   /// Amber — demo/preview badges.
   static Color get amber => BrandColors.amber;
+
+  /// Royal gold accent.
+  static Color get gold => BrandColors.gold;
 
   /// Primary text — near-white (dark) / near-black (light).
   static Color get textPrimary => current.textPrimary;
@@ -140,8 +165,8 @@ class AppColors {
   /// Frosted-glass border.
   static Color get glassBorder => current.glassBorder;
 
-  /// Legacy alias — old gold slot maps to the brand red primary.
+  /// Legacy aliases — map to the emerald primary and royal gold accent.
   static Color get royal => primary;
-  static Color get royalLight => primaryLight;
-  static Color get royalSoft => primarySoft;
+  static Color get royalLight => gold;
+  static Color get royalSoft => cyanSoft;
 }
