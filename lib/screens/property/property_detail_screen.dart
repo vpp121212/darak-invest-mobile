@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/router/app_router.dart';
+import '../../core/theme/app_colors.dart';
 import '../../core/utils/formatters.dart';
 import '../../models/property.dart';
 import '../../providers/auth_provider.dart';
@@ -134,7 +135,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                       _buildFeatures(),
                       const SizedBox(height: 20),
                     ],
-                    _buildMapSection(),
+                    _buildMapSection(context),
                     const SizedBox(height: 20),
                     if (_property.agent != null) ...[
                       _buildAgentCard(),
@@ -618,7 +619,8 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
     );
   }
 
-  Widget _buildMapSection() {
+  Widget _buildMapSection(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final hasCoords = _property.lat != 0 || _property.lng != 0;
     final center = LatLng(hasCoords ? _property.lat : 24.7136,
         hasCoords ? _property.lng : 46.6753);
@@ -665,14 +667,16 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                   options: MapOptions(
                     initialCenter: center,
                     initialZoom: 14,
+                    backgroundColor: AppColors.bg,
                     interactionOptions: const InteractionOptions(
                       flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
                     ),
                   ),
                   children: [
                     TileLayer(
-                      urlTemplate:
-                          'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                      urlTemplate: isDark
+                          ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                          : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
                       subdomains: const ['a', 'b', 'c', 'd'],
                       userAgentPackageName: 'com.darakwaheyk.mobile',
                     ),
@@ -683,7 +687,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                           width: 220,
                           height: 92,
                           alignment: Alignment.bottomCenter,
-                          child: _buildAdLabel(_property),
+                          child: _buildAdLabel(_property, context),
                         ),
                       ],
                     ),
@@ -745,7 +749,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
   }
 
   /// Marker bubble showing the ad name (عنوان الإعلان) above the pin.
-  Widget _buildAdLabel(Property p) {
+  Widget _buildAdLabel(Property p, BuildContext context) {
     final isRent = p.purpose == 'إيجار';
     final color = isRent ? cyan : primary;
     return Column(
@@ -755,7 +759,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           constraints: const BoxConstraints(maxWidth: 200),
           decoration: BoxDecoration(
-            color: const Color(0xF0222225),
+            color: AppColors.surface.withValues(alpha: 0.94),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: color, width: 1.2),
             boxShadow: softShadow,

@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../core/router/app_router.dart';
+import '../../core/theme/app_colors.dart';
 import '../../models/property.dart';
 import '../../providers/properties_provider.dart';
 import '../../theme/app_theme.dart';
@@ -50,6 +51,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       properties = [widget.initialProperty!];
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final initial = widget.initialProperty;
     final center = initial != null ? LatLng(initial.lat, initial.lng) : _riyadh;
     final zoom = initial != null ? 13.5 : 11.0;
@@ -65,15 +67,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               initialZoom: zoom,
               minZoom: 5,
               maxZoom: 18,
-              backgroundColor: const Color(0xFF18181A),
+              backgroundColor: AppColors.bg,
               interactionOptions: const InteractionOptions(
                 flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
               ),
             ),
             children: [
               TileLayer(
-                urlTemplate:
-                    'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                urlTemplate: isDark
+                    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                    : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
                 subdomains: const ['a', 'b', 'c', 'd'],
                 userAgentPackageName: 'com.example.darak_wa_hayk',
               ),
@@ -90,7 +93,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: scrim.withValues(alpha: 0.6),
+                color: AppColors.surface.withValues(alpha: 0.85),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: glassBorder),
               ),
@@ -154,6 +157,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 
   Widget _buildTopBar(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Positioned(
       top: 0,
       left: 0,
@@ -169,7 +173,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.black.withValues(alpha: 0.75), Colors.transparent],
+            colors: [
+              AppColors.surface.withValues(alpha: isDark ? 0.92 : 0.9),
+              AppColors.surface.withValues(alpha: 0.0),
+            ],
           ),
         ),
         child: Row(
@@ -204,7 +211,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       width: 42,
       height: 42,
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.55),
+        color: AppColors.surface.withValues(alpha: 0.85),
         shape: BoxShape.circle,
         border: Border.all(color: glassBorder),
       ),
@@ -225,7 +232,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: const Color(0xF0222225),
+          color: AppColors.surface.withValues(alpha: 0.94),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: glassBorder),
           boxShadow: softShadow,
