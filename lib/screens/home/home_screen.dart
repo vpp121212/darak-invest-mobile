@@ -802,6 +802,7 @@ class _HeroCard extends StatelessWidget {
             CachedNetworkImage(
               imageUrl: property.mainImage,
               fit: BoxFit.cover,
+              memCacheWidth: 900,
               placeholder: (c, _) => Container(
                 color: bgDark,
                 child: const Center(

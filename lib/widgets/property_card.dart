@@ -62,6 +62,7 @@ class PropertyCard extends StatelessWidget {
           height: imageHeight,
           width: double.infinity,
           fit: BoxFit.cover,
+          memCacheWidth: 700,
           placeholder: (c, _) => Container(
             height: imageHeight,
             color: bgDark,

@@ -64,7 +64,9 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
       body: Stack(
         children: [
           // صورة العقار العلمية — تمتد خلف الورقة القابلة للسحب.
-          Positioned.fill(child: _buildImageLayer()),
+          Positioned.fill(
+            child: RepaintBoundary(child: _buildImageLayer()),
+          ),
           // زر العودة
           Positioned(
             top: topInset + 12,
@@ -201,6 +203,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
               return CachedNetworkImage(
                 imageUrl: _images[index],
                 fit: BoxFit.cover,
+                memCacheWidth: 1600,
                 placeholder: (c, _) => Container(
                     color: cardDark,
                     child: const Center(
