@@ -58,7 +58,7 @@ class _ManagementScreenState extends ConsumerState<ManagementScreen>
         title: Text('إدارة العقارات',
             style: GoogleFonts.cairo(color: gold, fontSize: 17, fontWeight: FontWeight.bold)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_forward, color: textLight),
+          icon:  Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
         bottom: TabBar(
@@ -102,7 +102,7 @@ class _ManagementScreenState extends ConsumerState<ManagementScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.admin_panel_settings_outlined, color: textMuted, size: 48),
+           Icon(Icons.admin_panel_settings_outlined, color: textMuted, size: 48),
           const SizedBox(height: 12),
           Text('سجّل دخولك لإدارة عقاراتك', style: GoogleFonts.cairo(color: textMuted, fontSize: 14)),
           const SizedBox(height: 16),
@@ -238,7 +238,7 @@ class _ManagementScreenState extends ConsumerState<ManagementScreen>
             child: Icon(icon, color: gold, size: 20),
           ),
           title: Text(label, style: GoogleFonts.cairo(color: textLight, fontSize: 14)),
-          trailing: const Icon(Icons.add_circle_outline, color: gold, size: 22),
+          trailing:  Icon(Icons.add_circle_outline, color: gold, size: 22),
           onTap: onTap,
         ),
       ),
@@ -301,7 +301,7 @@ class _ManagementScreenState extends ConsumerState<ManagementScreen>
                 _actionBtn('إلغاء', red, () => _run(() => ref.read(managementProvider.notifier).updateContract(c.id, {'status': 'cancelled'}), 'تم إلغاء العقد')),
               if (c.isAuthenticated) ...[
                 const SizedBox(width: 8),
-                const Icon(Icons.verified, color: success, size: 18),
+                 Icon(Icons.verified, color: success, size: 18),
               ],
             ],
           ),
@@ -430,7 +430,7 @@ class _ManagementScreenState extends ConsumerState<ManagementScreen>
           ),
           child: Row(
             children: [
-              const Icon(Icons.balance_outlined, color: success, size: 26),
+               Icon(Icons.balance_outlined, color: success, size: 26),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -538,7 +538,7 @@ class _ManagementScreenState extends ConsumerState<ManagementScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.folder_open, color: textMuted, size: 48),
+           Icon(Icons.folder_open, color: textMuted, size: 48),
           const SizedBox(height: 12),
           Text(title, style: GoogleFonts.cairo(color: textLight, fontSize: 15, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
@@ -779,7 +779,7 @@ class _ManagementScreenState extends ConsumerState<ManagementScreen>
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: brandGradient),
+                        gradient:  LinearGradient(colors: brandGradient),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Center(

@@ -427,7 +427,7 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
 
   Widget _buildScene(ui.Image? pano) {
     if (_loading) {
-      return const Center(
+      return  Center(
         key: ValueKey('vt-loading'),
         child: CircularProgressIndicator(strokeWidth: 2, color: gold),
       );
@@ -438,7 +438,7 @@ class _VirtualTourViewerState extends State<VirtualTourViewer>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.threesixty, color: textMuted, size: 40),
+             Icon(Icons.threesixty, color: textMuted, size: 40),
             const SizedBox(height: 8),
             Text(
               _error!,

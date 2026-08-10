@@ -125,7 +125,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       appBar: AppBar(
         title: Text('حجز موعد معاينة', style: GoogleFonts.cairo(color: gold, fontSize: 17, fontWeight: FontWeight.bold)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_forward, color: textLight),
+          icon:  Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
       ),
@@ -192,7 +192,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           TextField(
             controller: _noteController,
             maxLines: 3,
-            style: const TextStyle(color: textLight),
+            style:  TextStyle(color: textLight),
             decoration: const InputDecoration(hintText: 'أي تفاصيل تود إخبار الوسيط بها...'),
           ),
           const SizedBox(height: 28),
@@ -304,7 +304,7 @@ class _PlaceholderIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: cardDark,
-      child: const Center(child: Icon(Icons.home, color: textMuted)),
+      child:  Center(child: Icon(Icons.home, color: textMuted)),
     );
   }
 }

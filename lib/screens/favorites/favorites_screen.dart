@@ -31,7 +31,7 @@ class FavoritesScreen extends ConsumerWidget {
           style: GoogleFonts.cairo(color: primary, fontSize: 17, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_forward, color: textLight),
+          icon:  Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
       ),
@@ -58,7 +58,7 @@ class FavoritesScreen extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.favorite_border, size: 60, color: textMuted),
+           Icon(Icons.favorite_border, size: 60, color: textMuted),
           const SizedBox(height: 12),
           Text(
             'لا توجد عقارات مفضلة بعد',

@@ -163,10 +163,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 decoration: InputDecoration(
                   hintText: 'ابحث بالاسم أو الموقع...',
                   hintStyle: GoogleFonts.cairo(color: textMuted),
-                  prefixIcon: const Icon(Icons.search, color: textMuted),
+                  prefixIcon:  Icon(Icons.search, color: textMuted),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.close,
+                          icon:  Icon(Icons.close,
                               color: textMuted, size: 18),
                           onPressed: () {
                             _searchController.clear();
@@ -188,7 +188,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 gradient: _showAdvanced
-                    ? const LinearGradient(colors: brandGradient)
+                    ?  LinearGradient(colors: brandGradient)
                     : null,
                 color: _showAdvanced ? null : cardDark,
                 borderRadius: BorderRadius.circular(30),
@@ -297,7 +297,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 children: [
                   Text('ترتيب: $_sortLabel',
                       style: GoogleFonts.cairo(color: textLight, fontSize: 12)),
-                  const Icon(Icons.arrow_drop_down, color: textMuted, size: 18),
+                   Icon(Icons.arrow_drop_down, color: textMuted, size: 18),
                 ],
               ),
             ),
@@ -407,7 +407,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
                       gradient: isSelected
-                          ? const LinearGradient(colors: brandGradient)
+                          ?  LinearGradient(colors: brandGradient)
                           : null,
                       color: isSelected ? null : bgDark,
                       borderRadius: BorderRadius.circular(12),
@@ -439,7 +439,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 14),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: brandGradient),
+                gradient:  LinearGradient(colors: brandGradient),
                 borderRadius: BorderRadius.circular(30),
               ),
               child: Center(
@@ -578,7 +578,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               child: TextButton.icon(
                 onPressed: () =>
                     ref.read(searchProvider.notifier).loadMore(),
-                icon: const Icon(Icons.expand_more, color: gold),
+                icon:  Icon(Icons.expand_more, color: gold),
                 label: Text(
                   'عرض المزيد',
                   style: GoogleFonts.cairo(

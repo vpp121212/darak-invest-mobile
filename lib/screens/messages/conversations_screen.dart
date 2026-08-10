@@ -45,7 +45,7 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
       appBar: AppBar(
         title: Text('الرسائل', style: GoogleFonts.cairo(color: gold, fontSize: 17, fontWeight: FontWeight.bold)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_forward, color: textLight),
+          icon:  Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
       ),
@@ -63,7 +63,7 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.chat_bubble_outline, color: textMuted, size: 48),
+           Icon(Icons.chat_bubble_outline, color: textMuted, size: 48),
           const SizedBox(height: 12),
           Text('سجّل دخولك لمراسلة الوسطاء', style: GoogleFonts.cairo(color: textMuted, fontSize: 14)),
           const SizedBox(height: 16),
@@ -85,7 +85,7 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
           const SizedBox(height: 120),
-          const Icon(Icons.mark_chat_unread_outlined, color: textMuted, size: 48),
+           Icon(Icons.mark_chat_unread_outlined, color: textMuted, size: 48),
           const SizedBox(height: 12),
           Center(child: Text('لا توجد محادثات', style: GoogleFonts.cairo(color: textMuted, fontSize: 14))),
           const SizedBox(height: 4),
@@ -167,7 +167,7 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
                         const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                          decoration: const BoxDecoration(color: gold, shape: BoxShape.circle),
+                          decoration:  BoxDecoration(color: gold, shape: BoxShape.circle),
                           constraints: const BoxConstraints(minWidth: 18),
                           child: Text('${c.unread}',
                               textAlign: TextAlign.center,
@@ -180,7 +180,7 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        const Icon(Icons.home_work_outlined, color: textMuted, size: 13),
+                         Icon(Icons.home_work_outlined, color: textMuted, size: 13),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(c.propertyTitle!,
@@ -209,11 +209,11 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
         width: 48,
         height: 48,
         child: url.isEmpty
-            ? Container(color: cardDark, child: const Icon(Icons.home, color: textMuted, size: 20))
+            ? Container(color: cardDark, child:  Icon(Icons.home, color: textMuted, size: 20))
             : CachedNetworkImage(imageUrl: url, fit: BoxFit.cover,
                 placeholder: (_, __) => Container(color: cardDark),
                 errorWidget: (_, __, ___) =>
-                    Container(color: cardDark, child: const Icon(Icons.home, color: textMuted, size: 20))),
+                    Container(color: cardDark, child:  Icon(Icons.home, color: textMuted, size: 20))),
       ),
     );
   }

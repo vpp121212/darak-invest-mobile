@@ -59,7 +59,7 @@ class _PulseScreenState extends ConsumerState<PulseScreen> {
           style: GoogleFonts.cairo(color: gold, fontSize: 17, fontWeight: FontWeight.bold),
         ),
           leading: IconButton(
-          icon: const Icon(Icons.arrow_forward, color: textLight),
+          icon:  Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
       ),
@@ -74,7 +74,7 @@ class _PulseScreenState extends ConsumerState<PulseScreen> {
               controller: _district,
               textInputAction: TextInputAction.search,
               onSubmitted: (_) => _load(),
-              style: const TextStyle(color: textLight),
+              style:  TextStyle(color: textLight),
               decoration: aiInputDecoration(hint: 'مثال: حي السلامة', icon: Icons.location_city_outlined),
             ),
           ),
@@ -122,7 +122,7 @@ class _PulseScreenState extends ConsumerState<PulseScreen> {
               color: gold.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.sensors, color: gold),
+            child:  Icon(Icons.sensors, color: gold),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -177,7 +177,7 @@ class _PulseScreenState extends ConsumerState<PulseScreen> {
 
   Widget _buildResult(AsyncValue<NeighborhoodPulse?> pulseAsync) {
     return pulseAsync.when(
-      loading: () => const Center(
+      loading: () =>  Center(
         child: Padding(
           padding: EdgeInsets.all(32),
           child: CircularProgressIndicator(color: gold),
@@ -298,7 +298,7 @@ class _PulseResultView extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Icon(Icons.location_city, color: gold, size: 40),
+           Icon(Icons.location_city, color: gold, size: 40),
           const SizedBox(height: 8),
           Text(
             pulse.district,
@@ -366,7 +366,7 @@ class _PulseResultView extends StatelessWidget {
                       width: 6,
                       height: 6,
                       margin: const EdgeInsets.only(left: 8),
-                      decoration: const BoxDecoration(color: gold, shape: BoxShape.circle),
+                      decoration:  BoxDecoration(color: gold, shape: BoxShape.circle),
                     ),
                     Expanded(
                       child: Text(item, style: GoogleFonts.cairo(color: textMuted, fontSize: 13)),

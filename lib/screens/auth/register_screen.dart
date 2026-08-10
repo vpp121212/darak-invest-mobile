@@ -286,7 +286,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       fillColor: cardDark,
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: textMuted.withValues(alpha: 0.2))),
       enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: textMuted.withValues(alpha: 0.2))),
-      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: gold)),
+      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide:  BorderSide(color: gold)),
     );
   }
 

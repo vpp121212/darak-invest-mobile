@@ -132,7 +132,7 @@ class _AddButton extends StatelessWidget {
       child: Container(
         width: 56,
         height: 56,
-        decoration: const BoxDecoration(
+        decoration:  BoxDecoration(
           gradient: LinearGradient(
             colors: brandGradient,
             begin: Alignment.topLeft,

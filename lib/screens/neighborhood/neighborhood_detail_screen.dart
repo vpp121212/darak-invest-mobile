@@ -111,7 +111,7 @@ class NeighborhoodDetailScreen extends ConsumerWidget {
           style: GoogleFonts.cairo(color: primary, fontSize: 17, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_forward, color: textLight),
+          icon:  Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
       ),
@@ -216,7 +216,7 @@ class NeighborhoodDetailScreen extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          const Icon(Icons.home_work_outlined, size: 40, color: textMuted),
+           Icon(Icons.home_work_outlined, size: 40, color: textMuted),
           const SizedBox(height: 8),
           Text(
             'لا توجد عقارات مسجّلة في $district حالياً',

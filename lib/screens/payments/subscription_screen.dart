@@ -46,7 +46,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
         title: Text('الباقات والاشتراك',
             style: GoogleFonts.cairo(color: gold, fontSize: 17, fontWeight: FontWeight.bold)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_forward, color: textLight),
+          icon:  Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
       ),
@@ -79,7 +79,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.workspace_premium_outlined, color: textMuted, size: 48),
+           Icon(Icons.workspace_premium_outlined, color: textMuted, size: 48),
           const SizedBox(height: 12),
           Text('سجّل دخولك للاطلاع على الباقات والاشتراك',
               style: GoogleFonts.cairo(color: textMuted, fontSize: 14)),
@@ -94,7 +94,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: brandGradient),
+        gradient:  LinearGradient(colors: brandGradient),
         borderRadius: BorderRadius.circular(18),
         boxShadow: const [
           BoxShadow(color: Color(0x40E50914), blurRadius: 20, offset: Offset(0, 8)),
@@ -135,7 +135,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.science_outlined, color: blue, size: 20),
+           Icon(Icons.science_outlined, color: blue, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text('وضع تجريبي: الدفع يتم محلياً بدون بوابة خارجية.',
@@ -203,7 +203,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.check_circle, color: success, size: 16),
+                     Icon(Icons.check_circle, color: success, size: 16),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(f, style: GoogleFonts.cairo(color: textLight, fontSize: 13)),
@@ -218,7 +218,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: brandGradient),
+                  gradient:  LinearGradient(colors: brandGradient),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(

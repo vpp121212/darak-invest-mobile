@@ -90,7 +90,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: gold.withValues(alpha: 0.3)),
           ),
-          child: const Icon(Icons.home_work_outlined, size: 40, color: gold),
+          child:  Icon(Icons.home_work_outlined, size: 40, color: gold),
         ),
         const SizedBox(height: 16),
         Text(
@@ -163,7 +163,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: gold),
+        borderSide:  BorderSide(color: gold),
       ),
     );
   }

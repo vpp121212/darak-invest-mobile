@@ -108,7 +108,7 @@ class _LegalScreenState extends State<LegalScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.gavel, color: primary, size: 26),
+           Icon(Icons.gavel, color: primary, size: 26),
           const SizedBox(width: 12),
           Expanded(
             child: Text(

@@ -207,7 +207,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                         child: CircularProgressIndicator(strokeWidth: 2))),
                 errorWidget: (c, _, __) => Container(
                   color: cardDark,
-                  child: const Icon(Icons.home, size: 60, color: textMuted),
+                  child:  Icon(Icons.home, size: 60, color: textMuted),
                 ),
               );
             },
@@ -294,7 +294,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
         const SizedBox(height: 8),
         Row(
           children: [
-            const Icon(Icons.location_on, size: 18, color: gold),
+             Icon(Icons.location_on, size: 18, color: gold),
             const SizedBox(width: 4),
             Expanded(
               child: Text(
@@ -418,7 +418,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
       children: [
         Row(
           children: [
-            const Icon(Icons.threesixty, color: gold, size: 20),
+             Icon(Icons.threesixty, color: gold, size: 20),
             const SizedBox(width: 6),
             Text(
               'جولة 360°',
@@ -455,7 +455,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
       children: [
         Row(
           children: [
-            const Icon(Icons.view_in_ar, color: gold, size: 20),
+             Icon(Icons.view_in_ar, color: gold, size: 20),
             const SizedBox(width: 6),
             Text(
               'بيت الدمية ثلاثي الأبعاد',
@@ -498,7 +498,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.auto_awesome, color: gold, size: 18),
+               Icon(Icons.auto_awesome, color: gold, size: 18),
               const SizedBox(width: 6),
               Text('أدوات الذكاء',
                   style: GoogleFonts.cairo(
@@ -627,8 +627,8 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
       children: [
         Row(
           children: [
-            const Icon(Icons.map_outlined, color: gold, size: 20),
-            const SizedBox(width: 6),
+             Icon(Icons.map_outlined, color: gold, size: 20),
+             SizedBox(width: 6),
             Text('الموقع على الخريطة',
                 style: GoogleFonts.cairo(
                     color: textLight,
@@ -720,8 +720,8 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.info_outline, size: 12, color: gold),
-                          const SizedBox(width: 4),
+                           Icon(Icons.info_outline, size: 12, color: gold),
+                           SizedBox(width: 4),
                           Text('موقع تقريبي',
                               style: GoogleFonts.cairo(
                                   color: gold,
@@ -986,8 +986,8 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.calendar_month, color: gold, size: 18),
-                      const SizedBox(width: 6),
+                       Icon(Icons.calendar_month, color: gold, size: 18),
+                       SizedBox(width: 6),
                       Text(
                         'حجز موعد',
                         style: GoogleFonts.cairo(
@@ -1007,7 +1007,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: brandGradient),
+                    gradient:  LinearGradient(colors: brandGradient),
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: const [
                       BoxShadow(
@@ -1061,7 +1061,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: gold.withValues(alpha: 0.6)),
                 ),
-                child: const Icon(Icons.mail_outline, color: gold, size: 24),
+                child:  Icon(Icons.mail_outline, color: gold, size: 24),
               ),
             ),
           ],

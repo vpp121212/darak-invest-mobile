@@ -221,7 +221,7 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
           else
             _buildError(),
           if (!_loaded && _error == null)
-            const Center(
+             Center(
               child: CircularProgressIndicator(strokeWidth: 2, color: gold),
             ),
           Positioned(
@@ -334,7 +334,7 @@ class _DollhouseViewerState extends State<DollhouseViewer> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.view_in_ar, color: textMuted, size: 40),
+           Icon(Icons.view_in_ar, color: textMuted, size: 40),
           const SizedBox(height: 8),
           Text(
             _error!,

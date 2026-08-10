@@ -71,7 +71,7 @@ class _RoiScreenState extends State<RoiScreen> {
           style: GoogleFonts.cairo(color: gold, fontSize: 17, fontWeight: FontWeight.bold),
         ),
           leading: IconButton(
-          icon: const Icon(Icons.arrow_forward, color: textLight),
+          icon:  Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
       ),
@@ -87,7 +87,7 @@ class _RoiScreenState extends State<RoiScreen> {
               child: TextField(
                 controller: _price,
                 keyboardType: TextInputType.number,
-                style: const TextStyle(color: textLight),
+                style:  TextStyle(color: textLight),
                 decoration: aiInputDecoration(hint: 'مثال: 3000000', icon: Icons.payments_outlined),
               ),
             ),
@@ -97,7 +97,7 @@ class _RoiScreenState extends State<RoiScreen> {
               child: TextField(
                 controller: _rent,
                 keyboardType: TextInputType.number,
-                style: const TextStyle(color: textLight),
+                style:  TextStyle(color: textLight),
                 decoration: aiInputDecoration(hint: 'مثال: 15000', icon: Icons.receipt_long_outlined),
               ),
             ),
@@ -107,7 +107,7 @@ class _RoiScreenState extends State<RoiScreen> {
               child: TextField(
                 controller: _costs,
                 keyboardType: TextInputType.number,
-                style: const TextStyle(color: textLight),
+                style:  TextStyle(color: textLight),
                 decoration: aiInputDecoration(hint: 'اختياري، مثال: 10000', icon: Icons.build_outlined),
               ),
             ),
@@ -117,7 +117,7 @@ class _RoiScreenState extends State<RoiScreen> {
               child: TextField(
                 controller: _appreciation,
                 keyboardType: TextInputType.number,
-                style: const TextStyle(color: textLight),
+                style:  TextStyle(color: textLight),
                 decoration: aiInputDecoration(hint: 'اختياري، مثال: 5', icon: Icons.trending_up),
               ),
             ),
@@ -164,9 +164,9 @@ class _RoiScreenState extends State<RoiScreen> {
               color: gold.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.trending_up, color: gold),
+            child:  Icon(Icons.trending_up, color: gold),
           ),
-          const SizedBox(width: 12),
+           SizedBox(width: 12),
           Expanded(
             child: Text(
               'احسب العائد السنوي على استثمارك العقاري ومدة استرداد رأس المال بناءً على الإيجار والتكاليف.',

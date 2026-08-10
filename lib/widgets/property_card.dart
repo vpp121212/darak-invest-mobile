@@ -73,7 +73,7 @@ class PropertyCard extends StatelessWidget {
           errorWidget: (c, _, __) => Container(
             height: imageHeight,
             color: primarySoft,
-            child: const Icon(Icons.home_rounded, size: 50, color: textMuted),
+            child:  Icon(Icons.home_rounded, size: 50, color: textMuted),
           ),
         ),
         Positioned(
@@ -237,7 +237,7 @@ class PropertyCard extends StatelessWidget {
           const SizedBox(height: 6),
           Row(
             children: [
-              const Icon(Icons.location_on, size: 16, color: primary),
+               Icon(Icons.location_on, size: 16, color: primary),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
@@ -269,7 +269,7 @@ class PropertyCard extends StatelessWidget {
                 Container(
                   width: 22,
                   height: 22,
-                  decoration: const BoxDecoration(
+                  decoration:  BoxDecoration(
                     color: primary,
                     shape: BoxShape.circle,
                   ),

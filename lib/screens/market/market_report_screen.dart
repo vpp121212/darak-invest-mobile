@@ -71,7 +71,7 @@ class MarketReportScreen extends ConsumerWidget {
           style: GoogleFonts.cairo(color: primary, fontSize: 17, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_forward, color: textLight),
+          icon:  Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
       ),
@@ -268,7 +268,7 @@ class MarketReportScreen extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.cloud_off, color: primary, size: 20),
+           Icon(Icons.cloud_off, color: primary, size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Text(

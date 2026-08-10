@@ -125,7 +125,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
           if (catalogue.isLoadingMore)
-            const SliverToBoxAdapter(
+             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 8),
                 child: Center(
@@ -148,7 +148,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: TextButton.icon(
                     onPressed: () =>
                         ref.read(propertiesProvider.notifier).loadMore(),
-                    icon: const Icon(Icons.expand_more, color: primary),
+                    icon:  Icon(Icons.expand_more, color: primary),
                     label: Text(
                       'عرض المزيد',
                       style: GoogleFonts.cairo(
@@ -180,7 +180,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Container(
                 width: 46,
                 height: 46,
-                decoration: const BoxDecoration(
+                decoration:  BoxDecoration(
                   gradient: LinearGradient(colors: brandGradient),
                   shape: BoxShape.circle,
                   boxShadow: [
@@ -217,7 +217,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 const SizedBox(height: 2),
                 Row(
                   children: [
-                    const Icon(Icons.location_on, size: 13, color: primary),
+                     Icon(Icons.location_on, size: 13, color: primary),
                     const SizedBox(width: 2),
                     Text(
                       'الرياض، السعودية',
@@ -241,7 +241,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     boxShadow: softShadow,
                   ),
                   child: IconButton(
-                    icon: const Icon(Icons.notifications_outlined,
+                    icon:  Icon(Icons.notifications_outlined,
                         color: textMuted, size: 22),
                     onPressed: () {
                       final auth = ref.read(authProvider);
@@ -299,7 +299,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Row(
               children: [
                 const SizedBox(width: 8),
-                const Icon(Icons.search, color: textMuted, size: 22),
+                 Icon(Icons.search, color: textMuted, size: 22),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -310,7 +310,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 Container(
                   width: 40,
                   height: 40,
-                  decoration: const BoxDecoration(
+                  decoration:  BoxDecoration(
                     color: primary,
                     shape: BoxShape.circle,
                     boxShadow: [
@@ -492,8 +492,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           child: Row(
             children: [
-              const Icon(Icons.cloud_off, color: red, size: 18),
-              const SizedBox(width: 8),
+               Icon(Icons.cloud_off, color: red, size: 18),
+               SizedBox(width: 8),
               Expanded(
                 child: Text(
                   'تعذّر تحديث البيانات — تعرض نسخة محفوظة/تجريبية',
@@ -699,9 +699,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.location_city,
+                             Icon(Icons.location_city,
                                 color: primary, size: 18),
-                            const Spacer(),
+                             Spacer(),
                             Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 3),
@@ -811,7 +811,7 @@ class _HeroCard extends StatelessWidget {
               ),
               errorWidget: (c, _, __) => Container(
                 color: primarySoft,
-                child: const Icon(Icons.home_rounded,
+                child:  Icon(Icons.home_rounded,
                     size: 60, color: textMuted),
               ),
             ),
@@ -1044,7 +1044,7 @@ class _HomeError extends StatelessWidget {
       padding: const EdgeInsets.all(32),
       children: [
         const SizedBox(height: 80),
-        const Icon(Icons.cloud_off, size: 60, color: textMuted),
+         Icon(Icons.cloud_off, size: 60, color: textMuted),
         const SizedBox(height: 16),
         Text(
           'تعذّر تحميل العقارات',
@@ -1090,7 +1090,7 @@ class _EmptyState extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 40),
       child: Column(
         children: [
-          const Icon(Icons.search_off, size: 60, color: textMuted),
+           Icon(Icons.search_off, size: 60, color: textMuted),
           const SizedBox(height: 12),
           Text('لا توجد عقارات مطابقة',
               style: GoogleFonts.cairo(

@@ -29,7 +29,7 @@ class DashboardScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: textMuted),
+            icon:  Icon(Icons.notifications_outlined, color: textMuted),
             onPressed: () {},
           ),
         ],
@@ -40,14 +40,14 @@ class DashboardScreen extends ConsumerWidget {
 
   Widget _buildBody(PropertyCatalogueState catalogue) {
     if (catalogue.isLoading) {
-      return const Center(child: CircularProgressIndicator(color: gold));
+      return  Center(child: CircularProgressIndicator(color: gold));
     }
     if (catalogue.error != null && catalogue.properties.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.cloud_off, size: 60, color: textMuted),
+             Icon(Icons.cloud_off, size: 60, color: textMuted),
             const SizedBox(height: 12),
             Text('تعذّر تحميل بيانات السوق', style: GoogleFonts.cairo(color: textMuted, fontSize: 16)),
             const SizedBox(height: 8),

@@ -85,7 +85,7 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
           style: GoogleFonts.cairo(color: gold, fontSize: 17, fontWeight: FontWeight.bold),
         ),
           leading: IconButton(
-          icon: const Icon(Icons.arrow_forward, color: textLight),
+          icon:  Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
       ),
@@ -103,7 +103,7 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
                     label: 'المدينة',
                     child: TextField(
                       controller: _city,
-                      style: const TextStyle(color: textLight),
+                      style:  TextStyle(color: textLight),
                       decoration: aiInputDecoration(hint: 'مثال: الرياض', icon: Icons.location_city_outlined),
                     ),
                   ),
@@ -112,7 +112,7 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
                     label: 'الحي',
                     child: TextField(
                       controller: _district,
-                      style: const TextStyle(color: textLight),
+                      style:  TextStyle(color: textLight),
                       decoration: aiInputDecoration(hint: 'مثال: حي النرجس', icon: Icons.map_outlined),
                     ),
                   ),
@@ -153,7 +153,7 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
                           child: TextField(
                             controller: _area,
                             keyboardType: TextInputType.number,
-                            style: const TextStyle(color: textLight),
+                            style:  TextStyle(color: textLight),
                             decoration: aiInputDecoration(hint: 'مثال: 500', icon: Icons.straighten),
                           ),
                         ),
@@ -165,7 +165,7 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
                           child: TextField(
                             controller: _rooms,
                             keyboardType: TextInputType.number,
-                            style: const TextStyle(color: textLight),
+                            style:  TextStyle(color: textLight),
                             decoration: aiInputDecoration(hint: 'مثال: 6', icon: Icons.king_bed_outlined),
                           ),
                         ),
@@ -178,7 +178,7 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
                     child: TextField(
                       controller: _baths,
                       keyboardType: TextInputType.number,
-                      style: const TextStyle(color: textLight),
+                      style:  TextStyle(color: textLight),
                       decoration: aiInputDecoration(hint: 'مثال: 5', icon: Icons.bathtub_outlined),
                     ),
                   ),
@@ -212,9 +212,9 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
               color: gold.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.auto_awesome, color: gold),
+            child:  Icon(Icons.auto_awesome, color: gold),
           ),
-          const SizedBox(width: 12),
+           SizedBox(width: 12),
           Expanded(
             child: Text(
               'خوارزمية ذكية تحلل بيانات السوق الفعلية لتقدير سعر عادل لعقارك مع احتمالية البيع.',
@@ -284,7 +284,7 @@ class _EstimateScreenState extends ConsumerState<EstimateScreen> {
 
   Widget _buildResult(AsyncValue<EstimateResult?> estimateAsync) {
     return estimateAsync.when(
-      loading: () => const Center(
+      loading: () =>  Center(
         child: Padding(
           padding: EdgeInsets.all(32),
           child: CircularProgressIndicator(color: gold),
@@ -350,7 +350,7 @@ class _EstimateResultView extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.insights, color: gold),
+               Icon(Icons.insights, color: gold),
               const SizedBox(width: 6),
               Text('نتيجة التقدير', style: GoogleFonts.cairo(color: gold, fontSize: 16, fontWeight: FontWeight.bold)),
             ],
@@ -451,7 +451,7 @@ class _NoData extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Icon(Icons.info_outline, size: 40, color: textMuted),
+           Icon(Icons.info_outline, size: 40, color: textMuted),
           const SizedBox(height: 10),
           Text(
             message ?? 'لا توجد بيانات كافية لتقدير السعر في هذه المنطقة، جرّب حياً آخر أو عدّل المدخلات.',

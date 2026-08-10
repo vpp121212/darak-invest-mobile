@@ -268,7 +268,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Icon(Icons.location_on,
+                           Icon(Icons.location_on,
                               size: 14, color: primary),
                           const SizedBox(width: 3),
                           Expanded(

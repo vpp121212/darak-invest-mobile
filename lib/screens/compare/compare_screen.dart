@@ -35,7 +35,7 @@ class _CompareScreenState extends ConsumerState<CompareScreen> {
           style: GoogleFonts.cairo(color: primary, fontSize: 17, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_forward, color: textLight),
+          icon:  Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
       ),
@@ -115,7 +115,7 @@ class _CompareScreenState extends ConsumerState<CompareScreen> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.tune, color: primary, size: 20),
+             Icon(Icons.tune, color: primary, size: 20),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -173,7 +173,7 @@ class _CompareScreenState extends ConsumerState<CompareScreen> {
                               style: GoogleFonts.cairo(color: textLight, fontSize: 12, fontWeight: FontWeight.bold),
                             ),
                           ),
-                          const Icon(Icons.close, color: textMuted, size: 16),
+                           Icon(Icons.close, color: textMuted, size: 16),
                         ],
                       ),
                       const SizedBox(height: 6),

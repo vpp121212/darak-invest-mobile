@@ -351,7 +351,7 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline, color: gold, size: 18),
+           Icon(Icons.info_outline, color: gold, size: 18),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -381,7 +381,7 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.arrow_drop_down, color: gold, size: 22),
+             Icon(Icons.arrow_drop_down, color: gold, size: 22),
             const SizedBox(width: 6),
             Expanded(
               child: Column(
@@ -432,7 +432,7 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
           ),
           ...options.map((item) => ListTile(
                 title: Text(item, style: GoogleFonts.cairo(color: textLight)),
-                trailing: value == item ? const Icon(Icons.check, color: gold) : null,
+                trailing: value == item ?  Icon(Icons.check, color: gold) : null,
                 onTap: () {
                   onChanged(item);
                   context.pop();
@@ -479,7 +479,7 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: gold, width: 1.5),
+          borderSide:  BorderSide(color: gold, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),

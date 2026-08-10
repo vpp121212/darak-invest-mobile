@@ -43,14 +43,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       appBar: AppBar(
         title: Text('الإشعارات', style: GoogleFonts.cairo(color: gold, fontSize: 17, fontWeight: FontWeight.bold)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_forward, color: textLight),
+          icon:  Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
         actions: [
           if (auth.isLoggedIn && state.unreadCount > 0)
             IconButton(
               tooltip: 'تعليم الكل كمقروء',
-              icon: const Icon(Icons.done_all, color: textMuted, size: 20),
+              icon:  Icon(Icons.done_all, color: textMuted, size: 20),
               onPressed: () => ref.read(notificationsProvider.notifier).markAllRead(),
             ),
         ],
@@ -69,7 +69,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.notifications_off_outlined, color: textMuted, size: 48),
+           Icon(Icons.notifications_off_outlined, color: textMuted, size: 48),
           const SizedBox(height: 12),
           Text('سجّل دخولك لعرض إشعاراتك', style: GoogleFonts.cairo(color: textMuted, fontSize: 14)),
           const SizedBox(height: 16),
@@ -91,7 +91,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
           const SizedBox(height: 120),
-          const Icon(Icons.notifications_none, color: textMuted, size: 48),
+           Icon(Icons.notifications_none, color: textMuted, size: 48),
           const SizedBox(height: 12),
           Center(child: Text('لا توجد إشعارات', style: GoogleFonts.cairo(color: textMuted, fontSize: 14))),
           const SizedBox(height: 4),
@@ -161,7 +161,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             ),
             if (!n.isRead) ...[
               const SizedBox(width: 8),
-              Container(width: 8, height: 8, decoration: const BoxDecoration(color: gold, shape: BoxShape.circle)),
+              Container(width: 8, height: 8, decoration:  BoxDecoration(color: gold, shape: BoxShape.circle)),
             ],
           ],
         ),

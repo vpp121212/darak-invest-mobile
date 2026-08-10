@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/router/app_router.dart';
-import 'theme/app_theme.dart';
+import 'core/theme/app_colors.dart';
+import 'providers/theme_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,15 +16,20 @@ void main() {
   runApp(const ProviderScope(child: DarakApp()));
 }
 
-class DarakApp extends StatelessWidget {
+class DarakApp extends ConsumerWidget {
   const DarakApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mode = ref.watch(themeProvider);
+    final platform = MediaQuery.platformBrightnessOf(context);
+    final brightness = darakThemeBrightness(mode, platform);
+    AppColors.current = brightness == Brightness.dark ? AppColors.dark : AppColors.light;
+
     return MaterialApp.router(
       title: 'دارك وحيك',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.theme,
+      theme: darakTheme(mode, platform),
       locale: const Locale('ar'),
       supportedLocales: const [Locale('ar'), Locale('en')],
       localizationsDelegates: const [

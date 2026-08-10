@@ -89,7 +89,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ],
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_forward, color: textLight),
+          icon:  Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
       ),
@@ -118,7 +118,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       return ListView(
         children: [
           const SizedBox(height: 140),
-          const Icon(Icons.forum_outlined, color: textMuted, size: 44),
+           Icon(Icons.forum_outlined, color: textMuted, size: 44),
           const SizedBox(height: 12),
           Center(
             child: Text('ابدأ المحادثة — اسأل عن العقار أو تفاوض على السعر',
@@ -178,7 +178,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final sending = ref.watch(messagesProvider).sending;
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 14),
-      decoration: const BoxDecoration(
+      decoration:  BoxDecoration(
         color: cardDark,
         border: Border(top: BorderSide(color: glassBorder)),
       ),
@@ -212,7 +212,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             child: Container(
               width: 44,
               height: 44,
-              decoration: const BoxDecoration(color: gold, shape: BoxShape.circle),
+              decoration:  BoxDecoration(color: gold, shape: BoxShape.circle),
               child: sending
                   ? const Padding(
                       padding: EdgeInsets.all(12),

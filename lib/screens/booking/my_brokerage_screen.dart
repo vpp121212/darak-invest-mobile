@@ -62,7 +62,7 @@ class _MyBrokerageScreenState extends ConsumerState<MyBrokerageScreen>
       appBar: AppBar(
         title: Text('وساطتي', style: GoogleFonts.cairo(color: gold, fontSize: 17, fontWeight: FontWeight.bold)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_forward, color: textLight),
+          icon:  Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
         bottom: TabBar(
@@ -94,7 +94,7 @@ class _MyBrokerageScreenState extends ConsumerState<MyBrokerageScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.lock_outline, color: textMuted, size: 48),
+           Icon(Icons.lock_outline, color: textMuted, size: 48),
           const SizedBox(height: 12),
           Text('سجّل دخولك لعرض حجوزاتك وعروضك', style: GoogleFonts.cairo(color: textMuted, fontSize: 14)),
           const SizedBox(height: 16),
@@ -152,7 +152,7 @@ class _MyBrokerageScreenState extends ConsumerState<MyBrokerageScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.inbox_outlined, color: textMuted, size: 48),
+           Icon(Icons.inbox_outlined, color: textMuted, size: 48),
           const SizedBox(height: 12),
           Text(title, style: GoogleFonts.cairo(color: textLight, fontSize: 15, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
@@ -297,11 +297,11 @@ class _MyBrokerageScreenState extends ConsumerState<MyBrokerageScreen>
         width: 60,
         height: 60,
         child: url.isEmpty
-            ? Container(color: cardDark, child: const Icon(Icons.home, color: textMuted))
+            ? Container(color: cardDark, child:  Icon(Icons.home, color: textMuted))
             : CachedNetworkImage(imageUrl: url, fit: BoxFit.cover,
                 placeholder: (_, __) => Container(color: cardDark),
                 errorWidget: (_, __, ___) =>
-                    Container(color: cardDark, child: const Icon(Icons.home, color: textMuted))),
+                    Container(color: cardDark, child:  Icon(Icons.home, color: textMuted))),
       ),
     );
   }

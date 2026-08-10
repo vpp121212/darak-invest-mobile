@@ -56,7 +56,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
           style: GoogleFonts.cairo(color: primary, fontSize: 17, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_forward, color: textLight),
+          icon:  Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
       ),
@@ -113,7 +113,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.info_outline, color: primary, size: 18),
+                 Icon(Icons.info_outline, color: primary, size: 18),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(

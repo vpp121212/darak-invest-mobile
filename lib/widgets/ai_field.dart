@@ -88,7 +88,7 @@ class AiDropdown extends StatelessWidget {
                 ),
               ),
             ),
-            const Icon(Icons.arrow_drop_down, color: gold),
+             Icon(Icons.arrow_drop_down, color: gold),
           ],
         ),
       ),
@@ -113,7 +113,7 @@ class AiDropdown extends StatelessWidget {
           ),
           ...items.map((item) => ListTile(
                 title: Text(item, style: GoogleFonts.cairo(color: textLight)),
-                trailing: item == value ? const Icon(Icons.check, color: gold) : null,
+                trailing: item == value ?  Icon(Icons.check, color: gold) : null,
                 onTap: () {
                   onSelected(item);
                   context.pop();

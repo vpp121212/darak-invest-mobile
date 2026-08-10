@@ -94,7 +94,7 @@ class _OfferScreenState extends ConsumerState<OfferScreen> {
       appBar: AppBar(
         title: Text('تقديم عرض شراء', style: GoogleFonts.cairo(color: gold, fontSize: 17, fontWeight: FontWeight.bold)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_forward, color: textLight),
+          icon:  Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
       ),
@@ -109,7 +109,7 @@ class _OfferScreenState extends ConsumerState<OfferScreen> {
             controller: _amountController,
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            style: const TextStyle(color: textLight, fontSize: 20, fontWeight: FontWeight.bold),
+            style:  TextStyle(color: textLight, fontSize: 20, fontWeight: FontWeight.bold),
             decoration: InputDecoration(
               hintText: 'مثال: ${Formatters.number(_property.price)}',
               prefixIcon: const Icon(Icons.payments_outlined),
@@ -155,7 +155,7 @@ class _OfferScreenState extends ConsumerState<OfferScreen> {
           TextField(
             controller: _noteController,
             maxLines: 3,
-            style: const TextStyle(color: textLight),
+            style:  TextStyle(color: textLight),
             decoration: const InputDecoration(hintText: 'شروط العرض، مواعيد السداد...'),
           ),
           const SizedBox(height: 28),
@@ -231,7 +231,7 @@ class _OfferPlaceholder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: cardDark,
-      child: const Center(child: Icon(Icons.home, color: textMuted)),
+      child:  Center(child: Icon(Icons.home, color: textMuted)),
     );
   }
 }

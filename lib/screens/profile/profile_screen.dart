@@ -6,6 +6,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../core/router/app_router.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/theme_provider.dart';
 import '../../theme/app_theme.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -69,6 +70,7 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           Text('عام', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
+          _buildThemeItem(context, ref),
           _buildMenuItem(Icons.settings_outlined, 'الإعدادات', null, () {}),
           _buildMenuItem(Icons.help_outline, 'المساعدة والدعم', null, () {}),
           _buildMenuItem(Icons.gavel, 'السياسة القانونية', 'الشروط وسياسة الخصوصية', () {
@@ -99,7 +101,7 @@ class ProfileScreen extends ConsumerWidget {
             CircleAvatar(
               radius: 28,
               backgroundColor: gold.withValues(alpha: 0.15),
-              child: const Icon(Icons.person_outline, color: gold, size: 30),
+              child:  Icon(Icons.person_outline, color: gold, size: 30),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -159,9 +161,105 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
           if (user?.isVerified == true)
-            const Icon(Icons.verified, color: green, size: 22),
+             Icon(Icons.verified, color: green, size: 22),
         ],
       ),
+    );
+  }
+
+  Widget _buildThemeItem(BuildContext context, WidgetRef ref) {
+    final mode = ref.watch(themeProvider);
+    final label = switch (mode) {
+      ThemeMode.light => 'فاتح',
+      ThemeMode.dark => 'داكن',
+      ThemeMode.system => 'تلقائي',
+    };
+    final icon = switch (mode) {
+      ThemeMode.light => Icons.light_mode_outlined,
+      ThemeMode.dark => Icons.dark_mode_outlined,
+      ThemeMode.system => Icons.brightness_auto_outlined,
+    };
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: cardDark,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: gold.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: gold, size: 22),
+        ),
+        title: Text('المظهر', style: GoogleFonts.cairo(color: textLight, fontSize: 15)),
+        subtitle: Text('الوضع الحالي: $label', style: GoogleFonts.cairo(color: textMuted, fontSize: 12)),
+        trailing: Icon(Icons.arrow_forward_ios, size: 14, color: textMuted),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        onTap: () => _showThemePicker(context, ref),
+      ),
+    );
+  }
+
+  Future<void> _showThemePicker(BuildContext context, WidgetRef ref) async {
+    final controller = ref.read(themeProvider.notifier);
+    final selected = await showModalBottomSheet<ThemeMode>(
+      context: context,
+      backgroundColor: cardDark,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        final current = ref.watch(themeProvider);
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: textMuted.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text('اختيار المظهر', style: GoogleFonts.cairo(color: textLight, fontSize: 17, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              _themeOption(context, current, ThemeMode.system, Icons.brightness_auto_outlined, 'تلقائي', 'حسب إضاءة النظام'),
+              _themeOption(context, current, ThemeMode.light, Icons.light_mode_outlined, 'فاتح', 'واجهة فاتحة'),
+              _themeOption(context, current, ThemeMode.dark, Icons.dark_mode_outlined, 'داكن', 'واجهة داكنة'),
+              const SizedBox(height: 12),
+            ],
+          ),
+        );
+      },
+    );
+    if (selected != null) {
+      await controller.setMode(selected);
+    }
+  }
+
+  Widget _themeOption(
+    BuildContext context,
+    ThemeMode current,
+    ThemeMode mode,
+    IconData icon,
+    String title,
+    String subtitle,
+  ) {
+    final selected = current == mode;
+    return ListTile(
+      leading: Icon(icon, color: selected ? gold : textMuted, size: 24),
+      title: Text(title, style: GoogleFonts.cairo(color: textLight, fontSize: 15)),
+      subtitle: Text(subtitle, style: GoogleFonts.cairo(color: textMuted, fontSize: 12)),
+      trailing: selected
+          ? Icon(Icons.check_circle, color: gold, size: 22)
+          : const Icon(Icons.radio_button_unchecked, color: Colors.grey, size: 22),
+      onTap: () => Navigator.pop(context, mode),
     );
   }
 
@@ -183,7 +281,7 @@ class ProfileScreen extends ConsumerWidget {
         ),
         title: Text(title, style: GoogleFonts.cairo(color: textLight, fontSize: 15)),
         subtitle: subtitle == null ? null : Text(subtitle, style: GoogleFonts.cairo(color: textMuted, fontSize: 12)),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: textMuted),
+        trailing:  Icon(Icons.arrow_forward_ios, size: 14, color: textMuted),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         onTap: onTap,
       ),

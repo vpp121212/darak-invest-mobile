@@ -39,7 +39,7 @@ class AgentsScreen extends ConsumerWidget {
               color: primary, fontSize: 17, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_forward, color: textLight),
+          icon:  Icon(Icons.arrow_forward, color: textLight),
           onPressed: () => context.pop(),
         ),
       ),
@@ -55,7 +55,7 @@ class AgentsScreen extends ConsumerWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.support_agent, color: primary, size: 20),
+                 Icon(Icons.support_agent, color: primary, size: 20),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -151,7 +151,7 @@ class AgentsScreen extends ConsumerWidget {
                             border: Border.all(
                                 color: success.withValues(alpha: 0.4)),
                           ),
-                          child: const Row(
+                          child:  Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(Icons.verified, size: 12, color: success),
