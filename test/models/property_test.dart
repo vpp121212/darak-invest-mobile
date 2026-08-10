@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:darak_wa_hayk/models/property.dart';
 
+const _base = 'https://darak-invest-backend-j6hy.onrender.com';
+
 void main() {
   group('Property.fromJson', () {
     test('parses a full property matching the live API shape', () {
@@ -108,11 +110,11 @@ void main() {
     test('parses panoramicImage and its aliases', () {
       expect(
         Property.fromJson(const {'panoramicImage': '/uploads/p1.jpg'}).panoramicImage,
-        '/uploads/p1.jpg',
+        '$_base/uploads/p1.jpg',
       );
       expect(
         Property.fromJson(const {'panoUrl': '/uploads/p2.jpg'}).panoramicImage,
-        '/uploads/p2.jpg',
+        '$_base/uploads/p2.jpg',
       );
       expect(
         Property.fromJson(const {'panorama': 'https://x.example/p.jpg'}).panoramicImage,
@@ -125,7 +127,7 @@ void main() {
         'panoramicImages': ['/r1.jpg', '/r2.jpg', '/r3.jpg'],
       });
       expect(property.panoramicImages, hasLength(3));
-      expect(property.panoramicImages, containsAll(['/r1.jpg', '/r3.jpg']));
+      expect(property.panoramicImages, containsAll(['$_base/r1.jpg', '$_base/r3.jpg']));
 
       final scenes = Property.fromJson(const {
         'scenes': ['/s1.jpg', '/s2.jpg'],
@@ -136,15 +138,15 @@ void main() {
     test('parses model3dUrl and its aliases', () {
       expect(
         Property.fromJson(const {'model3dUrl': '/models/villa.glb'}).model3dUrl,
-        '/models/villa.glb',
+        '$_base/models/villa.glb',
       );
       expect(
         Property.fromJson(const {'modelUrl': '/m.gltf'}).model3dUrl,
-        '/m.gltf',
+        '$_base/m.gltf',
       );
       expect(
         Property.fromJson(const {'model3d': '/x.glb'}).model3dUrl,
-        '/x.glb',
+        '$_base/x.glb',
       );
     });
 
@@ -157,7 +159,7 @@ void main() {
       final models = Property.fromJson(const {
         'models': ['/a.glb'],
       });
-      expect(models.model3dUrls, ['/a.glb']);
+      expect(models.model3dUrls, ['$_base/a.glb']);
     });
 
     test('defaults new tour fields to empty when absent', () {
@@ -183,7 +185,7 @@ void main() {
       final out = property.toJson();
       expect(out['_id'], '5');
       expect(out['title'], 'دوبلكس');
-      expect(out['images'], contains('/uploads/a.jpg'));
+      expect(out['images'], contains('$_base/uploads/a.jpg'));
       expect(out['features'], contains('حديقة'));
     });
 
@@ -195,10 +197,10 @@ void main() {
         'model3dUrls': ['/m1.glb'],
       });
       final out = property.toJson();
-      expect(out['panoramicImage'], '/p.jpg');
-      expect(out['panoramicImages'], ['/p1.jpg', '/p2.jpg']);
-      expect(out['model3dUrl'], '/m.glb');
-      expect(out['model3dUrls'], ['/m1.glb']);
+      expect(out['panoramicImage'], '$_base/p.jpg');
+      expect(out['panoramicImages'], ['$_base/p1.jpg', '$_base/p2.jpg']);
+      expect(out['model3dUrl'], '$_base/m.glb');
+      expect(out['model3dUrls'], ['$_base/m1.glb']);
     });
 
     test('copyWith updates panoramic and 3D fields', () {

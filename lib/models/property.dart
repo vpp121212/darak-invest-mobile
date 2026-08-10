@@ -1,4 +1,19 @@
+import '../core/network/api_client.dart';
 import '../core/utils/formatters.dart';
+
+/// Resolves a backend-relative path (e.g. `/uploads/...`) into an absolute
+/// URL so network images don't fail against the hosting origin.
+String _resolve(dynamic value) {
+  if (value == null) return '';
+  final s = value.toString();
+  if (s.isEmpty) return '';
+  return ApiClient.instance.resolve(s);
+}
+
+List<String>? _resolveList(dynamic value) {
+  if (value is! List) return null;
+  return value.map((e) => _resolve(e)).where((s) => s.isNotEmpty).toList();
+}
 
 class AgentInfo {
   final String id;
@@ -21,7 +36,7 @@ class AgentInfo {
       name: json['name'] ?? '',
       phone: json['phone'] ?? '',
       email: json['email'],
-      avatar: json['avatar'],
+      avatar: _resolve(json['avatar']),
     );
   }
 
@@ -171,15 +186,15 @@ class Property {
       facing: json['facing'] ?? '',
       purpose: json['purpose'] ?? '',
       desc: json['desc'] ?? json['description'] ?? '',
-      images: (json['images'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      images: _resolveList(json['images']) ?? [],
       features: (json['features'] as List?)?.map((e) => e.toString()).toList() ?? [],
-      panoramicImage: (json['panoramicImage'] ?? json['panoUrl'] ?? json['panorama'] ?? '').toString(),
-      panoramicImages: (json['panoramicImages'] as List?)?.map((e) => e.toString()).toList() ??
-          (json['scenes'] as List?)?.map((e) => e.toString()).toList() ??
+      panoramicImage: _resolve(json['panoramicImage'] ?? json['panoUrl'] ?? json['panorama'] ?? ''),
+      panoramicImages: _resolveList(json['panoramicImages']) ??
+          _resolveList(json['scenes']) ??
           [],
-      model3dUrl: (json['model3dUrl'] ?? json['modelUrl'] ?? json['model3d'] ?? '').toString(),
-      model3dUrls: (json['model3dUrls'] as List?)?.map((e) => e.toString()).toList() ??
-          (json['models'] as List?)?.map((e) => e.toString()).toList() ??
+      model3dUrl: _resolve(json['model3dUrl'] ?? json['modelUrl'] ?? json['model3d'] ?? ''),
+      model3dUrls: _resolveList(json['model3dUrls']) ??
+          _resolveList(json['models']) ??
           [],
       trust: _parseTrust(json['trust']),
       isDemo: json['isDemo'] == true,
