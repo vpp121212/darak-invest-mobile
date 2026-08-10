@@ -56,53 +56,99 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
         .take(6)
         .toList();
 
+    final topInset = MediaQuery.paddingOf(context).top;
+    final isFav = ref.watch(favoritesProvider).contains(_property.id);
+
     return Scaffold(
       backgroundColor: bgDark,
-      body: CustomScrollView(
-        slivers: [
-          _buildImageGallery(),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 16),
-                  _buildTitleAndPrice(),
-                  const SizedBox(height: 20),
-                  _buildStatsGrid(),
-                  const SizedBox(height: 20),
-                  if (_property.panoramicImage.isNotEmpty ||
-                      _property.panoramicImages.isNotEmpty) ...[
-                    _buildVirtualTour(),
-                    const SizedBox(height: 20),
-                  ],
-                  if (_property.model3dUrl.isNotEmpty ||
-                      _property.model3dUrls.isNotEmpty) ...[
-                    _buildDollhouse(),
-                    const SizedBox(height: 20),
-                  ],
-                  _buildAiTools(),
-                  const SizedBox(height: 20),
-                  if (_property.features.isNotEmpty) ...[
-                    _buildFeatures(),
-                    const SizedBox(height: 20),
-                  ],
-                  _buildDescription(),
-                  const SizedBox(height: 20),
-                  _buildMapSection(),
-                  const SizedBox(height: 20),
-                  if (_property.agent != null) ...[
-                    _buildAgentCard(),
-                    const SizedBox(height: 20),
-                  ],
-                  if (similar.isNotEmpty) ...[
-                    _buildSimilarProperties(similar),
-                    const SizedBox(height: 20),
-                  ],
-                ],
-              ),
+      body: Stack(
+        children: [
+          // صورة العقار العلمية — تمتد خلف الورقة القابلة للسحب.
+          Positioned.fill(child: _buildImageLayer()),
+          // زر العودة
+          Positioned(
+            top: topInset + 12,
+            right: 16,
+            child: _buildRoundIconButton(
+              icon: Icons.arrow_forward,
+              onTap: () => context.pop(),
             ),
+          ),
+          // المفضلة والمشاركة
+          Positioned(
+            top: topInset + 12,
+            left: 16,
+            child: Row(
+              children: [
+                _buildRoundIconButton(
+                  icon: isFav ? Icons.favorite : Icons.favorite_border,
+                  color: isFav ? const Color(0xFFE50914) : Colors.white,
+                  onTap: () =>
+                      ref.read(favoritesProvider.notifier).toggle(_property.id),
+                ),
+                const SizedBox(width: 10),
+                _buildRoundIconButton(
+                  icon: Icons.share,
+                  onTap: _share,
+                ),
+              ],
+            ),
+          ),
+          // محتوى التفاصيل — ورقة قابلة للسحب
+          DraggableScrollableSheet(
+            initialChildSize: 0.62,
+            minChildSize: 0.5,
+            maxChildSize: 0.92,
+            builder: (context, scrollController) {
+              return Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFF141416),
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(30)),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
+                  children: [
+                    _buildDragHandle(),
+                    const SizedBox(height: 8),
+                    _buildTitleAndPrice(),
+                    const Divider(color: Colors.white24, height: 32),
+                    _buildDescription(),
+                    const SizedBox(height: 20),
+                    _buildStatsGrid(),
+                    const SizedBox(height: 20),
+                    if (_property.panoramicImage.isNotEmpty ||
+                        _property.panoramicImages.isNotEmpty) ...[
+                      _buildVirtualTour(),
+                      const SizedBox(height: 20),
+                    ],
+                    if (_property.model3dUrl.isNotEmpty ||
+                        _property.model3dUrls.isNotEmpty) ...[
+                      _buildDollhouse(),
+                      const SizedBox(height: 20),
+                    ],
+                    _buildAiTools(),
+                    const SizedBox(height: 20),
+                    if (_property.features.isNotEmpty) ...[
+                      _buildFeatures(),
+                      const SizedBox(height: 20),
+                    ],
+                    _buildMapSection(),
+                    const SizedBox(height: 20),
+                    if (_property.agent != null) ...[
+                      _buildAgentCard(),
+                      const SizedBox(height: 20),
+                    ],
+                    if (similar.isNotEmpty) ...[
+                      _buildSimilarProperties(similar),
+                      const SizedBox(height: 20),
+                    ],
+                  ],
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -110,118 +156,100 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
     );
   }
 
-  Widget _buildImageGallery() {
-    final isFav = ref.watch(favoritesProvider).contains(_property.id);
-    return SliverAppBar(
-      expandedHeight: 350,
-      pinned: true,
-      backgroundColor: bgDark,
-      leading: GestureDetector(
-        onTap: () => context.pop(),
-        child: Container(
-          margin: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: scrim.withValues(alpha: 0.7),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(Icons.arrow_forward, color: Colors.white),
+  Widget _buildDragHandle() {
+    return Center(
+      child: Container(
+        width: 40,
+        height: 4,
+        decoration: BoxDecoration(
+          color: textMuted.withValues(alpha: 0.4),
+          borderRadius: BorderRadius.circular(2),
         ),
       ),
-      actions: [
-        GestureDetector(
-          onTap: () =>
-              ref.read(favoritesProvider.notifier).toggle(_property.id),
-          child: Container(
-            margin: const EdgeInsets.all(8),
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: scrim.withValues(alpha: 0.7),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              isFav ? Icons.favorite : Icons.favorite_border,
-              color: isFav ? Colors.red : Colors.white,
-            ),
-          ),
+    );
+  }
+
+  Widget _buildRoundIconButton({
+    required IconData icon,
+    required VoidCallback onTap,
+    Color? color,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: scrim.withValues(alpha: 0.7),
+          shape: BoxShape.circle,
+          border: Border.all(color: glassBorder),
         ),
-        GestureDetector(
-          onTap: _share,
-          child: Container(
-            margin: const EdgeInsets.all(8),
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: scrim.withValues(alpha: 0.7),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.share, color: Colors.white),
-          ),
-        ),
-      ],
-      flexibleSpace: FlexibleSpaceBar(
-        background: ClipRRect(
-          borderRadius:
-              const BorderRadius.vertical(bottom: Radius.circular(28)),
-          child: Stack(
-            children: [
-              PageView.builder(
-                itemCount: _images.length,
-                onPageChanged: (i) => setState(() => _currentImage = i),
-                itemBuilder: (context, index) {
-                  return CachedNetworkImage(
-                    imageUrl: _images[index],
-                    fit: BoxFit.cover,
-                    placeholder: (c, _) => Container(
-                        color: cardDark,
-                        child: const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2))),
-                    errorWidget: (c, _, __) => Container(
-                      color: cardDark,
-                      child: const Icon(Icons.home, size: 60, color: textMuted),
-                    ),
-                  );
-                },
-              ),
-              Positioned(
-                bottom: 16,
-                left: 0,
-                right: 0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(_images.length, (index) {
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      width: _currentImage == index ? 24 : 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: _currentImage == index
-                            ? gold
-                            : textMuted.withValues(alpha: 0.5),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    );
-                  }),
+        child: Icon(icon, color: color ?? Colors.white),
+      ),
+    );
+  }
+
+  Widget _buildImageLayer() {
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          PageView.builder(
+            itemCount: _images.length,
+            onPageChanged: (i) => setState(() => _currentImage = i),
+            itemBuilder: (context, index) {
+              return CachedNetworkImage(
+                imageUrl: _images[index],
+                fit: BoxFit.cover,
+                placeholder: (c, _) => Container(
+                    color: cardDark,
+                    child: const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2))),
+                errorWidget: (c, _, __) => Container(
+                  color: cardDark,
+                  child: const Icon(Icons.home, size: 60, color: textMuted),
                 ),
-              ),
-              Positioned(
-                bottom: 16,
-                left: 16,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              );
+            },
+          ),
+          Positioned(
+            bottom: 16,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(_images.length, (index) {
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  width: _currentImage == index ? 24 : 8,
+                  height: 8,
                   decoration: BoxDecoration(
-                    color: scrim.withValues(alpha: 0.8),
-                    borderRadius: BorderRadius.circular(8),
+                    color: _currentImage == index
+                        ? primary
+                        : textMuted.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                  child: Text(
-                    '${_currentImage + 1} / ${_images.length}',
-                    style: GoogleFonts.cairo(color: Colors.white, fontSize: 13),
-                  ),
-                ),
-              ),
-            ],
+                );
+              }),
+            ),
           ),
-        ),
+          Positioned(
+            bottom: 16,
+            left: 16,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: scrim.withValues(alpha: 0.8),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '${_currentImage + 1} / ${_images.length}',
+                style: GoogleFonts.cairo(color: Colors.white, fontSize: 13),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -297,13 +325,37 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
           ],
         ),
         const SizedBox(height: 12),
-        Text(
-          '${Formatters.number(_property.price)} ر.س${isRent ? '/شهر' : ''}',
-          style: GoogleFonts.cairo(
-              color: gold, fontSize: 28, fontWeight: FontWeight.bold),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+              child: Text(
+                '${Formatters.number(_property.price)} ر.س${isRent ? '/شهر' : ''}',
+                style: GoogleFonts.cairo(
+                    color: primary,
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            Row(
+              children: [
+                const Icon(Icons.star, color: Colors.amber, size: 18),
+                Text(
+                  ' $_ratingLabel',
+                  style: GoogleFonts.cairo(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ],
         ),
       ],
     );
+  }
+
+  String get _ratingLabel {
+    final score = (_property.trust / 20).clamp(0, 5).toDouble();
+    return score.toStringAsFixed(1);
   }
 
   Widget _buildStatsGrid() {
