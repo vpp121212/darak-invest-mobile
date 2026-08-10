@@ -8,12 +8,12 @@ class MockProperties {
   static const List<String> demoPanoScenes = [
     'https://pannellum.org/images/alma.jpg',
     'https://threejs.org/examples/textures/2294472375_24a3b8ef46_o.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/b/be/Biblioteca_P%C3%BAblica_de_%C3%89vora_-_Sala_de_exposi%C3%A7%C3%B5es_%28360_panorama%29.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/7/7b/Old_hall_%E2%80%93_Panorama_%28Sergej_Majboroda_via_Poly_Haven%29.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Biblioteca_P%C3%BAblica_de_%C3%89vora_-_Sala_de_exposi%C3%A7%C3%B5es_%28360_panorama%29.jpg/1280px-Biblioteca_P%C3%BAblica_de_%C3%89vora_-_Sala_de_exposi%C3%A7%C3%B5es_%28360_panorama%29.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Old_hall_%E2%80%93_Panorama_%28Sergej_Majboroda_via_Poly_Haven%29.jpg/1280px-Old_hall_%E2%80%93_Panorama_%28Sergej_Majboroda_via_Poly_Haven%29.jpg',
   ];
 
   static const List<String> demoModelUrls = [
-    'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/ABeautifulGame/glTF-Binary/ABeautifulGame.glb',
+    'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
     'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/SheenChair/glTF-Binary/SheenChair.glb',
     'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
   ];
@@ -44,7 +44,7 @@ class MockProperties {
           'إضافة إلى بيت الدمية ثلاثي الأبعاد. البيانات حقيقية وكل الروابط تعمل.',
       images: const [
         'https://threejs.org/examples/textures/2294472375_24a3b8ef46_o.jpg',
-        'https://upload.wikimedia.org/wikipedia/commons/b/be/Biblioteca_P%C3%BAblica_de_%C3%89vora_-_Sala_de_exposi%C3%A7%C3%B5es_%28360_panorama%29.jpg',
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Biblioteca_P%C3%BAblica_de_%C3%89vora_-_Sala_de_exposi%C3%A7%C3%B5es_%28360_panorama%29.jpg/1280px-Biblioteca_P%C3%BAblica_de_%C3%89vora_-_Sala_de_exposi%C3%A7%C3%B5es_%28360_panorama%29.jpg',
       ],
       features: const ['مجلس كبير', 'غرف ماستر', 'صالة عائلية', 'حديقة خاصة'],
       panoramicImage: demoPanoScenes.first,

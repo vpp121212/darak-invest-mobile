@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -105,8 +103,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
               return Container(
                 decoration: const BoxDecoration(
                   color: Color(0xFF141416),
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(30)),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: ListView(
@@ -335,9 +332,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
               child: Text(
                 '${Formatters.number(_property.price)} ر.س${isRent ? '/شهر' : ''}',
                 style: GoogleFonts.cairo(
-                    color: primary,
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold),
+                    color: primary, fontSize: 26, fontWeight: FontWeight.bold),
               ),
             ),
             Row(
@@ -760,36 +755,32 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           constraints: const BoxConstraints(maxWidth: 200),
           decoration: BoxDecoration(
-            color: glassFill,
+            color: const Color(0xF0222225),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: color, width: 1.2),
             boxShadow: softShadow,
           ),
-          clipBehavior: Clip.antiAlias,
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  p.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.cairo(
-                      color: textLight,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '${p.district}، ${p.city}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.cairo(color: textMuted, fontSize: 10),
-                ),
-              ],
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                p.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.cairo(
+                    color: textLight,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '${p.district}، ${p.city}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.cairo(color: textMuted, fontSize: 10),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 4),

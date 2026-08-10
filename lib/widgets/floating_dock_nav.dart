@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -35,30 +33,26 @@ class FloatingDockNav extends StatelessWidget {
         height: 68,
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
-          color: glassFill,
+          color: const Color(0xF0222225),
           borderRadius: BorderRadius.circular(34),
           border: Border.all(color: glassBorder),
           boxShadow: softShadow,
         ),
-        clipBehavior: Clip.antiAlias,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(5, (index) {
-              if (index == 2) {
-                return _AddButton(onTap: () => onTap(index));
-              }
-              return Expanded(
-                child: _DockItem(
-                  icon: icons[index],
-                  label: labels[index],
-                  active: currentIndex == index,
-                  onTap: () => onTap(index),
-                ),
-              );
-            }),
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: List.generate(5, (index) {
+            if (index == 2) {
+              return _AddButton(onTap: () => onTap(index));
+            }
+            return Expanded(
+              child: _DockItem(
+                icon: icons[index],
+                label: labels[index],
+                active: currentIndex == index,
+                onTap: () => onTap(index),
+              ),
+            );
+          }),
         ),
       ),
     );

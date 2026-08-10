@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -53,9 +51,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
 
     final initial = widget.initialProperty;
-    final center = initial != null
-        ? LatLng(initial.lat, initial.lng)
-        : _riyadh;
+    final center = initial != null ? LatLng(initial.lat, initial.lng) : _riyadh;
     final zoom = initial != null ? 13.5 : 11.0;
 
     return Scaffold(
@@ -76,7 +72,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             ),
             children: [
               TileLayer(
-                urlTemplate: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                urlTemplate:
+                    'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
                 subdomains: const ['a', 'b', 'c', 'd'],
                 userAgentPackageName: 'com.example.darak_wa_hayk',
               ),
@@ -133,7 +130,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             color: color,
             shape: BoxShape.circle,
             border: Border.all(
-              color: isSelected ? Colors.white : Colors.black.withValues(alpha: 0.4),
+              color: isSelected
+                  ? Colors.white
+                  : Colors.black.withValues(alpha: 0.4),
               width: isSelected ? 2.5 : 1.5,
             ),
             boxShadow: [
@@ -226,121 +225,121 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: glassFill,
+          color: const Color(0xF0222225),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: glassBorder),
           boxShadow: softShadow,
         ),
-        clipBehavior: Clip.antiAlias,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      color: isRent ? cyan : primary,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(
-                      isRent ? Icons.real_estate_agent : Icons.home_rounded,
-                      color: Colors.white,
-                      size: 26,
-                    ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: isRent ? cyan : primary,
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          p.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.cairo(
-                            color: textLight,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  child: Icon(
+                    isRent ? Icons.real_estate_agent : Icons.home_rounded,
+                    color: Colors.white,
+                    size: 26,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        p.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.cairo(
+                          color: textLight,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
                         ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            const Icon(Icons.location_on, size: 14, color: primary),
-                            const SizedBox(width: 3),
-                            Expanded(
-                              child: Text(
-                                '${p.district}، ${p.city}',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.cairo(color: textMuted, fontSize: 12),
-                              ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(Icons.location_on,
+                              size: 14, color: primary),
+                          const SizedBox(width: 3),
+                          Expanded(
+                            child: Text(
+                              '${p.district}، ${p.city}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.cairo(
+                                  color: textMuted, fontSize: 12),
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: isRent ? cyan : primary,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    p.purpose,
+                    style: GoogleFonts.cairo(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '${_num(p.price)} ر.س${isRent ? '/شهر' : ''}',
+                  style: GoogleFonts.cairo(
+                    color: primary,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () {
+                    context.pushRoute(PropertyDetailRoute(property: p));
+                  },
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
                     decoration: BoxDecoration(
-                      color: isRent ? cyan : primary,
-                      borderRadius: BorderRadius.circular(20),
+                      color: primary,
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      p.purpose,
+                      'التفاصيل',
                       style: GoogleFonts.cairo(
                         color: Colors.white,
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${_num(p.price)} ر.س${isRent ? '/شهر' : ''}',
-                    style: GoogleFonts.cairo(
-                      color: primary,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: () {
-                      context.pushRoute(PropertyDetailRoute(property: p));
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-                      decoration: BoxDecoration(
-                        color: primary,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        'التفاصيل',
-                        style: GoogleFonts.cairo(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
