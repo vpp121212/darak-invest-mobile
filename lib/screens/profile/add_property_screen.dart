@@ -1,20 +1,27 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/network/app_exception.dart';
+import '../../data/cities_data.dart';
 import '../../providers/properties_provider.dart';
 import '../../providers/tab_provider.dart';
 import '../../services/api_service.dart';
+import '../../services/geolocation_service.dart';
+import '../../services/image_upload_service.dart';
 import '../../services/local_properties_store.dart';
 import '../../theme/app_theme.dart';
 
 /// إضافة عقار جديد (نشر إعلان).
 ///
-/// يكمل دورة البيانات «إدخال المالك ← عرض المستخدم»: يدخل المالك بيانات
-/// العقار إضافة إلى روابط الجولة 360° (صور الغرف) وملفات بيت الدمية (.glb).
-/// عند نجاح الاتصال يُنشر على الخادم، وإلا يُحفظ محلياً ويظهر في القائمة.
+/// يدخل المالك بيانات العقار (النوع، القطاع، المدينة/الحي من بيانات فعلية،
+/// موقع مباشر من المتصفح، وصور مرفوعة من الجهاز) إضافة إلى روابط الجولة 360°
+/// وملفات بيت الدمية (.glb). عند نجاح الاتصال يُنشر على الخادم، وإلا يُحفظ
+/// محلياً (بما فيه الصور base64) ويظهر في القائمة.
 class AddPropertyScreen extends ConsumerStatefulWidget {
   const AddPropertyScreen({super.key});
 
@@ -30,8 +37,8 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
   final _areaCtrl = TextEditingController();
   final _roomsCtrl = TextEditingController();
   final _bathsCtrl = TextEditingController();
-  final _cityCtrl = TextEditingController(text: 'الرياض');
-  final _districtCtrl = TextEditingController();
+  final _floorsCtrl = TextEditingController();
+  final _unitsCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
   final _imagesCtrl = TextEditingController();
   final _panoCtrl = TextEditingController();
@@ -41,10 +48,25 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
 
   String _type = 'شقة';
   String _purpose = 'بيع';
+  String _sector = 'سكني';
+  String _facing = 'شمالية';
+  String? _selectedCity;
+  String? _selectedDistrict;
+  GeoPoint? _geoPoint;
+  bool _locating = false;
+  bool _pickingImages = false;
+
+  final List<String> _uploadedImages = [];
+
   bool _saving = false;
 
   static const _types = ['شقة', 'فيلا', 'دوبلكس', 'مكتب', 'استوديو', 'أرض', 'عمارة', 'محل'];
   static const _purposes = ['بيع', 'إيجار', 'رهن'];
+  static const _sectors = ['سكني', 'تجاري', 'استثماري'];
+  static const _facings = ['شرقية', 'غربية', 'شمالية', 'جنوبية'];
+
+  bool get _isVillaLike =>
+      _type == 'فيلا' || _type == 'عمارة' || _type == 'دوبلكس';
 
   @override
   void dispose() {
@@ -53,8 +75,8 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
     _areaCtrl.dispose();
     _roomsCtrl.dispose();
     _bathsCtrl.dispose();
-    _cityCtrl.dispose();
-    _districtCtrl.dispose();
+    _floorsCtrl.dispose();
+    _unitsCtrl.dispose();
     _descCtrl.dispose();
     _imagesCtrl.dispose();
     _panoCtrl.dispose();
@@ -87,34 +109,91 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
     return _urls(value).isEmpty ? 'أدخل رابطاً صحيحاً يبدأ بـ https://' : null;
   }
 
+  Future<void> _pickImages() async {
+    if (_pickingImages) return;
+    setState(() => _pickingImages = true);
+    try {
+      final uri = await ImageUploadService.pickPropertyImage();
+      if (uri != null && mounted) {
+        setState(() => _uploadedImages.add(uri));
+      }
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: cardDark,
+          content: Text(
+            'تعذّر رفع الصورة — جرّب صورة أخرى',
+            style: GoogleFonts.cairo(color: textLight),
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _pickingImages = false);
+    }
+  }
+
+  Future<void> _useMyLocation() async {
+    if (_locating) return;
+    setState(() => _locating = true);
+    final point = await GeolocationService.getCurrentPosition();
+    if (!mounted) return;
+    setState(() {
+      _locating = false;
+      _geoPoint = point;
+      if (point != null) {
+        _selectedCity = nearestCity(point.latitude, point.longitude);
+        _selectedDistrict = null;
+      }
+    });
+    if (point == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: cardDark,
+          content: Text(
+            'تعذّر الوصول لموقعك — تحقق من إذن الموقع في المتصفح',
+            style: GoogleFonts.cairo(color: textLight),
+          ),
+        ),
+      );
+    }
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
+
+    final city = _selectedCity ?? 'الرياض';
+    final images = <String>[
+      ..._uploadedImages,
+      ..._urls(_imagesCtrl.text),
+    ];
 
     final body = <String, dynamic>{
       'title': _titleCtrl.text.trim(),
       'type': _type,
       'purpose': _purpose,
+      'sector': _sector,
       'price': double.tryParse(_priceCtrl.text.trim()) ?? 0,
       'area': double.tryParse(_areaCtrl.text.trim()) ?? 0,
       'rooms': int.tryParse(_roomsCtrl.text.trim()) ?? 0,
       'baths': int.tryParse(_bathsCtrl.text.trim()) ?? 0,
-      'city': _cityCtrl.text.trim().isEmpty ? 'الرياض' : _cityCtrl.text.trim(),
-      'district': _districtCtrl.text.trim().isEmpty
-          ? _cityCtrl.text.trim().isEmpty
-              ? 'الرياض'
-              : _cityCtrl.text.trim()
-          : _districtCtrl.text.trim(),
+      'floors': _isVillaLike ? (int.tryParse(_floorsCtrl.text.trim()) ?? 0) : 0,
+      'units': _isVillaLike ? (int.tryParse(_unitsCtrl.text.trim()) ?? 0) : 0,
+      'city': city,
+      'district': _selectedDistrict ?? city,
+      'facing': _facing,
       'description': _descCtrl.text.trim(),
       'year': DateTime.now().year,
       'age': 0,
-      'facing': 'شمالي',
       'features': const <String>[],
-      'images': _urls(_imagesCtrl.text),
+      'images': images,
       'panoramicImage': _firstUrl(_panoCtrl.text),
       'panoramicImages': _urls(_panosCtrl.text),
       'model3dUrl': _firstUrl(_model3dCtrl.text),
       'model3dUrls': _urls(_modelsCtrl.text),
+      'lat': _geoPoint?.latitude ?? 0,
+      'lng': _geoPoint?.longitude ?? 0,
       'trust': 100,
       'isDemo': false,
     };
@@ -181,9 +260,19 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
             const SizedBox(height: 12),
             Row(
               children: [
-                Expanded(child: _buildDropdown('النوع', _types, _type, (v) => setState(() => _type = v))),
+                Expanded(child: _buildDropdown('النوع', _types, _type, (v) {
+                  setState(() => _type = v);
+                })),
                 const SizedBox(width: 12),
                 Expanded(child: _buildDropdown('الغرض', _purposes, _purpose, (v) => setState(() => _purpose = v))),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(child: _buildDropdown('القطاع', _sectors, _sector, (v) => setState(() => _sector = v))),
+                const SizedBox(width: 12),
+                Expanded(child: _buildDropdown('الواجهة', _facings, _facing, (v) => setState(() => _facing = v))),
               ],
             ),
             const SizedBox(height: 12),
@@ -234,27 +323,32 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextForm(
-                    _cityCtrl,
-                    label: 'المدينة',
-                    icon: Icons.location_city,
+            if (_isVillaLike) ...[
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTextForm(
+                      _floorsCtrl,
+                      label: 'عدد الأدوار',
+                      hint: 'مثال: 2',
+                      icon: Icons.stairs_outlined,
+                      keyboardType: TextInputType.number,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildTextForm(
-                    _districtCtrl,
-                    label: 'الحي',
-                    hint: 'مثال: الياسمين',
-                    icon: Icons.map_outlined,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildTextForm(
+                      _unitsCtrl,
+                      label: 'عدد الشقق',
+                      hint: 'مثال: 1',
+                      icon: Icons.apartment_outlined,
+                      keyboardType: TextInputType.number,
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
             const SizedBox(height: 12),
             _buildTextForm(
               _descCtrl,
@@ -264,9 +358,28 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
               maxLines: 4,
             ),
             const SizedBox(height: 24),
+            _sectionHeader('الموقع', Icons.location_on_outlined),
+            Row(
+              children: [
+                Expanded(child: _buildDropdown('المدينة', kCityNames, _selectedCity ?? 'الرياض', (v) {
+                  setState(() {
+                    _selectedCity = v;
+                    _selectedDistrict = null;
+                  });
+                })),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildDistrictDropdown(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _buildLocationButton(),
+            const SizedBox(height: 24),
             _sectionHeader('الصور والجولة 360°', Icons.threesixty),
+            _buildUploadedImages(),
             _buildInfoRow(
-              'ألصق روابط الصور البانورامية (داخلية 2:1) لتفعيل جولة 360° ودخول المنزل بين الغرف.',
+              'ألصق روابط الصور البانورامية (داخلية 2:1) لتفعيل جولة 360° ودخول المنزل بين الغرف، أو ارفع صور العقار من جهازك أعلاه.',
             ),
             const SizedBox(height: 12),
             _buildTextForm(
@@ -322,6 +435,245 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildDistrictDropdown() {
+    final city = cityByName(_selectedCity ?? 'الرياض');
+    final neighborhoods = city?.allNeighborhoods ?? const <String>[];
+    return GestureDetector(
+      onTap: neighborhoods.isEmpty
+          ? null
+          : () => _showDistrictPicker(city!),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+        decoration: BoxDecoration(
+          color: cardDark,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: textMuted.withValues(alpha: 0.25)),
+        ),
+        child: Row(
+          children: [
+             Icon(Icons.arrow_drop_down, color: gold, size: 22),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'الحي',
+                    style: GoogleFonts.cairo(color: textMuted, fontSize: 11),
+                  ),
+                  Text(
+                    _selectedDistrict ?? 'اختر الحي',
+                    style: GoogleFonts.cairo(
+                      color: _selectedDistrict != null ? textLight : textMuted,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDistrictPicker(CityData city) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: cardDark,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.7),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(color: textMuted, borderRadius: BorderRadius.circular(2)),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text('اختر الحي في ${city.name}',
+                  style: GoogleFonts.cairo(color: gold, fontSize: 18, fontWeight: FontWeight.bold)),
+            ),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  for (final direction in city.directions) ...[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                      child: Text(
+                        direction.name,
+                        style: GoogleFonts.cairo(color: gold, fontSize: 13, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    for (final item in direction.neighborhoods)
+                      ListTile(
+                        title: Text(item, style: GoogleFonts.cairo(color: textLight)),
+                        trailing: _selectedDistrict == item ?  Icon(Icons.check, color: gold) : null,
+                        onTap: () {
+                          setState(() => _selectedDistrict = item);
+                          context.pop();
+                        },
+                      ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLocationButton() {
+    final hasPoint = _geoPoint != null;
+    return GestureDetector(
+      onTap: _locating ? null : _useMyLocation,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: hasPoint ? green.withValues(alpha: 0.12) : cardDark,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: hasPoint ? green.withValues(alpha: 0.6) : textMuted.withValues(alpha: 0.25),
+          ),
+        ),
+        child: Row(
+          children: [
+            _locating
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(color: gold, strokeWidth: 2),
+                  )
+                :  Icon(
+                    hasPoint ? Icons.my_location : Icons.my_location_outlined,
+                    color: hasPoint ? green : gold,
+                    size: 22,
+                  ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                _locating
+                    ? 'جاري تحديد موقعك...'
+                    : hasPoint
+                        ? 'الموقع: ${_geoPoint!.latitude.toStringAsFixed(4)}، ${_geoPoint!.longitude.toStringAsFixed(4)}'
+                        : 'استخدم موقعي الحالي',
+                style: GoogleFonts.cairo(
+                  color: hasPoint ? green : textLight,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            if (hasPoint)
+              GestureDetector(
+                onTap: () => setState(() => _geoPoint = null),
+                child:  Icon(Icons.close, color: textMuted, size: 18),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUploadedImages() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (_uploadedImages.isNotEmpty) ...[
+          SizedBox(
+            height: 96,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: _uploadedImages.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (context, index) {
+                final uri = _uploadedImages[index];
+                return Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.memory(
+                        _dataBytes(uri),
+                        width: 96,
+                        height: 96,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Positioned(
+                      top: 4,
+                      left: 4,
+                      child: GestureDetector(
+                        onTap: () => setState(() => _uploadedImages.removeAt(index)),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.6),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.close, color: Colors.white, size: 14),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 10),
+        ],
+        GestureDetector(
+          onTap: _pickingImages ? null : _pickImages,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 22),
+            decoration: BoxDecoration(
+              color: gold.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: gold.withValues(alpha: 0.35), style: BorderStyle.solid),
+            ),
+            child: Column(
+              children: [
+                if (_pickingImages)
+                  SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(color: gold, strokeWidth: 2.5),
+                  )
+                else
+                   Icon(Icons.add_photo_alternate_outlined, color: gold, size: 28),
+                const SizedBox(height: 6),
+                Text(
+                  'رفع صور من الجهاز',
+                  style: GoogleFonts.cairo(color: gold, fontSize: 13, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+      ],
+    );
+  }
+
+  Uint8List _dataBytes(String dataUri) {
+    final comma = dataUri.indexOf(',');
+    return base64Decode(dataUri.substring(comma + 1));
   }
 
   Widget _sectionHeader(String title, IconData icon) {
@@ -395,6 +747,8 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
                   Text(
                     value,
                     style: GoogleFonts.cairo(color: textLight, fontSize: 15, fontWeight: FontWeight.bold),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

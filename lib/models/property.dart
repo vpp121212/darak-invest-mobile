@@ -82,6 +82,9 @@ class Property {
   final int trust;
   final bool isDemo;
   final AgentInfo? agent;
+  final String sector;
+  final int floors;
+  final int units;
 
   Property({
     required this.id,
@@ -114,6 +117,9 @@ class Property {
     required this.trust,
     this.isDemo = false,
     this.agent,
+    this.sector = 'سكني',
+    this.floors = 0,
+    this.units = 0,
   });
 
   /// Compact Arabic-friendly price: 3500000 -> "3.5 مليون".
@@ -128,6 +134,10 @@ class Property {
     String? model3dUrl,
     List<String>? model3dUrls,
     bool? isDemo,
+    AgentInfo? agent,
+    String? sector,
+    int? floors,
+    int? units,
   }) {
     return Property(
       id: id,
@@ -159,7 +169,10 @@ class Property {
       model3dUrls: model3dUrls ?? this.model3dUrls,
       trust: trust,
       isDemo: isDemo ?? this.isDemo,
-      agent: agent,
+      agent: agent ?? this.agent,
+      sector: sector ?? this.sector,
+      floors: floors ?? this.floors,
+      units: units ?? this.units,
     );
   }
 
@@ -199,6 +212,9 @@ class Property {
       trust: _parseTrust(json['trust']),
       isDemo: json['isDemo'] == true,
       agent: json['agent'] != null ? AgentInfo.fromJson(json['agent']) : null,
+      sector: json['sector'] ?? '',
+      floors: json['floors'] ?? 0,
+      units: json['units'] ?? 0,
     );
   }
 
@@ -253,6 +269,9 @@ class Property {
       'trust': trust,
       'isDemo': isDemo,
       if (agent != null) 'agent': agent!.toJson(),
+      'sector': sector,
+      'floors': floors,
+      'units': units,
     };
   }
 }

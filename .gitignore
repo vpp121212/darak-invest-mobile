@@ -55,3 +55,5 @@ node_modules/
 android/key.properties
 *.jks
 *.keystore
+
+.github/workflows/

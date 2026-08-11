@@ -28,6 +28,8 @@ dependencies:
   package_info_plus: ^9.0.1
   auto_route: ^11.1.0
   video_player: ^2.8.2
+  image_picker: ^1.1.2
+  image: ^4.5.4
 
 dev_dependencies:
   flutter_test:

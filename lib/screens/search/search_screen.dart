@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/router/app_router.dart';
+import '../../data/cities_data.dart';
 import '../../models/property.dart';
 import '../../providers/search_provider.dart';
+import '../../services/geolocation_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/property_card.dart';
 
@@ -18,15 +20,6 @@ class SearchScreen extends ConsumerStatefulWidget {
 }
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
-  static const _cities = [
-    'الرياض',
-    'جدة',
-    'مكة',
-    'المدينة',
-    'الدمام',
-    'الخبر',
-    'حائل'
-  ];
   static const _types = [
     'فيلا',
     'شقة',
@@ -43,13 +36,20 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   bool _showAdvanced = false;
 
   String? _selectedCity;
+  String? _selectedDistrict;
   String? _selectedType;
   String? _selectedPurpose;
   String? _selectedFacing;
+  bool _locating = false;
   int _rooms = 0;
   RangeValues _priceRange = const RangeValues(0, 5000000);
   RangeValues _areaRange = const RangeValues(0, 1000);
   String _sortKey = 'recent';
+
+  List<String> get _districtsForCity {
+    final city = cityByName(_selectedCity ?? '');
+    return city?.allNeighborhoods ?? const <String>[];
+  }
 
   String get _sortLabel => switch (_sortKey) {
         'price_asc' => 'السعر: من الأقل',
@@ -87,6 +87,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     return SearchFilters(
       q: _searchController.text.trim(),
       city: _selectedCity,
+      district: _selectedDistrict,
       type: _selectedType,
       purpose: _selectedPurpose,
       facing: _selectedFacing,
@@ -107,6 +108,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   void _resetAdvanced() {
     setState(() {
       _selectedCity = null;
+      _selectedDistrict = null;
       _selectedType = null;
       _selectedPurpose = null;
       _selectedFacing = null;
@@ -115,6 +117,32 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       _areaRange = const RangeValues(0, 1000);
     });
     _search();
+  }
+
+  Future<void> _useMyLocation() async {
+    if (_locating) return;
+    setState(() => _locating = true);
+    final point = await GeolocationService.getCurrentPosition();
+    if (!mounted) return;
+    setState(() {
+      _locating = false;
+      if (point != null) {
+        _selectedCity = nearestCity(point.latitude, point.longitude);
+        _selectedDistrict = null;
+      }
+    });
+    _search();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: point != null ? green : cardDark,
+        content: Text(
+          point != null
+              ? 'تم تحديد مدينتك تقريباً: $_selectedCity'
+              : 'تعذّر تحديد الموقع — تحقق من إذن الموقع في المتصفح',
+          style: GoogleFonts.cairo(color: textLight),
+        ),
+      ),
+    );
   }
 
   @override
@@ -349,8 +377,20 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          _buildFilterDropdown('المدينة', _selectedCity, _cities,
-              (val) => setState(() => _selectedCity = val)),
+          _buildLiveLocationRow(),
+          const SizedBox(height: 10),
+          _buildFilterDropdown('المدينة', _selectedCity, kCityNames,
+              (val) => setState(() {
+                    _selectedCity = val;
+                    _selectedDistrict = null;
+                  })),
+          const SizedBox(height: 10),
+          _buildFilterDropdown(
+            'الحي',
+            _selectedDistrict,
+            _districtsForCity,
+            (val) => setState(() => _selectedDistrict = val),
+          ),
           const SizedBox(height: 10),
           _buildFilterDropdown('نوع العقار', _selectedType, _types,
               (val) => setState(() => _selectedType = val)),
@@ -452,6 +492,59 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLiveLocationRow() {
+    return GestureDetector(
+      onTap: _locating ? null : _useMyLocation,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+        decoration: BoxDecoration(
+          color: _selectedCity != null && _locating == false
+              ? null
+              : gold.withValues(alpha: 0.06),
+          gradient: _selectedCity != null && _locating == false
+              ? LinearGradient(colors: brandGradient)
+              : null,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: _selectedCity != null && _locating == false
+                ? Colors.transparent
+                : gold.withValues(alpha: 0.3),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (_locating)
+              SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(color: gold, strokeWidth: 2),
+              )
+            else
+              Icon(
+                Icons.my_location,
+                color: _selectedCity != null ? Colors.white : gold,
+                size: 20,
+              ),
+            const SizedBox(width: 8),
+            Text(
+              _locating
+                  ? 'جاري تحديد مدينتك...'
+                  : _selectedCity != null
+                      ? 'موقعي: $_selectedCity'
+                      : 'حدّد مدينتي من موقعي المباشر',
+              style: GoogleFonts.cairo(
+                color: _selectedCity != null ? Colors.white : gold,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

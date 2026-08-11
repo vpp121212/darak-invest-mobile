@@ -35,10 +35,14 @@ class ApiClient {
   }
 
   /// Resolves backend-relative paths (e.g. `/uploads/...`) to absolute URLs.
+  ///
+  /// `data:` URIs (base64 images uploaded from the device) pass through
+  /// untouched so they can render offline from the local store.
   String resolve(String pathOrUrl) {
     if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://')) {
       return pathOrUrl;
     }
+    if (pathOrUrl.startsWith('data:')) return pathOrUrl;
     if (pathOrUrl.startsWith('assets/')) return pathOrUrl;
     if (pathOrUrl.isEmpty) return '';
     return pathOrUrl.startsWith('/')
