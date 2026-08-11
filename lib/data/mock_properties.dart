@@ -86,7 +86,7 @@ class MockProperties {
       desc: 'شقة راقية بتشطيب فاخر، قريبة من الخدمات والمرافق التجارية، '
           'بإطلالة هادئة وتصميم عصري يناسب العوائل.',
       images: const [
-        'https://images.pexels.com/photos/186077/pexels-photo-186077.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'assets/images/prop_townhouse.jpg',
       ],
       features: const ['مصعد خاص', 'موقف سيارة', 'خزائن ملابس راقية'],
       trust: 80,
@@ -116,8 +116,8 @@ class MockProperties {
       desc: 'فيلا مودرن بمساحة واسعة، تتضمن مجلساً كبيراً وملحقاً مستقلاً '
           'وحديقة خاصة ومسبحاً، في حي هادئ ومطلوب.',
       images: const [
-        'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'assets/images/prop_villa_night.jpg',
+        'assets/images/prop_house_garden.jpg',
       ],
       features: const ['مسبح خاص', 'ملحق مستقل', 'مجلس كبير', 'حديقة'],
       trust: 90,
@@ -147,7 +147,7 @@ class MockProperties {
       desc: 'شقة فاخرة بإطلالة بحرية مباشرة، واجهة زجاجية واسعة، ودورات مياه '
           'متعددة وخدمات مميزة في برج راقٍ.',
       images: const [
-        'https://images.pexels.com/photos/2089698/pexels-photo-2089698.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'assets/images/prop_interior.jpg',
       ],
       features: const ['إطلالة بحر', 'أمن 24 ساعة', 'مسبح مشترك'],
       trust: 75,
@@ -177,7 +177,7 @@ class MockProperties {
       desc: 'أرض سكنية على شارع تجاري هام، صك إلكتروني، مناسبة لبناء عمارة '
           'سكنية أو استثمار طويل الأمد.',
       images: const [
-        'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'assets/images/prop_villa_modern.jpg',
       ],
       features: const ['صك إلكتروني', 'على شارع تجاري'],
       trust: 70,
@@ -207,7 +207,7 @@ class MockProperties {
       desc: 'تاون هاوس عصري من دورين بمدخل خاص، سطوح خاصة، وتشطيب راقٍ '
           'ضمن مجتمع سكني متكامل الخدمات.',
       images: const [
-        'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'assets/images/prop_kitchen.jpg',
       ],
       features: const ['مدخل خاص', 'سطوح', 'مجتمع سكني'],
       trust: 85,
@@ -237,8 +237,8 @@ class MockProperties {
       desc: 'شقة استثمارية بإيجار شهري ممتاز، قريبة من الجامعة والمرافق '
           'التعليمية، مناسبة للعائد السنوي.',
       images: const [
-        'https://images.pexels.com/photos/186077/pexels-photo-186077.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/2089698/pexels-photo-2089698.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'assets/images/prop_townhouse.jpg',
+        'assets/images/prop_interior.jpg',
       ],
       features: const ['عائد استثماري', 'قريبة من الخدمات'],
       trust: 65,

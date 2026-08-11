@@ -39,6 +39,7 @@ class ApiClient {
     if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://')) {
       return pathOrUrl;
     }
+    if (pathOrUrl.startsWith('assets/')) return pathOrUrl;
     if (pathOrUrl.isEmpty) return '';
     return pathOrUrl.startsWith('/')
         ? '$baseUrl$pathOrUrl'

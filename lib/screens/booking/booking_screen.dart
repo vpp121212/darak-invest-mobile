@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +9,7 @@ import '../../models/property.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/brokerage_provider.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/app_image.dart';
 
 /// حجز موعد معاينة/استشارة/توقيع عقد مع وسيط العقار.
 @RoutePage()
@@ -233,7 +233,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               width: 84,
               height: 84,
               child: _property.mainImage.isNotEmpty
-                  ? CachedNetworkImage(imageUrl: _property.mainImage, fit: BoxFit.cover,
+                  ? AppImage(src: _property.mainImage, fit: BoxFit.cover,
                       placeholder: (_, __) => Container(color: cardDark),
                       errorWidget: (_, __, ___) => const _PlaceholderIcon())
                   : const _PlaceholderIcon(),

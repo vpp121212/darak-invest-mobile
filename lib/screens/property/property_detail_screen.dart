@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +16,7 @@ import '../../providers/favorites_provider.dart';
 import '../../providers/messages_provider.dart';
 import '../../providers/properties_provider.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/app_image.dart';
 import '../../widgets/dollhouse_viewer.dart';
 import '../../widgets/property_card.dart';
 import '../../widgets/virtual_tour_viewer.dart';
@@ -198,8 +198,8 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
             itemCount: _images.length,
             onPageChanged: (i) => setState(() => _currentImage = i),
             itemBuilder: (context, index) {
-              return CachedNetworkImage(
-                imageUrl: _images[index],
+              return AppImage(
+                src: _images[index],
                 fit: BoxFit.cover,
                 memCacheWidth: 1600,
                 placeholder: (c, _) => Container(

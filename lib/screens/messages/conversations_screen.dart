@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,6 +10,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/messages_provider.dart';
 import '../../services/api_service.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/app_image.dart';
 
 /// قائمة المحادثات مع الوسطاء والمشترين.
 @RoutePage()
@@ -210,7 +210,7 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
         height: 48,
         child: url.isEmpty
             ? Container(color: cardDark, child:  Icon(Icons.home, color: textMuted, size: 20))
-            : CachedNetworkImage(imageUrl: url, fit: BoxFit.cover,
+            : AppImage(src: url, fit: BoxFit.cover,
                 placeholder: (_, __) => Container(color: cardDark),
                 errorWidget: (_, __, ___) =>
                     Container(color: cardDark, child:  Icon(Icons.home, color: textMuted, size: 20))),

@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:auto_route/auto_route.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -9,6 +8,7 @@ import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../models/property.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/app_image.dart';
 
 /// Immersive multi-mode real-estate exploration system (Immersive Real
 /// Estate Diorama) on the royal Emerald + Gold identity.
@@ -117,7 +117,7 @@ const _dioramaProperties = <_DioramaProperty>[
     baths: 5,
     year: 2022,
     image:
-        'https://images.pexels.com/photos/2581922/pexels-photo-2581922.jpeg?auto=compress&cs=tinysrgb&w=1400',
+        'assets/images/prop_villa_pool.jpg',
     tag: 'تجربة ثلاثية الأبعاد سلسة',
     lat: 24.7628,
     lng: 46.6324,
@@ -136,7 +136,7 @@ const _dioramaProperties = <_DioramaProperty>[
     baths: 2,
     year: 2021,
     image:
-        'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1400',
+        'assets/images/prop_apartment.jpg',
     tag: 'إطلالة بانورامية ذكية',
     lat: 24.7743,
     lng: 46.739,
@@ -155,7 +155,7 @@ const _dioramaProperties = <_DioramaProperty>[
     baths: 4,
     year: 2020,
     image:
-        'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=1400',
+        'assets/images/prop_villa_modern.jpg',
     tag: 'تصميم مودرن متكامل',
     lat: 24.861,
     lng: 46.7128,
@@ -447,8 +447,8 @@ class _ScrollWorldScreenState extends State<ScrollWorldScreen> {
           const SizedBox(height: 12),
           ClipRRect(
             borderRadius: BorderRadius.circular(14),
-            child: CachedNetworkImage(
-              imageUrl: p.image,
+            child: AppImage(
+              src: p.image,
               height: 96,
               width: double.infinity,
               fit: BoxFit.cover,
@@ -1207,10 +1207,9 @@ class _ParallaxBackdropState extends State<_ParallaxBackdrop>
   }
 
   Widget _image(String url) {
-    return CachedNetworkImage(
-      imageUrl: url,
+    return AppImage(
+      src: url,
       fit: BoxFit.cover,
-      fadeInDuration: const Duration(milliseconds: 300),
       errorWidget: (_, __, ___) => Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(

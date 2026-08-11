@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,6 +14,7 @@ import '../../providers/notifications_provider.dart';
 import '../../providers/properties_provider.dart';
 import '../../providers/tab_provider.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/app_image.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -911,8 +911,8 @@ class _HeroCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            CachedNetworkImage(
-              imageUrl: property.mainImage,
+            AppImage(
+              src: property.mainImage,
               fit: BoxFit.cover,
               memCacheWidth: 900,
               placeholder: (c, _) => Container(
