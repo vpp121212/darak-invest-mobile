@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/router/app_router.dart';
+import '../../core/theme/app_colors.dart';
 import '../../core/utils/formatters.dart';
 import '../../data/neighborhoods_data.dart';
 import '../../models/property.dart';
@@ -46,6 +47,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final slivers = <Widget>[
       _headerBar(),
       _searchBar(),
+      _dioramaBanner(),
     ];
     if (catalogue.isLoading) {
       slivers.add(const SliverToBoxAdapter(child: _HomeSkeleton()));
@@ -321,6 +323,116 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ],
                   ),
                   child: const Icon(Icons.tune, color: Colors.white, size: 20),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _dioramaBanner() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        child: GestureDetector(
+          onTap: () => context.pushRoute(const ScrollWorldRoute()),
+          child: Container(
+            height: 150,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [BrandColors.gradientA, BrandColors.gradientB],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0x6610B981),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Stack(
+              children: [
+                Positioned(
+                  right: -24,
+                  bottom: -28,
+                  child: Icon(
+                    Icons.holiday_village_outlined,
+                    color: Colors.white.withValues(alpha: 0.16),
+                    size: 140,
+                  ),
+                ),
+                Positioned(
+                  left: -18,
+                  top: -24,
+                  child: Icon(
+                    Icons.home_work_outlined,
+                    color: Colors.white.withValues(alpha: 0.12),
+                    size: 120,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.3)),
+                        ),
+                        child: Icon(Icons.auto_awesome,
+                            color: AppColors.gold, size: 26),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'عالم العقارات التفاعلي',
+                              style: GoogleFonts.cairo(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'تجربة عرض سينمائية بالتمرير والتنقل بين العقارات الفاخرة',
+                              style: GoogleFonts.cairo(
+                                color: Colors.white.withValues(alpha: 0.85),
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

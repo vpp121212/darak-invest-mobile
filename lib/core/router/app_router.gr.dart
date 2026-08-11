@@ -669,6 +669,22 @@ class RoiRouteArgs {
 }
 
 /// generated route for
+/// [ScrollWorldScreen]
+class ScrollWorldRoute extends PageRouteInfo<void> {
+  const ScrollWorldRoute({List<PageRouteInfo>? children})
+      : super(ScrollWorldRoute.name, initialChildren: children);
+
+  static const String name = 'ScrollWorldRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ScrollWorldScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [SearchScreen]
 class SearchRoute extends PageRouteInfo<void> {
   const SearchRoute({List<PageRouteInfo>? children})

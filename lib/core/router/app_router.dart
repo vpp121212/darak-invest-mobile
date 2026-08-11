@@ -26,6 +26,7 @@ import '../../screens/payments/subscription_screen.dart';
 import '../../screens/property/property_detail_screen.dart';
 import '../../screens/root/app_shell.dart';
 import '../../screens/search/search_screen.dart';
+import '../../screens/scroll_world/scroll_world_screen.dart';
 
 part 'app_router.gr.dart';
 
@@ -42,6 +43,7 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: PulseRoute.page),
         AutoRoute(page: PropertyDetailRoute.page),
         AutoRoute(page: MapRoute.page),
+        AutoRoute(page: ScrollWorldRoute.page),
         AutoRoute(page: NeighborhoodDetailRoute.page),
         AutoRoute(page: FavoritesRoute.page),
         AutoRoute(page: FinanceRoute.page),
