@@ -117,7 +117,7 @@ const _dioramaProperties = <_DioramaProperty>[
     baths: 5,
     year: 2022,
     image:
-        'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=80',
+        'https://images.pexels.com/photos/2581922/pexels-photo-2581922.jpeg?auto=compress&cs=tinysrgb&w=1400',
     tag: 'تجربة ثلاثية الأبعاد سلسة',
     lat: 24.7628,
     lng: 46.6324,
@@ -136,7 +136,7 @@ const _dioramaProperties = <_DioramaProperty>[
     baths: 2,
     year: 2021,
     image:
-        'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1400&q=80',
+        'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1400',
     tag: 'إطلالة بانورامية ذكية',
     lat: 24.7743,
     lng: 46.739,
@@ -155,7 +155,7 @@ const _dioramaProperties = <_DioramaProperty>[
     baths: 4,
     year: 2020,
     image:
-        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1400&q=80',
+        'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=1400',
     tag: 'تصميم مودرن متكامل',
     lat: 24.861,
     lng: 46.7128,
