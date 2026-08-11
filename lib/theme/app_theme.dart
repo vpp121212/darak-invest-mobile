@@ -24,6 +24,10 @@ Color get cyan => AppColors.cyan;
 Color get primaryLight => AppColors.primaryLight;
 Color get primarySoft => AppColors.primarySoft;
 Color get cyanSoft => AppColors.cyanSoft;
+Color get onBrand => AppColors.onBrand;
+Color get brandCard => AppColors.brandCard;
+Color get whiteCard => AppColors.whiteCard;
+Color get onWhite => AppColors.onWhite;
 List<Color> get brandGradient => AppColors.gradient;
 
 /// Frosted-glass surface: translucent white fill for glassmorphism cards.

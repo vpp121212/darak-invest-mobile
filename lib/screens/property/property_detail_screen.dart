@@ -278,7 +278,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 color: isRent ? cyan : primary,
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: const [
-                  BoxShadow(color: Color(0x6610B981), blurRadius: 10),
+                  BoxShadow(color: Color(0x66C5A077), blurRadius: 10),
                 ],
               ),
               child: Text(
@@ -1015,7 +1015,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: const [
                       BoxShadow(
-                          color: Color(0x6610B981),
+                          color: Color(0x66C5A077),
                           blurRadius: 16,
                           offset: Offset(0, 6)),
                     ],

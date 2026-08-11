@@ -86,11 +86,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: gold.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: gold.withValues(alpha: 0.3)),
+            color: gold,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: softShadow,
           ),
-          child:  Icon(Icons.home_work_outlined, size: 40, color: gold),
+          child: Icon(Icons.home_work_outlined, size: 40, color: onBrand),
         ),
         const SizedBox(height: 16),
         Text(

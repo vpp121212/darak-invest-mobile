@@ -182,22 +182,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Container(
                 width: 46,
                 height: 46,
-                decoration:  BoxDecoration(
-                  gradient: LinearGradient(colors: brandGradient),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color(0x6610B981),
-                      blurRadius: 14,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
+                decoration: BoxDecoration(
+                  color: primary,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: softShadow,
                 ),
                 child: Center(
                   child: Text(
                     initial,
                     style: GoogleFonts.cairo(
-                        color: Colors.white,
+                        color: onBrand,
                         fontSize: 18,
                         fontWeight: FontWeight.bold),
                   ),
@@ -216,16 +210,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Row(
-                  children: [
-                     Icon(Icons.location_on, size: 13, color: primary),
-                    const SizedBox(width: 2),
-                    Text(
-                      'الرياض، السعودية',
-                      style: GoogleFonts.cairo(color: textMuted, fontSize: 12),
-                    ),
-                  ],
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: brandCard.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                        color: brandCard.withValues(alpha: 0.6)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.location_on, size: 12, color: primaryLight),
+                      const SizedBox(width: 4),
+                      Text(
+                        'الرياض، السعودية',
+                        style: GoogleFonts.cairo(
+                            color: textLight, fontSize: 11),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -233,26 +239,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: glassFill,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: glassBorder),
-                    boxShadow: softShadow,
-                  ),
-                  child: IconButton(
-                    icon:  Icon(Icons.notifications_outlined,
-                        color: textMuted, size: 22),
-                    onPressed: () {
-                      final auth = ref.read(authProvider);
-                      if (auth.isLoggedIn) {
-                        ref.read(notificationsProvider.notifier).load();
-                      }
-                      context.pushRoute(const NotificationsRoute());
-                    },
-                  ),
+                IconButton(
+                  icon: Icon(Icons.notifications_outlined,
+                      color: primary, size: 24),
+                  onPressed: () {
+                    final auth = ref.read(authProvider);
+                    if (auth.isLoggedIn) {
+                      ref.read(notificationsProvider.notifier).load();
+                    }
+                    context.pushRoute(const NotificationsRoute());
+                  },
                 ),
                 if (ref.watch(notificationsProvider).unreadCount > 0)
                   Positioned(
@@ -317,7 +313,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                          color: Color(0x6610B981),
+                          color: Color(0x66C5A077),
                           blurRadius: 12,
                           offset: Offset(0, 4)),
                     ],
@@ -341,17 +337,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Container(
             height: 150,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [BrandColors.gradientA, BrandColors.gradientB],
-              ),
-              boxShadow: [
+              color: whiteCard,
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: const [
                 BoxShadow(
-                  color: Color(0x6610B981),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+                  color: Color(0x33000000),
+                  blurRadius: 28,
+                  offset: Offset(0, 12),
                 ),
               ],
             ),
@@ -363,7 +355,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   bottom: -28,
                   child: Icon(
                     Icons.holiday_village_outlined,
-                    color: Colors.white.withValues(alpha: 0.16),
+                    color: onWhite.withValues(alpha: 0.08),
                     size: 140,
                   ),
                 ),
@@ -372,7 +364,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   top: -24,
                   child: Icon(
                     Icons.home_work_outlined,
-                    color: Colors.white.withValues(alpha: 0.12),
+                    color: onWhite.withValues(alpha: 0.07),
                     size: 120,
                   ),
                 ),
@@ -385,10 +377,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         width: 52,
                         height: 52,
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
+                          color: onWhite,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.3)),
                         ),
                         child: Icon(Icons.auto_awesome,
                             color: AppColors.gold, size: 26),
@@ -402,7 +392,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             Text(
                               'عالم العقارات التفاعلي',
                               style: GoogleFonts.cairo(
-                                color: Colors.white,
+                                color: onWhite,
                                 fontSize: 17,
                                 fontWeight: FontWeight.w900,
                               ),
@@ -411,7 +401,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             Text(
                               'تجربة عرض سينمائية بالتمرير والتنقل بين العقارات الفاخرة',
                               style: GoogleFonts.cairo(
-                                color: Colors.white.withValues(alpha: 0.85),
+                                color: onWhite.withValues(alpha: 0.6),
                                 fontSize: 11,
                               ),
                             ),
@@ -422,7 +412,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         width: 38,
                         height: 38,
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: primary,
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -509,7 +499,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   boxShadow: isSelected
                       ? const [
                           BoxShadow(
-                              color: Color(0x6610B981), blurRadius: 14)
+                              color: Color(0x66C5A077), blurRadius: 14)
                         ]
                       : softShadow,
                 ),
@@ -519,13 +509,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Icon(
                       c.$2,
                       size: 24,
-                      color: isSelected ? Colors.white : primary,
+                      color: isSelected ? onBrand : primary,
                     ),
                     const SizedBox(height: 6),
                     Text(
                       c.$1,
                       style: GoogleFonts.cairo(
-                        color: isSelected ? Colors.white : textLight,
+                        color: isSelected ? onBrand : textLight,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -567,7 +557,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       borderRadius: BorderRadius.circular(26),
                       boxShadow: isSelected
                           ? const [
-                              BoxShadow(color: Color(0x6610B981), blurRadius: 12)
+                              BoxShadow(color: Color(0x66C5A077), blurRadius: 12)
                             ]
                           : null,
                     ),
@@ -575,7 +565,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       child: Text(
                         purpose,
                         style: GoogleFonts.cairo(
-                          color: isSelected ? Colors.white : textMuted,
+                          color: isSelected ? onBrand : textMuted,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
@@ -725,10 +715,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 onTap: tool.$3,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: glassFill,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: glassBorder),
-                    boxShadow: softShadow,
+                    color: brandCard,
+                    borderRadius: BorderRadius.circular(22),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x33000000),
+                        blurRadius: 16,
+                        offset: Offset(0, 8),
+                      ),
+                    ],
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -736,16 +731,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: primary,
+                          color: onBrand,
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        child: Icon(tool.$2, color: Colors.white, size: 20),
+                        child: Icon(tool.$2, color: primaryLight, size: 20),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         tool.$1,
                         style: GoogleFonts.cairo(
-                          color: textLight,
+                          color: onBrand,
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
                         ),
@@ -958,7 +953,7 @@ class _HeroCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: const [
                     BoxShadow(
-                        color: Color(0x6610B981), blurRadius: 12),
+                        color: Color(0x66C5A077), blurRadius: 12),
                   ],
                 ),
                 child: Row(
@@ -991,7 +986,7 @@ class _HeroCard extends StatelessWidget {
                     border: Border.all(color: Colors.white, width: 0.5),
                     boxShadow: const [
                       BoxShadow(
-                          color: Color(0x6610B981), blurRadius: 12),
+                          color: Color(0x66C5A077), blurRadius: 12),
                     ],
                   ),
                   child: Row(

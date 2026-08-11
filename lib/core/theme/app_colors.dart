@@ -59,6 +59,18 @@ abstract final class BrandColors {
   static const Color gradientA = Color(0xFFD9BC94);
   static const Color gradientB = Color(0xFFA88B68);
 
+  /// Text/icons placed on bronze cards — deep green for high contrast.
+  static const Color onBrand = Color(0xFF0B3C34);
+
+  /// Bronze card background (secondary surfaces).
+  static const Color brandCard = Color(0xFFA88B68);
+
+  /// White pop-out card (elevated highlight surfaces).
+  static const Color whiteCard = Color(0xFFFFFFFF);
+
+  /// Text/icons placed on white cards — deep green.
+  static const Color onWhite = Color(0xFF0B3C34);
+
   /// Success green.
   static const Color success = Color(0xFF34D399);
 
@@ -149,6 +161,18 @@ class AppColors {
 
   /// Royal gold accent.
   static Color get gold => BrandColors.gold;
+
+  /// Text/icons placed on bronze cards — deep green for high contrast.
+  static Color get onBrand => BrandColors.onBrand;
+
+  /// Bronze card background (secondary surfaces).
+  static Color get brandCard => BrandColors.brandCard;
+
+  /// White pop-out card (elevated highlight surfaces).
+  static Color get whiteCard => BrandColors.whiteCard;
+
+  /// Text/icons placed on white cards — deep green.
+  static Color get onWhite => BrandColors.onWhite;
 
   /// Primary text — near-white (dark) / near-black (light).
   static Color get textPrimary => current.textPrimary;

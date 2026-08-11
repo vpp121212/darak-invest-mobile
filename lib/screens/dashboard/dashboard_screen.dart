@@ -149,9 +149,15 @@ class _DashboardContent extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: cardDark,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: textMuted.withValues(alpha: 0.1)),
+            color: brandCard,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x33000000),
+                blurRadius: 16,
+                offset: Offset(0, 8),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,19 +168,24 @@ class _DashboardContent extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: kpi.$4.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(8),
+                      color: onBrand,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(kpi.$1, color: kpi.$4, size: 20),
+                    child: Icon(kpi.$1, color: primaryLight, size: 20),
                   ),
                   const Spacer(),
-                  Text(kpi.$2, style: GoogleFonts.cairo(color: textMuted, fontSize: 11)),
+                  Text(kpi.$2,
+                      style: GoogleFonts.cairo(
+                          color: onBrand.withValues(alpha: 0.7),
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold)),
                 ],
               ),
               const SizedBox(height: 12),
               Text(
                 kpi.$3,
-                style: GoogleFonts.cairo(color: textLight, fontSize: 20, fontWeight: FontWeight.bold),
+                style: GoogleFonts.cairo(
+                    color: onBrand, fontSize: 22, fontWeight: FontWeight.w400),
               ),
             ],
           ),
