@@ -14,7 +14,7 @@ import '../../providers/notifications_provider.dart';
 import '../../providers/properties_provider.dart';
 import '../../providers/tab_provider.dart';
 import '../../theme/app_theme.dart';
-import '../../widgets/app_image.dart';
+import '../../widgets/ken_burns_image.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -911,10 +911,11 @@ class _HeroCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            AppImage(
+            KenBurnsImage(
               src: property.mainImage,
               fit: BoxFit.cover,
               memCacheWidth: 900,
+              phase: KenBurnsImage.phaseFor(property.title),
               placeholder: (c, _) => Container(
                 color: bgDark,
                 child: const Center(

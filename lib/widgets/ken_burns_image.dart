@@ -1,10 +1,16 @@
+import 'dart:math' as math;
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'app_image.dart';
 
-/// Wraps [AppImage] with a slow cinematic Ken Burns zoom loop, mirroring the
-/// motion of the property reel so cards feel alive without any network cost.
+/// Wraps [AppImage] with a cinematic camera move — a slow loop of zoom,
+/// lateral pan and a subtle tilt that gives the image a distinctive diorama
+/// angle, mirroring the camera work of the property reel.
+///
+/// Each card can pass a [phase] (via [phaseFor]) so neighbouring cards never
+/// move in sync, keeping the grid alive.
 class KenBurnsImage extends StatefulWidget {
   const KenBurnsImage({
     super.key,
@@ -15,10 +21,18 @@ class KenBurnsImage extends StatefulWidget {
     this.memCacheWidth,
     this.placeholder,
     this.errorWidget,
-    this.duration = const Duration(seconds: 10),
-    this.minScale = 1.0,
-    this.maxScale = 1.18,
+    this.duration = const Duration(seconds: 12),
+    this.minScale = 1.08,
+    this.maxScale = 1.22,
+    this.panX = 0.03,
+    this.panY = 0.012,
+    this.rotateAmplitude = 0.022,
+    this.phase = 0,
   });
+
+  /// Deterministic phase (radians) for a stable string seed, so cards in the
+  /// same grid drift out of sync with each other.
+  static double phaseFor(Object seed) => (seed.hashCode.abs() % 628) * 0.01;
 
   final String src;
   final double? width;
@@ -28,8 +42,20 @@ class KenBurnsImage extends StatefulWidget {
   final PlaceholderWidgetBuilder? placeholder;
   final LoadingErrorWidgetBuilder? errorWidget;
   final Duration duration;
+
+  /// Base zoom. Kept above 1.0 so the tilt/pan never exposes image edges.
   final double minScale;
   final double maxScale;
+
+  /// Horizontal/vertical pan as a fraction of the image size.
+  final double panX;
+  final double panY;
+
+  /// Tilt amplitude in radians (0.022 ≈ 1.26°).
+  final double rotateAmplitude;
+
+  /// Phase offset in radians to desynchronise cards.
+  final double phase;
 
   @override
   State<KenBurnsImage> createState() => _KenBurnsImageState();
@@ -38,16 +64,12 @@ class KenBurnsImage extends StatefulWidget {
 class _KenBurnsImageState extends State<KenBurnsImage>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<double> _scale;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: widget.duration)
-      ..repeat(reverse: true);
-    _scale = Tween(begin: widget.minScale, end: widget.maxScale).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),
-    );
+      ..repeat();
   }
 
   @override
@@ -59,22 +81,42 @@ class _KenBurnsImageState extends State<KenBurnsImage>
   @override
   Widget build(BuildContext context) {
     return ClipRect(
-      child: AnimatedBuilder(
-        animation: _scale,
-        child: AppImage(
-          src: widget.src,
-          width: widget.width,
-          height: widget.height,
-          fit: widget.fit,
-          memCacheWidth: widget.memCacheWidth,
-          placeholder: widget.placeholder,
-          errorWidget: widget.errorWidget,
-        ),
-        builder: (context, child) => Transform.scale(
-          scale: _scale.value,
-          alignment: Alignment.center,
-          child: child,
-        ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final w = constraints.maxWidth;
+          final h = constraints.maxHeight;
+          return AnimatedBuilder(
+            animation: _controller,
+            child: AppImage(
+              src: widget.src,
+              width: widget.width,
+              height: widget.height,
+              fit: widget.fit,
+              memCacheWidth: widget.memCacheWidth,
+              placeholder: widget.placeholder,
+              errorWidget: widget.errorWidget,
+            ),
+            builder: (context, child) {
+              final a = _controller.value * 2 * math.pi + widget.phase;
+              final scale = (widget.maxScale - widget.minScale) *
+                      0.5 *
+                      (1 - math.cos(a)) +
+                  widget.minScale;
+              final dx = widget.panX * math.sin(a);
+              final dy = widget.panY * math.cos(a);
+              final rot = widget.rotateAmplitude * math.sin(a);
+              final m = Matrix4.identity()
+                ..translateByDouble(w * dx, h * dy, 0, 1)
+                ..rotateZ(rot)
+                ..scaleByDouble(scale, scale, scale, 1);
+              return Transform(
+                transform: m,
+                alignment: Alignment.center,
+                child: child,
+              );
+            },
+          );
+        },
       ),
     );
   }

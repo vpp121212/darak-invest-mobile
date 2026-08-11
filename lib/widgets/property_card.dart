@@ -63,6 +63,7 @@ class PropertyCard extends StatelessWidget {
           width: double.infinity,
           fit: BoxFit.cover,
           memCacheWidth: 700,
+          phase: KenBurnsImage.phaseFor(property.title),
           placeholder: (c, _) => Container(
             height: imageHeight,
             color: bgDark,
