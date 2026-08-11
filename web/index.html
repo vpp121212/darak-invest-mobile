@@ -36,5 +36,14 @@
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
+  <script>
+    // Auto-refresh once the new service worker takes control so users never
+    // stay on a stale cached build after a deployment.
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        window.location.reload();
+      });
+    }
+  </script>
 </body>
 </html>
