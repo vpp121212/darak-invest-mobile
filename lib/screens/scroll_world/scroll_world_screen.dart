@@ -210,11 +210,19 @@ class _ScrollWorldScreenState extends State<ScrollWorldScreen> {
       switchOutCurve: Curves.easeInCubic,
       child: KeyedSubtree(
         key: ValueKey(_mode),
-        child: switch (_mode) {
-          _DioramaMode.diorama => _dioramaOverlay(context),
-          _DioramaMode.compare => _compareOverlay(context),
-          _DioramaMode.hud => _hudOverlay(context),
-        },
+        // The overlay builders return Positioned widgets that must sit directly
+        // inside a Stack; the AnimatedSwitcher otherwise wraps them in a
+        // FadeTransition and layout crashes with a ParentData error.
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            switch (_mode) {
+              _DioramaMode.diorama => _dioramaOverlay(context),
+              _DioramaMode.compare => _compareOverlay(context),
+              _DioramaMode.hud => _hudOverlay(context),
+            },
+          ],
+        ),
       ),
     );
   }
@@ -299,46 +307,58 @@ class _ScrollWorldScreenState extends State<ScrollWorldScreen> {
       bottom: 0,
       top: 0,
       child: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 130),
-            Text(
-              'مقارنة ذكية',
-              style: GoogleFonts.cairo(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.w900,
-                shadows: const [Shadow(color: Colors.black87, blurRadius: 10)],
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 130),
+                    Text(
+                      'مقارنة ذكية',
+                      style: GoogleFonts.cairo(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        shadows: const [
+                          Shadow(color: Colors.black87, blurRadius: 10)
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'المساحة · السعر · العائد المتوقع',
+                      style: GoogleFonts.cairo(
+                        color: AppColors.gold,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Spacer(),
+                    SizedBox(
+                      height: 380,
+                      child: PageView(
+                        controller: PageController(viewportFraction: 0.82),
+                        onPageChanged: (index) {
+                          if (index != _current) {
+                            setState(() => _current = index);
+                          }
+                        },
+                        children: [
+                          for (final p in _dioramaProperties)
+                            _compareCard(context, p),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    _navControls(context),
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 6),
-            Text(
-              'المساحة · السعر · العائد المتوقع',
-              style: GoogleFonts.cairo(
-                color: AppColors.gold,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const Spacer(),
-            SizedBox(
-              height: 380,
-              child: PageView(
-                controller: PageController(viewportFraction: 0.82),
-                onPageChanged: (index) {
-                  if (index != _current) {
-                    setState(() => _current = index);
-                  }
-                },
-                children: [
-                  for (final p in _dioramaProperties) _compareCard(context, p),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            _navControls(context),
-            const SizedBox(height: 20),
-          ],
+          ),
         ),
       ),
     );
@@ -556,49 +576,58 @@ class _ScrollWorldScreenState extends State<ScrollWorldScreen> {
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.only(top: 130, left: 20, right: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _roiGauge(p),
-                  const SizedBox(width: 18),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _hudStatRow(
-                          Icons.payments_outlined,
-                          'الإيجار السنوي المتوقع',
-                          '${(p.monthlyIncome * 12).toStringAsFixed(0)} ر.س',
-                          AppColors.gold,
-                        ),
-                        const SizedBox(height: 10),
-                        _hudStatRow(
-                          Icons.percent,
-                          'العائد على الاستثمار',
-                          '${p.roi}% سنوياً',
-                          AppColors.success,
-                        ),
-                        const SizedBox(height: 10),
-                        _hudStatRow(
-                          Icons.square_foot,
-                          'السعر للمتر المربع',
-                          '${p.pricePerMeter.toStringAsFixed(0)} ر.س/م²',
-                          AppColors.primary,
-                        ),
-                      ],
-                    ),
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          _roiGauge(p),
+                          const SizedBox(width: 18),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _hudStatRow(
+                                  Icons.payments_outlined,
+                                  'الإيجار السنوي المتوقع',
+                                  '${(p.monthlyIncome * 12).toStringAsFixed(0)} ر.س',
+                                  AppColors.gold,
+                                ),
+                                const SizedBox(height: 10),
+                                _hudStatRow(
+                                  Icons.percent,
+                                  'العائد على الاستثمار',
+                                  '${p.roi}% سنوياً',
+                                  AppColors.success,
+                                ),
+                                const SizedBox(height: 10),
+                                _hudStatRow(
+                                  Icons.square_foot,
+                                  'السعر للمتر المربع',
+                                  '${p.pricePerMeter.toStringAsFixed(0)} ر.س/م²',
+                                  AppColors.primary,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      _hudChips(p),
+                      const SizedBox(height: 14),
+                      _hudActions(context, p),
+                      const SizedBox(height: 24),
+                    ],
                   ),
-                ],
+                ),
               ),
-              const Spacer(),
-              _hudChips(p),
-              const SizedBox(height: 14),
-              _hudActions(context, p),
-              const SizedBox(height: 24),
-            ],
+            ),
           ),
         ),
       ),
