@@ -37,12 +37,32 @@
 <body>
   <script src="flutter_bootstrap.js" async></script>
   <script>
-    // Auto-refresh once the new service worker takes control so users never
-    // stay on a stale cached build after a deployment.
+    // Purge stale versions: if an old service worker (e.g. sw.js from a
+    // previous static app) still controls this page, unregister it and wipe
+    // every cache once, so users are never stuck on an outdated build.
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.addEventListener('controllerchange', function () {
-        window.location.reload();
-      });
+      (async function () {
+        try {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          const stale = regs.filter(
+            (r) => !r.active ||
+              r.active.scriptURL.indexOf('flutter_service_worker.js') === -1
+          );
+          if (stale.length > 0) {
+            await Promise.all(stale.map((r) => r.unregister()));
+            if ('caches' in window) {
+              const keys = await caches.keys();
+              await Promise.all(keys.map((k) => caches.delete(k)));
+            }
+            window.location.reload();
+            return;
+          }
+        } catch (_) { /* ignore */ }
+        // Auto-refresh once the new Flutter service worker takes control.
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+          window.location.reload();
+        });
+      })();
     }
   </script>
 </body>
