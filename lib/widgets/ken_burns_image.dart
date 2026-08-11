@@ -21,12 +21,12 @@ class KenBurnsImage extends StatefulWidget {
     this.memCacheWidth,
     this.placeholder,
     this.errorWidget,
-    this.duration = const Duration(seconds: 12),
-    this.minScale = 1.08,
-    this.maxScale = 1.22,
-    this.panX = 0.03,
-    this.panY = 0.012,
-    this.rotateAmplitude = 0.022,
+    this.duration = const Duration(seconds: 9),
+    this.minScale = 1.12,
+    this.maxScale = 1.38,
+    this.panX = 0.04,
+    this.panY = 0.015,
+    this.rotateAmplitude = 0.035,
     this.phase = 0,
   });
 
@@ -110,6 +110,7 @@ class _KenBurnsImageState extends State<KenBurnsImage>
                 ..rotateZ(rot)
                 ..scaleByDouble(scale, scale, scale, 1);
               return Transform(
+                key: const Key('ken-burns-transform'),
                 transform: m,
                 alignment: Alignment.center,
                 child: child,
