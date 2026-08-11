@@ -97,7 +97,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
         gradient:  LinearGradient(colors: brandGradient),
         borderRadius: BorderRadius.circular(18),
         boxShadow: const [
-          BoxShadow(color: Color(0x40C5A077), blurRadius: 20, offset: Offset(0, 8)),
+          BoxShadow(color: Color(0x40FFD700), blurRadius: 20, offset: Offset(0, 8)),
         ],
       ),
       child: Column(

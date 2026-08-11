@@ -101,7 +101,7 @@ class PropertyCard extends StatelessWidget {
               color: property.purpose == 'بيع' ? primary : cyan,
               borderRadius: BorderRadius.circular(30),
               boxShadow: const [
-                BoxShadow(color: Color(0x66C5A077), blurRadius: 12),
+                BoxShadow(color: Color(0x66FFD700), blurRadius: 12),
               ],
             ),
             child: Text(

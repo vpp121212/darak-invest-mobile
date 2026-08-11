@@ -205,7 +205,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 Text(
                   'دارك وحيك',
                   style: GoogleFonts.cairo(
-                    color: textLight,
+                    color: gold,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -289,15 +289,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             height: 52,
             padding: const EdgeInsets.symmetric(horizontal: 8),
             decoration: BoxDecoration(
-              color: glassFill,
+              color: primarySoft,
               borderRadius: BorderRadius.circular(30),
-              border: Border.all(color: glassBorder),
+              border: Border.all(color: primary.withValues(alpha: 0.45)),
               boxShadow: softShadow,
             ),
             child: Row(
               children: [
                 const SizedBox(width: 8),
-                 Icon(Icons.search, color: textMuted, size: 22),
+                 Icon(Icons.search, color: primary, size: 22),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -313,7 +313,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                          color: Color(0x66C5A077),
+                          color: Color(0x66FFD700),
                           blurRadius: 12,
                           offset: Offset(0, 4)),
                     ],
@@ -377,11 +377,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         width: 52,
                         height: 52,
                         decoration: BoxDecoration(
-                          color: onWhite,
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              BrandColors.gradientA,
+                              BrandColors.gradientB,
+                            ],
+                          ),
                           borderRadius: BorderRadius.circular(16),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x40C5A077),
+                              blurRadius: 10,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: Icon(Icons.auto_awesome,
-                            color: AppColors.gold, size: 26),
+                            color: onBrand, size: 26),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -441,7 +455,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Text(
             title,
             style: GoogleFonts.cairo(
-                color: textLight, fontSize: 20, fontWeight: FontWeight.bold),
+                color: gold, fontSize: 20, fontWeight: FontWeight.bold),
           ),
           if (onSeeAll != null)
             GestureDetector(
@@ -491,15 +505,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 duration: const Duration(milliseconds: 220),
                 width: 76,
                 decoration: BoxDecoration(
-                  color: isSelected ? primary : glassFill,
+                  color: isSelected ? primary : primarySoft,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isSelected ? primary : glassBorder,
+                    color: isSelected
+                        ? primary
+                        : primary.withValues(alpha: 0.35),
                   ),
                   boxShadow: isSelected
                       ? const [
                           BoxShadow(
-                              color: Color(0x66C5A077), blurRadius: 14)
+                              color: Color(0x66FFD700), blurRadius: 14)
                         ]
                       : softShadow,
                 ),
@@ -537,9 +553,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: glassFill,
+            color: primarySoft,
             borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: glassBorder),
+            border: Border.all(color: primary.withValues(alpha: 0.35)),
             boxShadow: softShadow,
           ),
           child: Row(
@@ -557,7 +573,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       borderRadius: BorderRadius.circular(26),
                       boxShadow: isSelected
                           ? const [
-                              BoxShadow(color: Color(0x66C5A077), blurRadius: 12)
+                              BoxShadow(color: Color(0x66FFD700), blurRadius: 12)
                             ]
                           : null,
                     ),
@@ -618,7 +634,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Text(
             title,
             style: GoogleFonts.cairo(
-                color: textLight, fontSize: 20, fontWeight: FontWeight.bold),
+                color: gold, fontSize: 20, fontWeight: FontWeight.bold),
           ),
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -769,7 +785,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 Text(
                   'الأحياء',
                   style: GoogleFonts.cairo(
-                      color: textLight,
+                      color: gold,
                       fontSize: 20,
                       fontWeight: FontWeight.bold),
                 ),
@@ -796,9 +812,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     width: 150,
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: glassFill,
+                      color: primarySoft,
                       borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: glassBorder),
+                      border: Border.all(
+                          color: primary.withValues(alpha: 0.35)),
                       boxShadow: softShadow,
                     ),
                     child: Column(
@@ -953,7 +970,7 @@ class _HeroCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: const [
                     BoxShadow(
-                        color: Color(0x66C5A077), blurRadius: 12),
+                        color: Color(0x66FFD700), blurRadius: 12),
                   ],
                 ),
                 child: Row(
@@ -986,7 +1003,7 @@ class _HeroCard extends StatelessWidget {
                     border: Border.all(color: Colors.white, width: 0.5),
                     boxShadow: const [
                       BoxShadow(
-                          color: Color(0x66C5A077), blurRadius: 12),
+                          color: Color(0x66FFD700), blurRadius: 12),
                     ],
                   ),
                   child: Row(

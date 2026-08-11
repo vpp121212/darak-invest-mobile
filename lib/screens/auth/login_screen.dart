@@ -152,7 +152,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       hintStyle: GoogleFonts.cairo(color: textMuted),
       prefixIcon: Icon(icon, color: textMuted),
       filled: true,
-      fillColor: cardDark,
+      fillColor: primarySoft,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide(color: textMuted.withValues(alpha: 0.2)),

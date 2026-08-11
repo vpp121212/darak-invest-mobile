@@ -40,30 +40,30 @@ class AppPalette {
 
 /// Theme-agnostic brand colors shared by both dark and light modes.
 abstract final class BrandColors {
-  /// Primary — bronze (identity, CTAs, active states).
-  static const Color primary = Color(0xFFC5A077);
+  /// Primary — warm gold (identity, CTAs, active states).
+  static const Color primary = Color(0xFFFFD700);
 
-  /// Secondary accent — lighter bronze (premium highlights, rent markers).
-  static const Color cyan = Color(0xFFA88B68);
+  /// Secondary accent — deep gold (premium highlights, rent markers).
+  static const Color cyan = Color(0xFFE0A72E);
 
-  /// Lighter bronze (badges, hints).
-  static const Color primaryLight = Color(0xFFD9BC94);
+  /// Lighter gold (badges, hints).
+  static const Color primaryLight = Color(0xFFF7E07F);
 
-  /// Soft bronze tint (selected states, icon chips).
-  static const Color primarySoft = Color(0x26C5A077);
+  /// Soft gold tint (selected states, icon chips).
+  static const Color primarySoft = Color(0x26FFD700);
 
-  /// Soft bronze tint.
-  static const Color cyanSoft = Color(0x26A88B68);
+  /// Soft deep-gold tint.
+  static const Color cyanSoft = Color(0x26E0A72E);
 
-  /// Brand gradient: light bronze → deep bronze.
-  static const Color gradientA = Color(0xFFD9BC94);
-  static const Color gradientB = Color(0xFFA88B68);
+  /// Brand gradient: light gold → deep gold.
+  static const Color gradientA = Color(0xFFF7E07F);
+  static const Color gradientB = Color(0xFFE0A72E);
 
-  /// Text/icons placed on bronze cards — deep green for high contrast.
+  /// Text/icons placed on gold cards — deep green for high contrast.
   static const Color onBrand = Color(0xFF0B3C34);
 
-  /// Bronze card background (secondary surfaces).
-  static const Color brandCard = Color(0xFFA88B68);
+  /// Gold card background (secondary surfaces).
+  static const Color brandCard = Color(0xFFE0A72E);
 
   /// White pop-out card (elevated highlight surfaces).
   static const Color whiteCard = Color(0xFFFFFFFF);
@@ -83,14 +83,14 @@ abstract final class BrandColors {
   /// Amber — demo/preview badges.
   static const Color amber = Color(0xFFFFB020);
 
-  /// Bronze accent.
-  static const Color gold = Color(0xFFC5A077);
+  /// Warm gold accent.
+  static const Color gold = Color(0xFFFFD700);
 }
 
-/// Deep green + bronze palette.
+/// Deep green + warm gold palette.
 ///
-/// Dark green (#0B3C34) backgrounds with bronze (#C5A077 / #A88B68) accents
-/// for a luxurious, business-focused feel.
+/// Dark green (#0B3C34) backgrounds with warm gold (#FFD700 / #E0A72E)
+/// accents for a luxurious, business-focused feel.
 class AppColors {
   /// Dark-mode palette.
   static const AppPalette dark = AppPalette(

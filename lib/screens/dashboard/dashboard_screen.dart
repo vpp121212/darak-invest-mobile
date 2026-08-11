@@ -87,7 +87,7 @@ class _DashboardContent extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('أفضل الأسعار', style: GoogleFonts.cairo(color: textLight, fontSize: 20, fontWeight: FontWeight.bold)),
+            Text('أفضل الأسعار', style: GoogleFonts.cairo(color: gold, fontSize: 20, fontWeight: FontWeight.bold)),
             Text('${properties.length} عقار', style: GoogleFonts.cairo(color: textMuted, fontSize: 13)),
           ],
         ),
@@ -130,7 +130,7 @@ class _DashboardContent extends StatelessWidget {
     final kpis = <(IconData, String, String, Color)>[
       (Icons.home_work_outlined, 'إجمالي العقارات', Formatters.number(stats.total), gold),
       (Icons.sell_outlined, 'للبيع', Formatters.number(stats.saleCount), const Color(0xFF3B82F6)),
-      (Icons.receipt_long_outlined, 'للإيجار', Formatters.number(stats.rentCount), const Color(0xFFC5A077)),
+      (Icons.receipt_long_outlined, 'للإيجار', Formatters.number(stats.rentCount), const Color(0xFFFFD700)),
       (Icons.attach_money, 'متوسط سعر البيع', Formatters.compactPrice(stats.avgSalePrice), const Color(0xFF8B5CF6)),
     ];
 

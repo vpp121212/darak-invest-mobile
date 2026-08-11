@@ -44,7 +44,7 @@ List<BoxShadow> get softShadow => [
         offset: const Offset(0, 10),
       ),
       const BoxShadow(
-        color: Color(0x1FC5A077),
+        color: Color(0x1FFFD700),
         blurRadius: 18,
         offset: Offset(0, 0),
       ),
@@ -138,9 +138,9 @@ class AppTheme {
           color: BrandColors.primary),
       sliderTheme: SliderThemeData(
         activeTrackColor: BrandColors.primary,
-        inactiveTrackColor: const Color(0x33C5A077),
+        inactiveTrackColor: const Color(0x33FFD700),
         thumbColor: BrandColors.primary,
-        overlayColor: const Color(0x2BC5A077),
+        overlayColor: const Color(0x2BFFD700),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: palette.card,
