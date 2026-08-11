@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 
 import 'app_image.dart';
 
-/// Wraps [AppImage] with a cinematic camera move — a slow loop of zoom,
-/// lateral pan and a subtle tilt that gives the image a distinctive diorama
-/// angle, mirroring the camera work of the property reel.
+/// Wraps [AppImage] with a deep-dive cinematic camera move — a slow loop of
+/// marketing zoom (scale 1.06 → 1.3), lateral pan (−2%/−1% → +2%/+1%) and a
+/// subtle tilt that gives the image a distinctive diorama angle. Mirrors the
+/// CSS `cinematicZoom` keyframes the design asked for.
 ///
 /// Each card can pass a [phase] (via [phaseFor]) so neighbouring cards never
 /// move in sync, keeping the grid alive.
@@ -21,12 +22,12 @@ class KenBurnsImage extends StatefulWidget {
     this.memCacheWidth,
     this.placeholder,
     this.errorWidget,
-    this.duration = const Duration(seconds: 9),
-    this.minScale = 1.12,
-    this.maxScale = 1.38,
-    this.panX = 0.04,
-    this.panY = 0.015,
-    this.rotateAmplitude = 0.035,
+    this.duration = const Duration(seconds: 8),
+    this.minScale = 1.06,
+    this.maxScale = 1.30,
+    this.panX = 0.02,
+    this.panY = 0.01,
+    this.rotateAmplitude = 0.015,
     this.phase = 0,
   });
 

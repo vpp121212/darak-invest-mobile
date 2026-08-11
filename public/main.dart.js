@@ -60332,7 +60332,7 @@ n===$&&A.a()
 s=n*2*3.141592653589793+o.a.ay
 n=Math.cos(s)
 o.a.toString
-r=0.1299999999999999*(1-n)+1.12
+r=0.12*(1-n)+1.06
 n=Math.sin(s)
 o.a.toString
 q=Math.cos(s)
@@ -60340,8 +60340,8 @@ o.a.toString
 o=Math.sin(s)
 p=new A.bK(new Float64Array(16))
 p.eJ()
-p.eE(this.b*(0.04*n),this.c*(0.015*q),0,1)
-p.Jt(0.035*o)
+p.eE(this.b*(0.02*n),this.c*(0.01*q),0,1)
+p.Jt(0.015*o)
 p.nu(r,r,r,1)
 return A.Lm(B.a_,b,null,B.ap7,p,!0)},
 $S:157}
@@ -129434,7 +129434,7 @@ B.um=new A.b5(6048e8)
 B.un=new A.b5(7e4)
 B.oa=new A.b5(7e5)
 B.iw=new A.b5(75e3)
-B.U7=new A.b5(9e6)
+B.U7=new A.b5(8e6)
 B.U8=new A.b5(-38e3)
 B.U9=new A.aoc(0,"tonalSpot")
 B.Ua=new A.d4(0,0,12,0)
