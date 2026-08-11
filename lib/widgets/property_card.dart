@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../models/property.dart';
 import '../theme/app_theme.dart';
-import 'app_image.dart';
+import 'ken_burns_image.dart';
 
 /// Athletic frosted-glass property card — blurred translucent surface with
 /// electric-lime accents, inspired by Nike Training Club.
@@ -57,7 +57,7 @@ class PropertyCard extends StatelessWidget {
     final imageHeight = compact ? 150.0 : 190.0;
     return Stack(
       children: [
-        AppImage(
+        KenBurnsImage(
           src: property.mainImage,
           height: imageHeight,
           width: double.infinity,
