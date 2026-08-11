@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
@@ -190,7 +191,7 @@ class _ScrollWorldScreenState extends State<ScrollWorldScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: _ParallaxBackdrop(key: ValueKey(_current), property: _currentProperty),
+            child: _DioramaBackdrop(property: _currentProperty),
           ),
           Positioned.fill(child: _modeContent(context)),
           _identityHeader(context),
@@ -1088,6 +1089,72 @@ class _ScrollWorldScreenState extends State<ScrollWorldScreen> {
   }
 }
 
+/// Cinematic backdrop for the diorama: plays the property reel video
+/// (Ken Burns + crossfades, bundled locally so it always plays smoothly)
+/// with a graceful fallback to the multi-layer parallax while the video
+/// initialises or if it fails.
+class _DioramaBackdrop extends StatefulWidget {
+  const _DioramaBackdrop({required this.property});
+
+  final _DioramaProperty property;
+
+  @override
+  State<_DioramaBackdrop> createState() => _DioramaBackdropState();
+}
+
+class _DioramaBackdropState extends State<_DioramaBackdrop> {
+  VideoPlayerController? _video;
+  bool _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final video = VideoPlayerController.asset('assets/videos/property_reel.mp4')
+      ..setLooping(true);
+    _video = video;
+    video.initialize().then((_) {
+      if (!mounted) return;
+      video.setVolume(0);
+      video.play();
+      setState(() => _ready = true);
+    }).catchError((Object _) {});
+  }
+
+  @override
+  void dispose() {
+    _video?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final video = _video;
+    if (_ready && video != null && video.value.isInitialized) {
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          SizedBox.expand(
+            child: FittedBox(
+              fit: BoxFit.cover,
+              clipBehavior: Clip.hardEdge,
+              child: SizedBox(
+                width: video.value.size.width,
+                height: video.value.size.height,
+                child: VideoPlayer(video),
+              ),
+            ),
+          ),
+          const _BackdropOverlays(),
+        ],
+      );
+    }
+    return _ParallaxBackdrop(
+      key: ValueKey(widget.property.title),
+      property: widget.property,
+    );
+  }
+}
+
 /// Multi-layer parallax + ken-burns cinematic backdrop.
 ///
 /// Two copies of the property image drift at slightly different scales and
@@ -1166,41 +1233,7 @@ class _ParallaxBackdropState extends State<_ParallaxBackdrop>
               child: _image(widget.property.image),
             ),
           ),
-          // Cinematic vignette + bottom gradient for readability.
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black54,
-                  Colors.black26,
-                  Colors.transparent,
-                  Colors.transparent,
-                  Colors.black54,
-                  Colors.black87,
-                ],
-                stops: [0.0, 0.18, 0.4, 0.62, 0.85, 1.0],
-              ),
-            ),
-          ),
-          // Royal gold + emerald ambient glows (cheap, no blur).
-          Positioned(
-            right: -80,
-            top: -60,
-            child: _glow(
-              color: AppColors.gold.withValues(alpha: 0.14),
-              size: 240,
-            ),
-          ),
-          Positioned(
-            left: -70,
-            bottom: -50,
-            child: _glow(
-              color: AppColors.primary.withValues(alpha: 0.16),
-              size: 220,
-            ),
-          ),
+          const _BackdropOverlays(),
         ],
       ),
     );
@@ -1223,8 +1256,63 @@ class _ParallaxBackdropState extends State<_ParallaxBackdrop>
       ),
     );
   }
+}
 
-  Widget _glow({required Color color, required double size}) {
+/// Cinematic vignette + bottom gradient + royal gold/emerald ambient glows.
+class _BackdropOverlays extends StatelessWidget {
+  const _BackdropOverlays();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        const DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.black54,
+                Colors.black26,
+                Colors.transparent,
+                Colors.transparent,
+                Colors.black54,
+                Colors.black87,
+              ],
+              stops: [0.0, 0.18, 0.4, 0.62, 0.85, 1.0],
+            ),
+          ),
+        ),
+        Positioned(
+          right: -80,
+          top: -60,
+          child: _OverlayGlow(
+            color: AppColors.gold.withValues(alpha: 0.14),
+            size: 240,
+          ),
+        ),
+        Positioned(
+          left: -70,
+          bottom: -50,
+          child: _OverlayGlow(
+            color: AppColors.primary.withValues(alpha: 0.16),
+            size: 220,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _OverlayGlow extends StatelessWidget {
+  const _OverlayGlow({required this.color, required this.size});
+
+  final Color color;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: size,
       height: size,
