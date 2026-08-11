@@ -83,7 +83,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
               children: [
                 _buildRoundIconButton(
                   icon: isFav ? Icons.favorite : Icons.favorite_border,
-                  color: isFav ? const Color(0xFFD4AF37) : Colors.white,
+                  color: isFav ? const Color(0xFFC5A077) : Colors.white,
                   onTap: () =>
                       ref.read(favoritesProvider.notifier).toggle(_property.id),
                 ),

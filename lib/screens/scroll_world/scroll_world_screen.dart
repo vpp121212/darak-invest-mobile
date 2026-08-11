@@ -652,7 +652,7 @@ class _ScrollWorldScreenState extends State<ScrollWorldScreen> {
                 strokeCap: StrokeCap.round,
                 backgroundColor: Colors.white.withValues(alpha: 0.1),
                 valueColor:
-                    const AlwaysStoppedAnimation<Color>(Color(0xFFD4AF37)),
+                    const AlwaysStoppedAnimation<Color>(Color(0xFFC5A077)),
               ),
               Center(
                 child: Column(
@@ -775,7 +775,7 @@ class _ScrollWorldScreenState extends State<ScrollWorldScreen> {
           child: _hudActionButton(
             icon: Icons.event_available_outlined,
             label: 'حجز معاينة',
-            gradient: const [Color(0xFFF0C24B), Color(0xFFB9922F)],
+            gradient: const [Color(0xFFD9BC94), Color(0xFFA88B68)],
             onTap: () => context.pushRoute(BookingRoute(property: property)),
           ),
         ),
@@ -978,7 +978,7 @@ class _ScrollWorldScreenState extends State<ScrollWorldScreen> {
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Color(0xFFF0C24B), Color(0xFFD4AF37)],
+                  colors: [Color(0xFFD9BC94), Color(0xFFC5A077)],
                 ),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
@@ -990,7 +990,7 @@ class _ScrollWorldScreenState extends State<ScrollWorldScreen> {
                 ],
               ),
               child: const Icon(Icons.home_rounded,
-                  color: Color(0xFF1D1D1F), size: 22),
+                  color: Color(0xFF0B3C34), size: 22),
             ),
             const SizedBox(width: 12),
             Column(

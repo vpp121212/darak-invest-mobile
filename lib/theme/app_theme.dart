@@ -32,7 +32,7 @@ Color get glassFill => AppColors.glassFill;
 /// Frosted-glass border: subtle white hairline.
 Color get glassBorder => AppColors.glassBorder;
 
-/// Shared soft shadow — black base with a faint emerald glow.
+/// Shared soft shadow — black base with a faint bronze glow.
 List<BoxShadow> get softShadow => [
       BoxShadow(
         color: AppColors.scrim.withValues(alpha: 0.3),
@@ -40,7 +40,7 @@ List<BoxShadow> get softShadow => [
         offset: const Offset(0, 10),
       ),
       const BoxShadow(
-        color: Color(0x1F10B981),
+        color: Color(0x1FC5A077),
         blurRadius: 18,
         offset: Offset(0, 0),
       ),
@@ -58,18 +58,18 @@ class AppTheme {
           ? const ColorScheme.dark(
               primary: BrandColors.primary,
               secondary: BrandColors.cyan,
-              surface: Color(0xFF242426),
+              surface: Color(0xFF17544A),
               onPrimary: Colors.white,
-              onSecondary: Color(0xFF1D1D1F),
-              onSurface: Color(0xFFF5F5F7),
+              onSecondary: Color(0xFF0B3C34),
+              onSurface: Color(0xFFF2E9DD),
             )
           : const ColorScheme.light(
               primary: BrandColors.primary,
               secondary: BrandColors.cyan,
               surface: Color(0xFFFFFFFF),
               onPrimary: Colors.white,
-              onSecondary: Color(0xFF1D1D1F),
-              onSurface: Color(0xFF1D1D1F),
+              onSecondary: Color(0xFF0B3C34),
+              onSurface: Color(0xFF123F36),
             ),
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -134,9 +134,9 @@ class AppTheme {
           color: BrandColors.primary),
       sliderTheme: SliderThemeData(
         activeTrackColor: BrandColors.primary,
-        inactiveTrackColor: const Color(0x33D4AF37),
+        inactiveTrackColor: const Color(0x33C5A077),
         thumbColor: BrandColors.primary,
-        overlayColor: const Color(0x2BD4AF37),
+        overlayColor: const Color(0x2BC5A077),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: palette.card,

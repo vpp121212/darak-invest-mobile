@@ -40,27 +40,27 @@ class AppPalette {
 
 /// Theme-agnostic brand colors shared by both dark and light modes.
 abstract final class BrandColors {
-  /// Primary — deep emerald (identity, CTAs, active states).
-  static const Color primary = Color(0xFF10B981);
+  /// Primary — bronze (identity, CTAs, active states).
+  static const Color primary = Color(0xFFC5A077);
 
-  /// Secondary accent — royal gold (premium highlights, rent markers).
-  static const Color cyan = Color(0xFFD4AF37);
+  /// Secondary accent — lighter bronze (premium highlights, rent markers).
+  static const Color cyan = Color(0xFFA88B68);
 
-  /// Lighter emerald (badges, hints).
-  static const Color primaryLight = Color(0xFF34D399);
+  /// Lighter bronze (badges, hints).
+  static const Color primaryLight = Color(0xFFD9BC94);
 
-  /// Soft emerald tint (selected states, icon chips).
-  static const Color primarySoft = Color(0x1A10B981);
+  /// Soft bronze tint (selected states, icon chips).
+  static const Color primarySoft = Color(0x26C5A077);
 
-  /// Soft gold tint.
-  static const Color cyanSoft = Color(0x1AD4AF37);
+  /// Soft bronze tint.
+  static const Color cyanSoft = Color(0x26A88B68);
 
-  /// Brand gradient: bright emerald → deep emerald.
-  static const Color gradientA = Color(0xFF10B981);
-  static const Color gradientB = Color(0xFF065F46);
+  /// Brand gradient: light bronze → deep bronze.
+  static const Color gradientA = Color(0xFFD9BC94);
+  static const Color gradientB = Color(0xFFA88B68);
 
   /// Success green.
-  static const Color success = Color(0xFF22C55E);
+  static const Color success = Color(0xFF34D399);
 
   /// Secondary sky blue.
   static const Color blue = Color(0xFF38BDF8);
@@ -71,36 +71,36 @@ abstract final class BrandColors {
   /// Amber — demo/preview badges.
   static const Color amber = Color(0xFFFFB020);
 
-  /// Royal gold accent.
-  static const Color gold = Color(0xFFD4AF37);
+  /// Bronze accent.
+  static const Color gold = Color(0xFFC5A077);
 }
 
-/// Emerald + royal gold palette.
+/// Deep green + bronze palette.
 ///
-/// Deep charcoal backgrounds with a premium emerald (#10B981) primary and
-/// royal gold (#D4AF37) accents for a luxurious real-estate feel.
+/// Dark green (#0B3C34) backgrounds with bronze (#C5A077 / #A88B68) accents
+/// for a luxurious, business-focused feel.
 class AppColors {
   /// Dark-mode palette.
   static const AppPalette dark = AppPalette(
-    bg: Color(0xFF18181A),
-    card: Color(0xFF242426),
-    surface: Color(0xFF2C2C2E),
+    bg: Color(0xFF0B3C34),
+    card: Color(0xFF11473D),
+    surface: Color(0xFF17544A),
     glassFill: Color(0x14FFFFFF),
     glassBorder: Color(0x1FFFFFFF),
-    textPrimary: Color(0xFFF5F5F7),
-    textMuted: Color(0xFFA1A1A6),
+    textPrimary: Color(0xFFF2E9DD),
+    textMuted: Color(0xFFBCAB90),
     scrim: Color(0xFF000000),
   );
 
   /// Light-mode palette.
   static const AppPalette light = AppPalette(
-    bg: Color(0xFFF5F5F7),
+    bg: Color(0xFFF4EFE6),
     card: Color(0xFFFFFFFF),
-    surface: Color(0xFFF0F0F2),
+    surface: Color(0xFFEDE6D8),
     glassFill: Color(0x33FFFFFF),
     glassBorder: Color(0x33000000),
-    textPrimary: Color(0xFF1D1D1F),
-    textMuted: Color(0xFF6E6E73),
+    textPrimary: Color(0xFF123F36),
+    textMuted: Color(0xFF7A6A51),
     scrim: Color(0xFF000000),
   );
 
