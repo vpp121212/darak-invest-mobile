@@ -14,13 +14,24 @@ class GeoPoint {
   });
 }
 
+/// نتيجة عملية تحديد الموقع مع رسالة توضيحية عند الفشل.
+class GeoResult {
+  final GeoPoint? point;
+
+  /// رسالة عربية تشرح سبب الفشل عندما يكون [point] فارغاً.
+  final String? message;
+
+  const GeoResult({this.point, this.message});
+
+  bool get success => point != null;
+}
+
 /// قراءة الموقع الجغرافي المباشر من متصفح الويب عبر Geolocation API.
 ///
 /// على الويب تُنفَّذ عبر Geolocation API مباشرة (لا توجد أذونات منصة
-/// أصلية)، وعلى المنصات الأخرى تُرجع false/null بأمان.
+/// أصلية)، وعلى المنصات الأخرى تُرجع نتيجة فاشلة برسالة توضيحية.
 class GeolocationService {
   static bool get isSupported => impl.GeolocationService.isSupported;
 
-  static Future<GeoPoint?> getCurrentPosition() =>
-      impl.GeolocationService.getCurrentPosition();
+  static Future<GeoResult> locate() => impl.GeolocationService.locate();
 }

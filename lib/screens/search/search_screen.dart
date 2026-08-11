@@ -122,7 +122,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Future<void> _useMyLocation() async {
     if (_locating) return;
     setState(() => _locating = true);
-    final point = await GeolocationService.getCurrentPosition();
+    final result = await GeolocationService.locate();
+    final point = result.point;
     if (!mounted) return;
     setState(() {
       _locating = false;
@@ -138,7 +139,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         content: Text(
           point != null
               ? 'تم تحديد مدينتك تقريباً: $_selectedCity'
-              : 'تعذّر تحديد الموقع — تحقق من إذن الموقع في المتصفح',
+              : result.message ?? 'تعذّر تحديد الموقع',
           style: GoogleFonts.cairo(color: textLight),
         ),
       ),

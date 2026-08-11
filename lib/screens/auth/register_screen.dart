@@ -57,7 +57,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final data = <String, dynamic>{
       'name': _nameController.text.trim(),
       'email': _emailController.text.trim(),
-      'phone': _phoneController.text.trim(),
+      'phone': _normalizePhone(_phoneController.text),
       'password': _passwordController.text,
       'role': _roles[_selectedRole]['value'],
       if (_isOffice) 'officeName': _officeNameController.text.trim(),
@@ -77,6 +77,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   void _snack(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg, style: GoogleFonts.cairo())));
+  }
+
+  /// تطبيع رقم الجوال إلى صيغة يقبلها الخادم:
+  /// إزالة الفراغات/الفواصل، تحويل الأرقام العربية إلى لاتينية،
+  /// وتحويل `05…` أو `966…` إلى `+966…`.
+  String _normalizePhone(String raw) {
+    var p = raw.trim().replaceAll(RegExp(r'[\s\-()]'), '');
+    const arabicDigits = '٠١٢٣٤٥٦٧٨٩';
+    const latinDigits = '0123456789';
+    for (var i = 0; i < arabicDigits.length; i++) {
+      p = p.replaceAll(arabicDigits[i], latinDigits[i]);
+    }
+    if (p.startsWith('+966')) return p;
+    if (p.startsWith('966') && p.length > 3) return '+966${p.substring(3)}';
+    if (p.startsWith('0') && p.length > 1) return '+966${p.substring(1)}';
+    return p;
   }
 
   @override
@@ -116,7 +132,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ],
                 if (auth.error != null) ...[
                   const SizedBox(height: 14),
-                  _buildError(),
+                  _buildError(auth.error!),
                 ],
                 const SizedBox(height: 28),
                 _buildRegisterButton(auth.isLoading),
@@ -232,10 +248,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       controller: _phoneController,
       keyboardType: TextInputType.phone,
       style: GoogleFonts.cairo(color: textLight),
-      decoration: _inputDecoration('رقم الجوال', Icons.phone_outlined),
+      decoration: _inputDecoration('رقم الجوال (05XXXXXXXX أو 9665XXXXXXXX)', Icons.phone_outlined),
       validator: (val) {
         if (val == null || val.isEmpty) return 'رقم الجوال مطلوب';
-        if (val.length < 10) return 'رقم الجوال غير صحيح';
+        final digits = val.replaceAll(RegExp(r'[\s\-()]'), '');
+        if (digits.length < 9) return 'رقم الجوال غير صحيح';
         return null;
       },
     );
@@ -313,7 +330,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 
-  Widget _buildError() {
+  Widget _buildError(String rawError) {
+    final message = _readableError(rawError);
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -327,13 +345,28 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'تعذّر إنشاء الحساب، تحقق من البيانات وحاول مجدداً',
+              message,
               style: GoogleFonts.cairo(color: Colors.red, fontSize: 13),
             ),
           ),
         ],
       ),
     );
+  }
+
+  String _readableError(String raw) {
+    if (raw.trim().isEmpty) return 'تعذّر إنشاء الحساب، حاول مجدداً';
+    if (raw.contains('لا يوجد اتصال') || raw.contains('SocketException')) {
+      return 'لا يوجد اتصال بالإنترنت';
+    }
+    if (raw.contains('مهلة الاتصال') || raw.contains('Timeout')) {
+      return 'انتهت مهلة الاتصال، تحقق من اتصالك ثم حاول مجدداً';
+    }
+    if (raw.contains('تعذّر الاتصال')) {
+      return 'تعذّر الاتصال بالخادم، حاول مجدداً';
+    }
+    // رسائل الخادم تصل بالعربية (تفاصيل التحقق مثل «رقم الجوال غير صحيح»).
+    return raw.trim();
   }
 
   Widget _buildRegisterButton(bool isLoading) {

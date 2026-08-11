@@ -120,11 +120,19 @@ class ApiClient {
       // رسائل الخطأ صغيرة — فك الترميز المباشر لا يحجب الواجهة ويظل متوافقاً
       // مع بيئة الاختبارات.
       final decoded = jsonDecode(body);
-      message = (decoded is Map && decoded['message'] != null)
-          ? decoded['message'].toString()
-          : (decoded is Map && decoded['error'] != null
-              ? decoded['error'].toString()
-              : message);
+      if (decoded is Map) {
+        final serverMsg = decoded['message'] ?? decoded['error'];
+        if (serverMsg != null) message = serverMsg.toString();
+        final details = decoded['details'];
+        if (details is List && details.isNotEmpty) {
+          final detailMsgs = details
+              .map((d) => (d is Map ? d['message'] : null)?.toString())
+              .whereType<String>()
+              .where((s) => s.trim().isNotEmpty)
+              .toList();
+          if (detailMsgs.isNotEmpty) message = detailMsgs.join('، ');
+        }
+      }
     } catch (_) {
       // keep default message when body is not JSON
     }

@@ -71,7 +71,9 @@ class ProfileScreen extends ConsumerWidget {
           Text('عام', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           _buildThemeItem(context, ref),
-          _buildMenuItem(Icons.settings_outlined, 'الإعدادات', null, () {}),
+          _buildMenuItem(Icons.settings_outlined, 'الإعدادات', null, () {
+            context.pushRoute(const SettingsRoute());
+          }),
           _buildMenuItem(Icons.help_outline, 'المساعدة والدعم', null, () {}),
           _buildMenuItem(Icons.gavel, 'السياسة القانونية', 'الشروط وسياسة الخصوصية', () {
             context.pushRoute(const LegalRoute());

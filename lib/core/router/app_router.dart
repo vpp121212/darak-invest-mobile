@@ -24,6 +24,7 @@ import '../../screens/neighborhood/neighborhood_detail_screen.dart';
 import '../../screens/notifications/notifications_screen.dart';
 import '../../screens/payments/subscription_screen.dart';
 import '../../screens/property/property_detail_screen.dart';
+import '../../screens/profile/settings_screen.dart';
 import '../../screens/root/app_shell.dart';
 import '../../screens/search/search_screen.dart';
 import '../../screens/scroll_world/scroll_world_screen.dart';
@@ -59,6 +60,7 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: NotificationsRoute.page),
         AutoRoute(page: SubscriptionRoute.page),
         AutoRoute(page: ManagementRoute.page),
+        AutoRoute(page: SettingsRoute.page),
       ];
 }
 
