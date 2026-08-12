@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:video_player/video_player.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
@@ -191,7 +190,9 @@ class _ScrollWorldScreenState extends State<ScrollWorldScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: _DioramaBackdrop(property: _currentProperty),
+            child: _DioramaBackdrop(
+              images: [for (final p in _dioramaProperties) p.image],
+            ),
           ),
           Positioned.fill(child: _modeContent(context)),
           _identityHeader(context),
@@ -1118,91 +1119,48 @@ class _ScrollWorldScreenState extends State<ScrollWorldScreen> {
   }
 }
 
-/// Cinematic backdrop for the diorama: plays the property reel video
-/// (Ken Burns + crossfades, bundled locally so it always plays smoothly)
-/// with a graceful fallback to the multi-layer parallax while the video
-/// initialises or if it fails.
-class _DioramaBackdrop extends StatefulWidget {
-  const _DioramaBackdrop({required this.property});
+/// Cinematic backdrop for the diorama: a smooth code-rendered Ken Burns
+/// crossfade reel over the showcase images. Rendered in Flutter (not video)
+/// so the motion is perfectly smooth — no decoder jitter, no upscale shimmer
+/// — with a slow continuous zoom/pan and soft image-to-image dissolves.
+class _DioramaBackdrop extends StatelessWidget {
+  const _DioramaBackdrop({required this.images});
 
-  final _DioramaProperty property;
-
-  @override
-  State<_DioramaBackdrop> createState() => _DioramaBackdropState();
-}
-
-class _DioramaBackdropState extends State<_DioramaBackdrop> {
-  VideoPlayerController? _video;
-  bool _ready = false;
-
-  @override
-  void initState() {
-    super.initState();
-    final video = VideoPlayerController.asset('assets/videos/property_reel.mp4')
-      ..setLooping(true);
-    _video = video;
-    video.initialize().then((_) {
-      if (!mounted) return;
-      video.setVolume(0);
-      video.play();
-      setState(() => _ready = true);
-    }).catchError((Object _) {});
-  }
-
-  @override
-  void dispose() {
-    _video?.dispose();
-    super.dispose();
-  }
+  final List<String> images;
 
   @override
   Widget build(BuildContext context) {
-    final video = _video;
-    if (_ready && video != null && video.value.isInitialized) {
-      return Stack(
-        fit: StackFit.expand,
-        children: [
-          SizedBox.expand(
-            child: FittedBox(
-              fit: BoxFit.cover,
-              clipBehavior: Clip.hardEdge,
-              child: SizedBox(
-                width: video.value.size.width,
-                height: video.value.size.height,
-                child: VideoPlayer(video),
-              ),
-            ),
-          ),
-          const _BackdropOverlays(),
-        ],
-      );
-    }
-    return _ParallaxBackdrop(
-      key: ValueKey(widget.property.title),
-      property: widget.property,
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        _CinematicBackdrop(images: images),
+        const _BackdropOverlays(),
+      ],
     );
   }
 }
 
-/// Multi-layer parallax + ken-burns cinematic backdrop.
+/// Smooth Ken Burns crossfade reel.
 ///
-/// Two copies of the property image drift at slightly different scales and
-/// speeds (true parallax), a slow ken-burns zoom runs on the whole stack, and
-/// a dark cinematic gradient guarantees crystal-clear text readability.
-class _ParallaxBackdrop extends StatefulWidget {
-  const _ParallaxBackdrop({super.key, required this.property});
+/// Two image layers share the *same* continuous transform (slow sinusoidal
+/// zoom + pan, rounded to whole pixels to avoid subpixel shimmer) while the
+/// opacity crossfades linearly between consecutive frames. Because both layers
+/// move identically, the dissolve is seamless and the combined transform never
+/// jumps — the whole loop is a single continuous camera move.
+class _CinematicBackdrop extends StatefulWidget {
+  const _CinematicBackdrop({required this.images});
 
-  final _DioramaProperty property;
+  final List<String> images;
 
   @override
-  State<_ParallaxBackdrop> createState() => _ParallaxBackdropState();
+  State<_CinematicBackdrop> createState() => _CinematicBackdropState();
 }
 
-class _ParallaxBackdropState extends State<_ParallaxBackdrop>
+class _CinematicBackdropState extends State<_CinematicBackdrop>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(seconds: 36),
+    duration: const Duration(seconds: 24),
   )..repeat();
 
   @override
@@ -1211,78 +1169,60 @@ class _ParallaxBackdropState extends State<_ParallaxBackdrop>
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 700),
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Curves.easeInCubic,
-      layoutBuilder: (currentChild, previousChildren) => Stack(
-        alignment: Alignment.center,
-        children: [...previousChildren, if (currentChild != null) currentChild],
-      ),
-      child: Stack(
-        key: ValueKey(widget.property.title),
-        fit: StackFit.expand,
-        children: [
-          AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              final t = _controller.value;
-              final zoom = 1.05 + 0.05 * math.sin(t * 2 * math.pi);
-              final driftX = (t - 0.5) * 12.0;
-              final driftY = (t - 0.5) * 8.0;
-              return Transform.scale(
-                scale: zoom,
-                child: Transform.translate(
-                  offset: Offset(driftX, driftY),
-                  child: child,
-                ),
-              );
-            },
-            child: _image(widget.property.image),
-          ),
-          AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              final t = _controller.value;
-              final zoom = 1.12 + 0.06 * math.sin((t * 2 * math.pi) + math.pi);
-              final driftX = (0.5 - t) * 18.0;
-              final driftY = (0.5 - t) * 12.0;
-              return Transform.scale(
-                scale: zoom,
-                child: Transform.translate(
-                  offset: Offset(driftX, driftY),
-                  child: child,
-                ),
-              );
-            },
-            child: Opacity(
-              opacity: 0.85,
-              child: _image(widget.property.image),
+  Widget _layer(String src, double opacity) {
+    return Opacity(
+      opacity: opacity,
+      child: AppImage(
+        src: src,
+        fit: BoxFit.cover,
+        errorWidget: (_, __, ___) => Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [BrandColors.gradientA, BrandColors.gradientB],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
           ),
-          const _BackdropOverlays(),
-        ],
+          child: const Icon(Icons.home_work_outlined,
+              color: Colors.white, size: 56),
+        ),
       ),
     );
   }
 
-  Widget _image(String url) {
-    return AppImage(
-      src: url,
-      fit: BoxFit.cover,
-      errorWidget: (_, __, ___) => Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [BrandColors.gradientA, BrandColors.gradientB],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+  @override
+  Widget build(BuildContext context) {
+    final images = widget.images;
+    if (images.isEmpty) return const SizedBox.shrink();
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        final n = images.length;
+        final t = _controller.value * n;
+        final from = t.floor() % n;
+        final to = (t.floor() + 1) % n;
+        final u = t - t.floor();
+
+        // One shared, continuous camera move for both layers.
+        final w = _controller.value * 2 * math.pi * 2;
+        final zoom = 1.03 + 0.10 * ((math.sin(w) + 1) / 2);
+        final panX = math.sin(w) * 10.0;
+        final panY = math.cos(w) * 6.0;
+
+        return Transform.scale(
+          scale: zoom,
+          child: Transform.translate(
+            offset: Offset(panX.roundToDouble(), panY.roundToDouble()),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                _layer(images[from], 1 - u),
+                _layer(images[to], u),
+              ],
+            ),
           ),
-        ),
-        child: const Icon(Icons.home_work_outlined,
-            color: Colors.white, size: 56),
-      ),
+        );
+      },
     );
   }
 }
