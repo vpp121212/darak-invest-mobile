@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="/darak-invest-mobile/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="دارك وحيك — منصة عقارية ذكية للبيع والإيجار">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10B981">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="دارك وحيك">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>دارك وحيك — منصة عقارية ذكية</title>
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <script src="flutter_bootstrap.js" async></script>
+  <script>
+    // Purge stale versions: if an old service worker (e.g. sw.js from a
+    // previous static app) still controls this page, unregister it and wipe
+    // every cache once, so users are never stuck on an outdated build.
+    if ('serviceWorker' in navigator) {
+      (async function () {
+        try {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          const stale = regs.filter(
+            (r) => !r.active ||
+              r.active.scriptURL.indexOf('flutter_service_worker.js') === -1
+          );
+          if (stale.length > 0) {
+            await Promise.all(stale.map((r) => r.unregister()));
+            if ('caches' in window) {
+              const keys = await caches.keys();
+              await Promise.all(keys.map((k) => caches.delete(k)));
+            }
+            window.location.reload();
+            return;
+          }
+        } catch (_) { /* ignore */ }
+        // Auto-refresh once the new Flutter service worker takes control.
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+          window.location.reload();
+        });
+      })();
+    }
+  </script>
+</body>
+</html>
