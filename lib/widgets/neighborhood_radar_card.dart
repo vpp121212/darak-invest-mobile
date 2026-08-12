@@ -21,9 +21,9 @@ class NeighborhoodRadarCard extends StatelessWidget {
     required this.onInvest,
   });
 
-  static const _accent = Color(0xFFFFD700);
+  static const _accent = Color(0xFF10B981);
   static const _tagLight = Color(0xFFFFFFFF);
-  static const _onBrand = Color(0xFF0B3C34);
+  static const _onBrand = Color(0xFF065F46);
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class NeighborhoodRadarCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 20),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFFFFD700), Color(0xFFE0A72E)],
+          colors: [Color(0xFF10B981), Color(0xFF059669)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

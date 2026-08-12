@@ -59,7 +59,7 @@ class NeighborhoodDetailScreen extends ConsumerWidget {
             color: primary,
             borderRadius: BorderRadius.circular(14),
             boxShadow: const [
-              BoxShadow(color: Color(0x4DFFD700), blurRadius: 14),
+              BoxShadow(color: Color(0x4D10B981), blurRadius: 14),
             ],
           ),
           child: Row(
@@ -160,7 +160,7 @@ class NeighborhoodDetailScreen extends ConsumerWidget {
               color: primary,
               borderRadius: BorderRadius.circular(18),
               boxShadow: const [
-                BoxShadow(color: Color(0x66FFD700), blurRadius: 16),
+                BoxShadow(color: Color(0x6610B981), blurRadius: 16),
               ],
             ),
             child: const Icon(Icons.location_city, color: Colors.white, size: 32),

@@ -83,7 +83,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
               children: [
                 _buildRoundIconButton(
                   icon: isFav ? Icons.favorite : Icons.favorite_border,
-                  color: isFav ? const Color(0xFFFFD700) : Colors.white,
+                  color: isFav ? const Color(0xFF10B981) : Colors.white,
                   onTap: () =>
                       ref.read(favoritesProvider.notifier).toggle(_property.id),
                 ),
@@ -278,7 +278,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 color: isRent ? cyan : primary,
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: const [
-                  BoxShadow(color: Color(0x66FFD700), blurRadius: 10),
+                  BoxShadow(color: Color(0x6610B981), blurRadius: 10),
                 ],
               ),
               child: Text(
@@ -1015,7 +1015,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: const [
                       BoxShadow(
-                          color: Color(0x66FFD700),
+                          color: Color(0x6610B981),
                           blurRadius: 16,
                           offset: Offset(0, 6)),
                     ],

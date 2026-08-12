@@ -33,7 +33,7 @@ class FloatingDockNav extends StatelessWidget {
         height: 68,
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
-          color: const Color(0xF00B3C34),
+          color: const Color(0xF00B2018),
           borderRadius: BorderRadius.circular(34),
           border: Border.all(color: glassBorder),
           boxShadow: softShadow,
@@ -141,7 +141,7 @@ class _AddButton extends StatelessWidget {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Color(0x66FFD700),
+              color: Color(0x6610B981),
               blurRadius: 16,
               offset: Offset(0, 6),
             ),

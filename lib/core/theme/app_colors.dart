@@ -22,7 +22,7 @@ class AppPalette {
   /// Slightly elevated surface (popups, dialogs).
   final Color surface;
 
-  /// Frosted-glass fill — translucent white in dark, translucent black in light.
+  /// Frosted-glass fill — translucent white in dark, translucent tint in light.
   final Color glassFill;
 
   /// Frosted-glass border.
@@ -40,39 +40,39 @@ class AppPalette {
 
 /// Theme-agnostic brand colors shared by both dark and light modes.
 abstract final class BrandColors {
-  /// Primary — warm gold (identity, CTAs, active states).
-  static const Color primary = Color(0xFFFFD700);
+  /// Primary — emerald (identity, CTAs, active states).
+  static const Color primary = Color(0xFF10B981);
 
-  /// Secondary accent — deep gold (premium highlights, rent markers).
-  static const Color cyan = Color(0xFFE0A72E);
+  /// Secondary accent — deeper emerald (premium highlights, rent markers).
+  static const Color cyan = Color(0xFF059669);
 
-  /// Lighter gold (badges, hints).
-  static const Color primaryLight = Color(0xFFF7E07F);
+  /// Lighter emerald (badges, hints).
+  static const Color primaryLight = Color(0xFF34D399);
 
-  /// Soft gold tint (selected states, icon chips).
-  static const Color primarySoft = Color(0x26FFD700);
+  /// Soft emerald tint (selected states, icon chips).
+  static const Color primarySoft = Color(0x1A10B981);
 
-  /// Soft deep-gold tint.
-  static const Color cyanSoft = Color(0x26E0A72E);
+  /// Soft emerald tint.
+  static const Color cyanSoft = Color(0x1A059669);
 
-  /// Brand gradient: light gold → deep gold.
-  static const Color gradientA = Color(0xFFF7E07F);
-  static const Color gradientB = Color(0xFFE0A72E);
+  /// Brand gradient: light emerald → deep emerald.
+  static const Color gradientA = Color(0xFF34D399);
+  static const Color gradientB = Color(0xFF059669);
 
-  /// Text/icons placed on gold cards — deep green for high contrast.
-  static const Color onBrand = Color(0xFF0B3C34);
+  /// Text/icons placed on emerald surfaces — deep emerald for high contrast.
+  static const Color onBrand = Color(0xFF065F46);
 
-  /// Gold card background (secondary surfaces).
-  static const Color brandCard = Color(0xFFE0A72E);
+  /// Emerald-tinted card background (secondary surfaces).
+  static const Color brandCard = Color(0xFFE8F6F1);
 
   /// White pop-out card (elevated highlight surfaces).
   static const Color whiteCard = Color(0xFFFFFFFF);
 
-  /// Text/icons placed on white cards — deep green.
-  static const Color onWhite = Color(0xFF0B3C34);
+  /// Text/icons placed on white cards — deep emerald.
+  static const Color onWhite = Color(0xFF065F46);
 
   /// Success green.
-  static const Color success = Color(0xFF34D399);
+  static const Color success = Color(0xFF10B981);
 
   /// Secondary sky blue.
   static const Color blue = Color(0xFF38BDF8);
@@ -83,46 +83,46 @@ abstract final class BrandColors {
   /// Amber — demo/preview badges.
   static const Color amber = Color(0xFFFFB020);
 
-  /// Warm gold accent.
-  static const Color gold = Color(0xFFFFD700);
+  /// Accent alias — maps to emerald.
+  static const Color gold = Color(0xFF10B981);
 }
 
-/// Deep green + warm gold palette.
+/// Emerald + white palette.
 ///
-/// Dark green (#0B3C34) backgrounds with warm gold (#FFD700 / #E0A72E)
-/// accents for a luxurious, business-focused feel.
+/// White backgrounds with emerald (#10B981 / #059669) accents for a fresh,
+/// clean, premium real-estate feel.
 class AppColors {
-  /// Dark-mode palette.
-  static const AppPalette dark = AppPalette(
-    bg: Color(0xFF0B3C34),
-    card: Color(0xFF11473D),
-    surface: Color(0xFF17544A),
-    glassFill: Color(0x14FFFFFF),
-    glassBorder: Color(0x1FFFFFFF),
-    textPrimary: Color(0xFFF2E9DD),
-    textMuted: Color(0xFFBCAB90),
+  /// Light-mode palette (default) — white with emerald accents.
+  static const AppPalette light = AppPalette(
+    bg: Color(0xFFFFFFFF),
+    card: Color(0xFFFFFFFF),
+    surface: Color(0xFFF0FAF6),
+    glassFill: Color(0x0F059669),
+    glassBorder: Color(0x1A059669),
+    textPrimary: Color(0xFF0B2018),
+    textMuted: Color(0xFF5C756C),
     scrim: Color(0xFF000000),
   );
 
-  /// Light-mode palette.
-  static const AppPalette light = AppPalette(
-    bg: Color(0xFFF4EFE6),
-    card: Color(0xFFFFFFFF),
-    surface: Color(0xFFEDE6D8),
-    glassFill: Color(0x33FFFFFF),
-    glassBorder: Color(0x33000000),
-    textPrimary: Color(0xFF123F36),
-    textMuted: Color(0xFF7A6A51),
+  /// Dark-mode palette — deep emerald with white text.
+  static const AppPalette dark = AppPalette(
+    bg: Color(0xFF0B2018),
+    card: Color(0xFF102B23),
+    surface: Color(0xFF17382E),
+    glassFill: Color(0x14FFFFFF),
+    glassBorder: Color(0x1FFFFFFF),
+    textPrimary: Color(0xFFFFFFFF),
+    textMuted: Color(0xFFA3BCB3),
     scrim: Color(0xFF000000),
   );
 
   /// The currently active palette. Swapped at runtime by the theme controller.
-  static AppPalette current = dark;
+  static AppPalette current = light;
 
-  /// Page background — deep charcoal (dark) / light grey (light).
+  /// Page background.
   static Color get bg => current.bg;
 
-  /// Solid dark surface (base for cards and sheets).
+  /// Solid surface (base for cards and sheets).
   static Color get card => current.card;
 
   /// Slightly elevated surface.
@@ -131,7 +131,7 @@ class AppColors {
   /// Primary — emerald.
   static Color get primary => BrandColors.primary;
 
-  /// Secondary accent — royal gold.
+  /// Secondary accent — deep emerald.
   static Color get cyan => BrandColors.cyan;
 
   /// Lighter emerald (badges, hints).
@@ -140,7 +140,7 @@ class AppColors {
   /// Soft emerald tint (selected states, icon chips).
   static Color get primarySoft => BrandColors.primarySoft;
 
-  /// Soft gold tint.
+  /// Soft emerald tint.
   static Color get cyanSoft => BrandColors.cyanSoft;
 
   /// Brand gradient: bright emerald → deep emerald.
@@ -159,25 +159,25 @@ class AppColors {
   /// Amber — demo/preview badges.
   static Color get amber => BrandColors.amber;
 
-  /// Royal gold accent.
+  /// Accent alias — emerald.
   static Color get gold => BrandColors.gold;
 
-  /// Text/icons placed on bronze cards — deep green for high contrast.
+  /// Text/icons placed on emerald surfaces — deep emerald.
   static Color get onBrand => BrandColors.onBrand;
 
-  /// Bronze card background (secondary surfaces).
+  /// Emerald-tinted card background (secondary surfaces).
   static Color get brandCard => BrandColors.brandCard;
 
   /// White pop-out card (elevated highlight surfaces).
   static Color get whiteCard => BrandColors.whiteCard;
 
-  /// Text/icons placed on white cards — deep green.
+  /// Text/icons placed on white cards — deep emerald.
   static Color get onWhite => BrandColors.onWhite;
 
-  /// Primary text — near-white (dark) / near-black (light).
+  /// Primary text.
   static Color get textPrimary => current.textPrimary;
 
-  /// Muted text — cool grey.
+  /// Muted text.
   static Color get textMuted => current.textMuted;
 
   /// Dark scrim for overlays over images and immersive viewers.
@@ -189,7 +189,7 @@ class AppColors {
   /// Frosted-glass border.
   static Color get glassBorder => current.glassBorder;
 
-  /// Legacy aliases — map to the emerald primary and royal gold accent.
+  /// Legacy aliases — map to the emerald primary.
   static Color get royal => primary;
   static Color get royalLight => gold;
   static Color get royalSoft => cyanSoft;

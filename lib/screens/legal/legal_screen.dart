@@ -98,7 +98,7 @@ class _LegalScreenState extends State<LegalScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0x26FFD700), Color(0x1FE0A72E)],
+          colors: [Color(0x2610B981), Color(0x1F059669)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

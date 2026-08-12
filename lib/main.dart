@@ -42,7 +42,7 @@ class DarakApp extends ConsumerWidget {
         Widget frame = child!;
         if (width > 520) {
           frame = ColoredBox(
-            color: const Color(0xFF06251F),
+            color: const Color(0xFF05241C),
             child: Center(
               child: Container(
                 width: 430,

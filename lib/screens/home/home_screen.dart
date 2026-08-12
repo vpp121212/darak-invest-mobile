@@ -313,7 +313,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                          color: Color(0x66FFD700),
+                          color: Color(0x6610B981),
                           blurRadius: 12,
                           offset: Offset(0, 4)),
                     ],
@@ -388,7 +388,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: const [
                             BoxShadow(
-                              color: Color(0x40C5A077),
+                              color: Color(0x4010B981),
                               blurRadius: 10,
                               offset: Offset(0, 4),
                             ),
@@ -515,7 +515,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   boxShadow: isSelected
                       ? const [
                           BoxShadow(
-                              color: Color(0x66FFD700), blurRadius: 14)
+                              color: Color(0x6610B981), blurRadius: 14)
                         ]
                       : softShadow,
                 ),
@@ -573,7 +573,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       borderRadius: BorderRadius.circular(26),
                       boxShadow: isSelected
                           ? const [
-                              BoxShadow(color: Color(0x66FFD700), blurRadius: 12)
+                              BoxShadow(color: Color(0x6610B981), blurRadius: 12)
                             ]
                           : null,
                     ),
@@ -970,7 +970,7 @@ class _HeroCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: const [
                     BoxShadow(
-                        color: Color(0x66FFD700), blurRadius: 12),
+                        color: Color(0x6610B981), blurRadius: 12),
                   ],
                 ),
                 child: Row(
@@ -1003,7 +1003,7 @@ class _HeroCard extends StatelessWidget {
                     border: Border.all(color: Colors.white, width: 0.5),
                     boxShadow: const [
                       BoxShadow(
-                          color: Color(0x66FFD700), blurRadius: 12),
+                          color: Color(0x6610B981), blurRadius: 12),
                     ],
                   ),
                   child: Row(

@@ -130,7 +130,7 @@ class _DashboardContent extends StatelessWidget {
     final kpis = <(IconData, String, String, Color)>[
       (Icons.home_work_outlined, 'إجمالي العقارات', Formatters.number(stats.total), gold),
       (Icons.sell_outlined, 'للبيع', Formatters.number(stats.saleCount), const Color(0xFF3B82F6)),
-      (Icons.receipt_long_outlined, 'للإيجار', Formatters.number(stats.rentCount), const Color(0xFFFFD700)),
+      (Icons.receipt_long_outlined, 'للإيجار', Formatters.number(stats.rentCount), const Color(0xFF10B981)),
       (Icons.attach_money, 'متوسط سعر البيع', Formatters.compactPrice(stats.avgSalePrice), const Color(0xFF8B5CF6)),
     ];
 
