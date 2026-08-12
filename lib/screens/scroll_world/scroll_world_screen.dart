@@ -2,11 +2,13 @@ import 'dart:math' as math;
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../models/property.dart';
+import '../../providers/properties_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/app_image.dart';
 
@@ -21,11 +23,11 @@ import '../../widgets/app_image.dart';
 /// 3. **Interactive HUD** — ROI gauge with actionable buttons
 ///    (virtual 360° tour, book a viewing).
 @RoutePage()
-class ScrollWorldScreen extends StatefulWidget {
+class ScrollWorldScreen extends ConsumerStatefulWidget {
   const ScrollWorldScreen({super.key});
 
   @override
-  State<ScrollWorldScreen> createState() => _ScrollWorldScreenState();
+  ConsumerState<ScrollWorldScreen> createState() => _ScrollWorldScreenState();
 }
 
 enum _DioramaMode { diorama, compare, hud }
@@ -48,6 +50,7 @@ class _DioramaProperty {
     required this.tag,
     required this.lat,
     required this.lng,
+    this.source,
   });
 
   final String title;
@@ -67,11 +70,50 @@ class _DioramaProperty {
   final double lat;
   final double lng;
 
+  /// The live property this entry came from (null for built-in showcase).
+  final Property? source;
+
   double get pricePerMeter => areaValue > 0 ? priceValue / areaValue : 0;
 
-  /// Bridges the showcase entry to the real [Property] model so the HUD
-  /// action buttons can open the detail / booking flows.
-  Property toProperty() {
+  /// Bridges a live property into the diorama card shape.
+  ///
+  /// The ROI / expected monthly income are deterministic estimates derived
+  /// from the property's trust score — a placeholder until per-property
+  /// rental data is available.
+  factory _DioramaProperty.fromProperty(Property p) {
+    final capRate = 5.5 + (p.trust % 6) * 0.5;
+    return _DioramaProperty(
+      title: p.title,
+      neighborhood: p.loc,
+      type: p.type,
+      priceValue: p.price,
+      priceLabel: p.formattedPrice,
+      areaValue: p.area,
+      areaLabel: p.area > 0 ? '${p.area.toStringAsFixed(0)} م²' : '—',
+      roi: double.parse(capRate.toStringAsFixed(1)),
+      monthlyIncome: p.price * capRate / 100 / 12,
+      rooms: p.rooms,
+      baths: p.baths,
+      year: p.year,
+      image: p.mainImage,
+      tag: _dioramaTag(p),
+      lat: p.lat,
+      lng: p.lng,
+      source: p,
+    );
+  }
+
+  static String _dioramaTag(Property p) {
+    if (p.features.isNotEmpty) return p.features.first;
+    if (p.desc.trim().isNotEmpty) return p.desc.trim();
+    return 'عرض موثوق';
+  }
+
+  /// Returns the live [Property] when available so detail / booking flows keep
+  /// the real object, otherwise a bridge built from the showcase entry.
+  Property toProperty() => source ?? _bridgeProperty();
+
+  Property _bridgeProperty() {
     return Property(
       id: 'diorama-$title',
       title: title,
@@ -162,20 +204,23 @@ const _dioramaProperties = <_DioramaProperty>[
   ),
 ];
 
-class _ScrollWorldScreenState extends State<ScrollWorldScreen> {
+class _ScrollWorldScreenState extends ConsumerState<ScrollWorldScreen> {
   int _current = 0;
   _DioramaMode _mode = _DioramaMode.diorama;
 
-  _DioramaProperty get _currentProperty => _dioramaProperties[_current];
+  /// The active diorama list — real server properties when available,
+  /// otherwise the built-in showcase (offline/demo fallback).
+  List<_DioramaProperty> _properties = _dioramaProperties;
+
+  _DioramaProperty get _currentProperty => _properties[_current];
 
   void _next() {
-    setState(() => _current = (_current + 1) % _dioramaProperties.length);
+    setState(() => _current = (_current + 1) % _properties.length);
   }
 
   void _prev() {
     setState(() =>
-        _current = (_current - 1 + _dioramaProperties.length) %
-            _dioramaProperties.length);
+        _current = (_current - 1 + _properties.length) % _properties.length);
   }
 
   void _setMode(_DioramaMode mode) {
@@ -185,13 +230,21 @@ class _ScrollWorldScreenState extends State<ScrollWorldScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final catalogue = ref.watch(propertiesProvider);
+    final live = catalogue.properties
+        .map(_DioramaProperty.fromProperty)
+        .toList(growable: false);
+    _properties = live.isEmpty ? _dioramaProperties : live;
+    if (_current >= _properties.length) {
+      _current = _properties.isEmpty ? 0 : _current % _properties.length;
+    }
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: Stack(
         children: [
           Positioned.fill(
             child: _DioramaBackdrop(
-              images: [for (final p in _dioramaProperties) p.image],
+              images: [for (final p in _properties) p.image],
             ),
           ),
           Positioned.fill(child: _modeContent(context)),
@@ -1014,6 +1067,21 @@ class _ScrollWorldScreenState extends State<ScrollWorldScreen> {
                   ),
                 ),
               ],
+            ),
+            const Spacer(),
+            Material(
+              color: Colors.white.withValues(alpha: 0.08),
+              shape: const CircleBorder(),
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: () =>
+                    ref.read(propertiesProvider.notifier).load(),
+                child: const Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Icon(Icons.refresh_rounded,
+                      color: Colors.white, size: 20),
+                ),
+              ),
             ),
           ],
         ),
