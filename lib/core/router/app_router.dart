@@ -1,11 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/widgets.dart';
-
-import '../../models/property.dart';
-import '../../screens/agents/agents_screen.dart';
-import '../../screens/ai/estimate_screen.dart';
-import '../../screens/ai/pulse_screen.dart';
-import '../../screens/ai/roi_screen.dart';
+import '../../screens/admin/admin_stats_screen.dart';
 import '../../screens/auth/login_screen.dart';
 import '../../screens/auth/register_screen.dart';
 import '../../screens/booking/booking_screen.dart';
@@ -28,6 +22,10 @@ import '../../screens/profile/settings_screen.dart';
 import '../../screens/root/app_shell.dart';
 import '../../screens/search/search_screen.dart';
 import '../../screens/scroll_world/scroll_world_screen.dart';
+import '../../screens/agents/agents_screen.dart';
+import '../../screens/estimate/estimate_screen.dart';
+import '../../screens/roi/roi_screen.dart';
+import '../../screens/pulse/pulse_screen.dart';
 
 part 'app_router.gr.dart';
 
@@ -61,6 +59,7 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: SubscriptionRoute.page),
         AutoRoute(page: ManagementRoute.page),
         AutoRoute(page: SettingsRoute.page),
+        AutoRoute(page: AdminStatsRoute.page),
       ];
 }
 

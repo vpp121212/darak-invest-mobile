@@ -44,6 +44,7 @@ import pulseRoutes from './routes/pulse.js';
 import panoramaRoutes from './routes/panorama.js';
 import realestateRoutes from './routes/realestate.js';
 import paymentRoutes from './routes/payments.js';
+import webhookRoutes from './routes/webhook.js';
 import featuredRoutes from './routes/featured.js';
 import photographyRoutes from './routes/photography.js';
 import dashboardRoutes from './routes/dashboard.js';import reportRoutes from './routes/reports.js';
@@ -89,6 +90,10 @@ if (process.env.REDIS_URL) {
     console.log('🟡 socket.io Redis adapter unavailable:', err.message);
   }
 }
+
+  // Webhook من Tap يجب أن يُعالج قبل express.json() حتى نستلم الـ raw body
+  // المطلوب للتحقق من توقيع hashstring.
+  app.use('/api/payments/webhook', webhookRoutes);
 
   // Body parser (must be before security middleware)
   app.use(express.json());

@@ -44,6 +44,9 @@ if (dbUrl) {
 
   ALTER TABLE payments ADD COLUMN IF NOT EXISTS "productType" TEXT DEFAULT 'subscription';
   ALTER TABLE payments ADD COLUMN IF NOT EXISTS "productRef" TEXT;
+  ALTER TABLE payments ADD COLUMN IF NOT EXISTS "tapChargeId" TEXT;
+  ALTER TABLE payments DROP CONSTRAINT IF EXISTS payments_status_check;
+  ALTER TABLE payments ADD CONSTRAINT payments_status_check CHECK(status IN ('pending','paid','failed','refunded','cancelled'));
 
   CREATE TABLE IF NOT EXISTS photography_bookings (
     id SERIAL PRIMARY KEY,

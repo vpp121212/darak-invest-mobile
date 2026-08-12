@@ -66,6 +66,50 @@ export async function createCheckout({ userId, productId, propertyId = null, pro
   const ref = propertyId ? String(propertyId) : productRef;
   const description = product.name;
 
+  // Tap gateway — يستخدم تلقائيًا عند تعيين TAP_SECRET_KEY (إضافة اختيارية).
+  if (process.env.TAP_SECRET_KEY) {
+    try {
+      const [payment] = await sql`
+        INSERT INTO payments ("userId", amount, currency, status, "packageId", description, "productType", "productRef")
+        VALUES (${userId}, ${product.price}, 'SAR', 'pending', 'none', ${description}, ${productId}, ${ref})
+        RETURNING id
+      `;
+      const tapRes = await fetch('https://api.tap.company/v2/charges', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + process.env.TAP_SECRET_KEY,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          amount: product.price,
+          currency: 'SAR',
+          description,
+          customer: {
+            first_name: user.name || '',
+            email: user.email || '',
+            phone: { country_code: '966', number: user.phone || '' }
+          },
+          source: { id: 'src_all' },
+          reference: { transaction: `darak-${payment.id}-${Date.now()}` },
+          metadata: { paymentId: String(payment.id), userId: String(userId), productId, productRef: ref },
+          post: { url: process.env.TAP_WEBHOOK_URL || 'https://darak-invest-backend-j6hy.onrender.com/api/payments/webhook' },
+          redirect: { url: process.env.TAP_REDIRECT_URL || 'https://vpp121212.github.io/darak-invest-mobile/?payment=result' }
+        })
+      });
+      const charge = await tapRes.json();
+      if (!tapRes.ok) throw new Error(charge.errors?.[0]?.description || charge.message || 'Tap error');
+
+      await sql`UPDATE payments SET "tapChargeId" = ${charge.id} WHERE id = ${payment.id}`;
+      return { success: true, redirectUrl: charge.transaction?.url, id: charge.id, testMode: false };
+    } catch (e) {
+      console.error('Tap error:', e.message);
+      const err = new Error('فشل الاتصال ببوابة الدفع');
+      err.status = 502;
+      throw err;
+    }
+  }
+
   if (process.env.MOYASAR_SECRET_KEY) {
     try {
       const moyasarRes = await fetch('https://api.moyasar.com/v1/invoices', {

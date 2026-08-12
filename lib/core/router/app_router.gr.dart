@@ -11,6 +11,22 @@
 part of 'app_router.dart';
 
 /// generated route for
+/// [AdminStatsScreen]
+class AdminStatsRoute extends PageRouteInfo<void> {
+  const AdminStatsRoute({List<PageRouteInfo>? children})
+      : super(AdminStatsRoute.name, initialChildren: children);
+
+  static const String name = 'AdminStatsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AdminStatsScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [AgentsScreen]
 class AgentsRoute extends PageRouteInfo<void> {
   const AgentsRoute({List<PageRouteInfo>? children})

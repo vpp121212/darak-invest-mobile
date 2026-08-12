@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -9,13 +10,15 @@ void main() {
     GoogleFonts.config.allowRuntimeFetching = false;
   });
 
+  Widget host() => const ProviderScope(
+        child: MaterialApp(
+          home: Scaffold(body: ScrollWorldScreen()),
+        ),
+      );
+
   testWidgets('diorama screen builds and renders without exceptions',
       (tester) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(body: ScrollWorldScreen()),
-      ),
-    );
+    await tester.pumpWidget(host());
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
     await tester.pump(const Duration(seconds: 1));
@@ -30,11 +33,7 @@ void main() {
   });
 
   testWidgets('mode switching keeps the screen alive', (tester) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(body: ScrollWorldScreen()),
-      ),
-    );
+    await tester.pumpWidget(host());
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
