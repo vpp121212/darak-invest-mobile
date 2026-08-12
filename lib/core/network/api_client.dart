@@ -111,7 +111,13 @@ class ApiClient {
       try {
         return await Isolate.run(() => jsonDecode(body));
       } catch (_) {
-        throw const ParseException();
+        // `Isolate.run` قد يرمي على بعض المنصات (مثل Flutter web)؛
+        // نستخدم تحليلًا مباشرةً كاحتياطٍ لضمان استلام الاستجابة.
+        try {
+          return jsonDecode(body);
+        } catch (_) {
+          throw const ParseException();
+        }
       }
     }
 
