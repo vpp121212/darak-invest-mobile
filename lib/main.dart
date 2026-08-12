@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_colors.dart';
@@ -9,6 +10,10 @@ import 'providers/theme_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  // Cairo is bundled locally — never fetch fonts from the network at runtime.
+  // This avoids the font-flash (Arabic text briefly rendered with a wrong
+  // fallback, e.g. CJK glyphs) on first load / refresh.
+  GoogleFonts.config.allowRuntimeFetching = false;
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
