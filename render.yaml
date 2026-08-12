@@ -20,4 +20,4 @@ services:
       - key: MAPBOX_TOKEN
         value: pk.eyJ1IjoidnBwLTY2IiwiYSI6ImNtcndoZW5hdzA2MGYzM3IzbTA4cW1yNnAifQ.bP-Z7H9Wn6WkgF2fXYITQw
       - key: DATABASE_URL
-        sync: false
+        value: "postgresql://neondb_owner:npg_VSM8RrwiZJ5n@ep-blue-mouse-ay97md59-pooler.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
