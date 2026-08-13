@@ -9,6 +9,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../theme/app_theme.dart';
 
+@RoutePage()
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
@@ -52,6 +53,9 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           Text('إدارة العقارات', style: GoogleFonts.cairo(color: textLight, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
+          _buildMenuItem(Icons.add_home_outlined, 'نشر إعلان', 'أضف عقاراً بالصور والموقع لتسويقه', () {
+            context.pushRoute(const AddPropertyRoute());
+          }),
           _buildMenuItem(Icons.admin_panel_settings_outlined, 'إدارة عقاراتي', 'العقود والفواتير والرخص والصكوك', () {
             context.pushRoute(const ManagementRoute());
           }),

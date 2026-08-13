@@ -11,6 +11,22 @@
 part of 'app_router.dart';
 
 /// generated route for
+/// [AddPropertyScreen]
+class AddPropertyRoute extends PageRouteInfo<void> {
+  const AddPropertyRoute({List<PageRouteInfo>? children})
+      : super(AddPropertyRoute.name, initialChildren: children);
+
+  static const String name = 'AddPropertyRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AddPropertyScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [AdminStatsScreen]
 class AdminStatsRoute extends PageRouteInfo<void> {
   const AdminStatsRoute({List<PageRouteInfo>? children})
@@ -185,6 +201,22 @@ class ConversationsRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [DashboardScreen]
+class DashboardRoute extends PageRouteInfo<void> {
+  const DashboardRoute({List<PageRouteInfo>? children})
+      : super(DashboardRoute.name, initialChildren: children);
+
+  static const String name = 'DashboardRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const DashboardScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [EstimateScreen]
 class EstimateRoute extends PageRouteInfo<EstimateRouteArgs> {
   EstimateRoute({Key? key, Property? property, List<PageRouteInfo>? children})
@@ -290,6 +322,22 @@ class FinanceRouteArgs {
 
   @override
   int get hashCode => key.hashCode ^ initialPrice.hashCode;
+}
+
+/// generated route for
+/// [HomeScreen]
+class HomeRoute extends PageRouteInfo<void> {
+  const HomeRoute({List<PageRouteInfo>? children})
+      : super(HomeRoute.name, initialChildren: children);
+
+  static const String name = 'HomeRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const HomeScreen();
+    },
+  );
 }
 
 /// generated route for
@@ -527,6 +575,22 @@ class OfferRouteArgs {
 
   @override
   int get hashCode => key.hashCode ^ property.hashCode;
+}
+
+/// generated route for
+/// [ProfileScreen]
+class ProfileRoute extends PageRouteInfo<void> {
+  const ProfileRoute({List<PageRouteInfo>? children})
+      : super(ProfileRoute.name, initialChildren: children);
+
+  static const String name = 'ProfileRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ProfileScreen();
+    },
+  );
 }
 
 /// generated route for

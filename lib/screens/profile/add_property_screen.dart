@@ -22,6 +22,7 @@ import '../../theme/app_theme.dart';
 /// موقع مباشر من المتصفح، وصور مرفوعة من الجهاز) إضافة إلى روابط الجولة 360°
 /// وملفات بيت الدمية (.glb). عند نجاح الاتصال يُنشر على الخادم، وإلا يُحفظ
 /// محلياً (بما فيه الصور base64) ويظهر في القائمة.
+@RoutePage()
 class AddPropertyScreen extends ConsumerStatefulWidget {
   const AddPropertyScreen({super.key});
 
@@ -113,9 +114,9 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
     if (_pickingImages) return;
     setState(() => _pickingImages = true);
     try {
-      final uri = await ImageUploadService.pickPropertyImage();
-      if (uri != null && mounted) {
-        setState(() => _uploadedImages.add(uri));
+      final uris = await ImageUploadService.pickPropertyImages();
+      if (uris.isNotEmpty && mounted) {
+        setState(() => _uploadedImages.addAll(uris));
       }
     } catch (_) {
       if (!mounted) return;
@@ -123,7 +124,7 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
         SnackBar(
           backgroundColor: cardDark,
           content: Text(
-            'تعذّر رفع الصورة — جرّب صورة أخرى',
+            'تعذّر رفع الصور — جرّب صوراً أخرى',
             style: GoogleFonts.cairo(color: textLight),
           ),
         ),
@@ -249,6 +250,8 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            _buildSubmitButton(),
+            const SizedBox(height: 20),
             _sectionHeader('بيانات العقار', Icons.home_work_outlined),
             _buildTextForm(
               _titleCtrl,
@@ -429,8 +432,6 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
               maxLines: 2,
               validator: _validateUrls,
             ),
-            const SizedBox(height: 28),
-            _buildSubmitButton(),
             const SizedBox(height: 20),
           ],
         ),
@@ -660,7 +661,7 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
                    Icon(Icons.add_photo_alternate_outlined, color: gold, size: 28),
                 const SizedBox(height: 6),
                 Text(
-                  'رفع صور من الجهاز',
+                  'رفع صور من الجهاز (يمكنك اختيار عدة صور)',
                   style: GoogleFonts.cairo(color: gold, fontSize: 13, fontWeight: FontWeight.bold),
                 ),
               ],
