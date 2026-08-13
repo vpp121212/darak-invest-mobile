@@ -400,7 +400,7 @@ class _ScrollWorldScreenState extends ConsumerState<ScrollWorldScreen> {
                           }
                         },
                         children: [
-                          for (final p in _dioramaProperties)
+                          for (final p in _properties)
                             _compareCard(context, p),
                         ],
                       ),
@@ -420,13 +420,13 @@ class _ScrollWorldScreenState extends ConsumerState<ScrollWorldScreen> {
 
   Widget _compareCard(BuildContext context, _DioramaProperty p) {
     final selected = p.title == _currentProperty.title;
-    final maxPrice = _dioramaProperties
+    final maxPrice = _properties
         .map((e) => e.priceValue)
         .reduce((a, b) => math.max(a, b));
-    final maxArea = _dioramaProperties
+    final maxArea = _properties
         .map((e) => e.areaValue)
         .reduce((a, b) => math.max(a, b));
-    final maxRoi = _dioramaProperties
+    final maxRoi = _properties
         .map((e) => e.roi)
         .reduce((a, b) => math.max(a, b));
 
@@ -967,7 +967,7 @@ class _ScrollWorldScreenState extends ConsumerState<ScrollWorldScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14),
             child: Text(
-              '0${_current + 1} / 0${_dioramaProperties.length}',
+              '${(_current + 1).toString().padLeft(2, '0')} / ${_properties.length.toString().padLeft(2, '0')}',
               style: GoogleFonts.cairo(
                 color: AppColors.gold,
                 fontSize: 13,

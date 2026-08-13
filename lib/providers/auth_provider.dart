@@ -142,7 +142,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// دخول الزائر — تصفح بدون تسجيل: لا يُنشأ حساب ولا رمز دخول،
   /// فقط جلسة محلية تحفظ في التخزين لاستعادتها عند إعادة الفتح.
   Future<void> enterAsGuest() async {
-    await TokenStorage.clearGuest();
+    await TokenStorage.clear();
     final guest = User(
       id: 'guest',
       name: 'زائر',
