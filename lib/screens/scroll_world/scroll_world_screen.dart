@@ -1271,16 +1271,20 @@ class _CinematicBackdropState extends State<_CinematicBackdrop>
         final to = (t.floor() + 1) % n;
         final u = t - t.floor();
 
-        // One shared, continuous camera move for both layers.
+        // One shared, continuous camera move for both layers. The motion is
+        // kept subtle and fully sub-pixel: no integer rounding (which stepped
+        // the pan frame by frame against a continuous zoom and caused visible
+        // judder), a gentle zoom band (1.04–1.10) and a small drift so the
+        // image always stays covered without looking agitated.
         final w = _controller.value * 2 * math.pi * 2;
-        final zoom = 1.03 + 0.10 * ((math.sin(w) + 1) / 2);
-        final panX = math.sin(w) * 10.0;
-        final panY = math.cos(w) * 6.0;
+        final zoom = 1.04 + 0.06 * ((math.sin(w) + 1) / 2);
+        final panX = math.sin(w) * 4.0;
+        final panY = math.cos(w) * 2.5;
 
         return Transform.scale(
           scale: zoom,
           child: Transform.translate(
-            offset: Offset(panX.roundToDouble(), panY.roundToDouble()),
+            offset: Offset(panX, panY),
             child: Stack(
               fit: StackFit.expand,
               children: [
