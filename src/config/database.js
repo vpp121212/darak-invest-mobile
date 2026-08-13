@@ -35,6 +35,12 @@ if (dbUrl) {
   ALTER TABLE users ADD COLUMN IF NOT EXISTS "otpCode" TEXT;
   ALTER TABLE users ADD COLUMN IF NOT EXISTS "otpExpires" TEXT;
 
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS "officeName" TEXT;
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS "commercialRegister" TEXT;
+
+  ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
+  ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN ('user','guest','browser','advertiser','agent','office','admin','owner'));
+
   ALTER TABLE users ADD COLUMN IF NOT EXISTS "adCredits" INTEGER DEFAULT 0;
   ALTER TABLE users ADD COLUMN IF NOT EXISTS "adPackage" TEXT;
 

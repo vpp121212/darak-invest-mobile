@@ -4,7 +4,10 @@ export const registerSchema = z.object({
   name: z.string().min(2, 'الاسم يجب أن يكون حرفين على الأقل').max(50, 'الاسم طويل جداً'),
   email: z.string().email('البريد الإلكتروني غير صالح'),
   phone: z.string().regex(/^(\+966|0)?5\d{8}$/, 'رقم الجوال غير صالح (مثال: 05xxxxxxxx)'),
-  password: z.string().min(6, 'كلمة المرور يجب أن تكون 6 أحرف على الأقل').max(100)
+  password: z.string().min(6, 'كلمة المرور يجب أن تكون 6 أحرف على الأقل').max(100),
+  role: z.enum(['guest', 'browser', 'advertiser', 'agent', 'office']).optional().default('browser'),
+  officeName: z.string().max(100).optional().or(z.literal('')),
+  commercialRegister: z.string().max(50).optional().or(z.literal(''))
 });
 
 export const loginSchema = z.object({

@@ -12,14 +12,15 @@ const authLimiter = createRateLimiter('basic');
 
 router.post('/register', authLimiter, validate.body(registerSchema), async (req, res) => {
   try {
-    const { name, email, phone, password } = req.body;
+    const { name, email, phone, password, role, officeName, commercialRegister } = req.body;
 
     const [exists] = await sql`SELECT id FROM users WHERE email = ${email}`;
     if (exists) return res.status(400).json(Errors.duplicate('البريد').toJSON());
 
     const hashedPassword = await bcrypt.hash(password, 12);
     const [result] = await sql`
-      INSERT INTO users (name, email, phone, password) VALUES (${name}, ${email}, ${phone}, ${hashedPassword})
+      INSERT INTO users (name, email, phone, password, role, "officeName", "commercialRegister")
+      VALUES (${name}, ${email}, ${phone}, ${hashedPassword}, ${role ?? 'browser'}, ${officeName || null}, ${commercialRegister || null})
       RETURNING id
     `;
 
@@ -28,7 +29,7 @@ router.post('/register', authLimiter, validate.body(registerSchema), async (req,
 
     res.status(201).json({
       success: true,
-      user: { id: result.id, name, email, role: 'user' },
+      user: { id: result.id, name, email, role: role ?? 'browser' },
       ...tokens
     });
   } catch (err) {
