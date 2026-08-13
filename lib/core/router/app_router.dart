@@ -44,10 +44,10 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: AppShellRoute.page, children: [
       AutoRoute(page: HomeRoute.page),
       AutoRoute(page: SearchRoute.page),
-      AutoRoute(page: MapRoute.page),
       AutoRoute(page: FavoritesRoute.page),
       AutoRoute(page: ProfileRoute.page),
     ]),
+    AutoRoute(page: MapRoute.page),
     AutoRoute(page: PropertyDetailRoute.page),
     AutoRoute(page: AddPropertyRoute.page),
     AutoRoute(page: BookingRoute.page),
