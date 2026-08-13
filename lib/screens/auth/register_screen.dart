@@ -27,14 +27,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   int _selectedRole = -1;
 
   static const _roles = [
+    {'icon': Icons.visibility_outlined, 'title': 'زائر', 'desc': 'دخول مجاني للتصفح والتجربة', 'value': 'guest'},
     {'icon': Icons.person_outline, 'title': 'متصفح', 'desc': 'تصفح العقارات فقط', 'value': 'browser'},
     {'icon': Icons.campaign_outlined, 'title': 'معلن', 'desc': 'نشر عقارات للبيع/الإيجار', 'value': 'advertiser'},
     {'icon': Icons.handshake_outlined, 'title': 'وسيط', 'desc': 'وسيلة عقارية', 'value': 'agent'},
     {'icon': Icons.business_outlined, 'title': 'مكتب عقار', 'desc': 'إدارة عقارات مكتبية', 'value': 'office'},
   ];
 
-  bool get _isOffice => _selectedRole == 3;
-  bool get _needVerification => _selectedRole >= 1;
+  bool get _isOffice => _selectedRole == 4;
+  bool get _needVerification => _selectedRole >= 2;
 
   @override
   void dispose() {
@@ -48,11 +49,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   Future<void> _register() async {
-    if (!_formKey.currentState!.validate()) return;
     if (_selectedRole == -1) {
       _snack('اختر نوع الحساب');
       return;
     }
+    if (_roles[_selectedRole]['value'] == 'guest') {
+      await ref.read(authProvider.notifier).enterAsGuest();
+      if (!mounted) return;
+      context.router.replaceAll([const AppShellRoute()]);
+      return;
+    }
+    if (!_formKey.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
     final data = <String, dynamic>{
       'name': _nameController.text.trim(),

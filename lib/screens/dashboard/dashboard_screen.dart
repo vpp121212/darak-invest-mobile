@@ -10,6 +10,7 @@ import '../../providers/properties_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/property_card.dart';
 
+@RoutePage()
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 

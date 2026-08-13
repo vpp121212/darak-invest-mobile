@@ -23,6 +23,25 @@ class ImageUploadService {
     return uri ?? base64Raw(bytes);
   }
 
+  /// يفتح معرض الجهاز ويُرجِع عدّة صور مضغوطة كـ data URIs (على المنصات
+  /// الداعمة للاختيار المتعدد مثل الويب)، أو صورة واحدة إن لم تتوفر.
+  static Future<List<String>> pickPropertyImages() async {
+    final picker = ImagePicker();
+    try {
+      final files = await picker.pickMultiImage(limit: 10);
+      if (files.isEmpty) return const [];
+      final uris = <String>[];
+      for (final file in files) {
+        final bytes = await file.readAsBytes();
+        uris.add(compressToDataUri(bytes) ?? base64Raw(bytes));
+      }
+      return uris;
+    } catch (_) {
+      final single = await pickPropertyImage();
+      return single == null ? const [] : [single];
+    }
+  }
+
   /// يضغط الصورة إلى JPEG ≤1280 بكسل ويُرجعها كـ `data:image/jpeg;base64,...`.
   static String? compressToDataUri(Uint8List bytes) {
     try {

@@ -16,6 +16,7 @@ import '../../providers/tab_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/ken_burns_image.dart';
 
+@RoutePage()
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
