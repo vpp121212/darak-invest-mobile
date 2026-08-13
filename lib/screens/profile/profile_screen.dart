@@ -94,6 +94,48 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   Widget _buildUserHeader(BuildContext context, WidgetRef ref, AuthState auth) {
+    if (auth.isGuest) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: cardDark,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: gold.withValues(alpha: 0.25)),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 28,
+              backgroundColor: gold.withValues(alpha: 0.15),
+              child: Icon(Icons.visibility_outlined, color: gold, size: 30),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('أنت تتصفح كزائر', style: GoogleFonts.cairo(color: textLight, fontSize: 17, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  Text('سجّل دخولك لحفظ المفضلة والنشر', style: GoogleFonts.cairo(color: textMuted, fontSize: 12)),
+                ],
+              ),
+            ),
+            GestureDetector(
+              onTap: () => context.pushRoute(const LoginRoute()),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: gold,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text('دخول', style: GoogleFonts.cairo(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     if (!auth.isLoggedIn) {
       return Container(
         padding: const EdgeInsets.all(20),

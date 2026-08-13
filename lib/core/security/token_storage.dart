@@ -12,6 +12,7 @@ class TokenStorage {
 
   static const _tokenKey = 'auth_token';
   static const _userKey = 'auth_user';
+  static const _guestKey = 'auth_guest';
 
   static const _secure = FlutterSecureStorage(
     aOptions: AndroidOptions(),
@@ -67,12 +68,50 @@ class TokenStorage {
         await Future.wait([
           _secure.delete(key: _tokenKey),
           _secure.delete(key: _userKey),
+          _secure.delete(key: _guestKey),
         ]);
       } catch (_) {
         /* ignore */
       }
     }
     await _clearPrefs();
+  }
+
+  /// وضع الزائر — جلسة تصفح بدون حساب (بدون رمز دخول).
+  static Future<void> saveGuest(String userJson) async {
+    if (_useSecure) {
+      try {
+        await _secure.write(key: _guestKey, value: userJson);
+        return;
+      } catch (_) {
+        /* fall through to prefs */
+      }
+    }
+    await _prefsSet(_guestKey, userJson);
+  }
+
+  static Future<String?> readGuest() async {
+    if (_useSecure) {
+      try {
+        final v = await _secure.read(key: _guestKey);
+        if (v != null && v.isNotEmpty) return v;
+      } catch (_) {
+        /* fall through to prefs */
+      }
+    }
+    return _prefsGet(_guestKey);
+  }
+
+  static Future<void> clearGuest() async {
+    if (_useSecure) {
+      try {
+        await _secure.delete(key: _guestKey);
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_guestKey);
   }
 
   static Future<String?> _prefsGet(String key) async {

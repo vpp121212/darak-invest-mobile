@@ -40,6 +40,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  Future<void> _enterAsGuest() async {
+    FocusScope.of(context).unfocus();
+    await ref.read(authProvider.notifier).enterAsGuest();
+    if (mounted) {
+      context.router.replaceAll([const AppShellRoute()]);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
@@ -69,6 +77,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ],
                 const SizedBox(height: 24),
                 _buildLoginButton(auth.isLoading),
+                const SizedBox(height: 12),
+                _buildGuestButton(),
                 const SizedBox(height: 24),
                 _buildRegisterLink(),
               ],
@@ -235,6 +245,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   'تسجيل الدخول',
                   style: GoogleFonts.cairo(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
                 ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGuestButton() {
+    return GestureDetector(
+      onTap: _enterAsGuest,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: gold.withValues(alpha: 0.6)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.visibility_outlined, color: gold, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              'تصفح كزائر بدون تسجيل',
+              style: GoogleFonts.cairo(color: gold, fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
       ),
     );
