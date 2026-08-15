@@ -13,6 +13,7 @@ import '../../screens/finance/finance_screen.dart';
 import '../../screens/legal/legal_screen.dart';
 import '../../screens/map/map_screen.dart';
 import '../../screens/market/market_report_screen.dart';
+import '../../screens/market/official_sources_screen.dart';
 import '../../screens/management/management_screen.dart';
 import '../../screens/messages/chat_screen.dart';
 import '../../screens/messages/conversations_screen.dart';
@@ -61,6 +62,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: FinanceRoute.page),
     AutoRoute(page: LegalRoute.page),
     AutoRoute(page: MarketReportRoute.page),
+    AutoRoute(page: OfficialSourcesRoute.page),
     AutoRoute(page: ManagementRoute.page),
     AutoRoute(page: SubscriptionRoute.page),
     AutoRoute(page: SettingsRoute.page),

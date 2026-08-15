@@ -578,6 +578,22 @@ class OfferRouteArgs {
 }
 
 /// generated route for
+/// [OfficialSourcesScreen]
+class OfficialSourcesRoute extends PageRouteInfo<void> {
+  const OfficialSourcesRoute({List<PageRouteInfo>? children})
+      : super(OfficialSourcesRoute.name, initialChildren: children);
+
+  static const String name = 'OfficialSourcesRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const OfficialSourcesScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [ProfileScreen]
 class ProfileRoute extends PageRouteInfo<void> {
   const ProfileRoute({List<PageRouteInfo>? children})

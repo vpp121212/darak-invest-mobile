@@ -700,6 +700,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         () => context.pushRoute(const MarketReportRoute())
       ),
       (
+        'المصادر الرسمية',
+        Icons.verified_outlined,
+        () => context.pushRoute(const OfficialSourcesRoute())
+      ),
+      (
         'المفضلة',
         Icons.favorite_border,
         () => context.pushRoute(const FavoritesRoute())
