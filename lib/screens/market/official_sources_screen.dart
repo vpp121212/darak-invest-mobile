@@ -1,3 +1,5 @@
+// Hallmark · genre: atmospheric · macrostructure: Stat-Led · theme: locked app tokens (dark #0B2018 · accent #10B981 · Cairo)
+// Stamps: display roman, no gradient text, no icon tiles, hairline rules, tabular-nums, single accent.
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,6 +11,34 @@ import '../../theme/app_theme.dart';
 @RoutePage()
 class OfficialSourcesScreen extends StatelessWidget {
   const OfficialSourcesScreen({super.key});
+
+  static const _months = [
+    '',
+    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
+  ];
+
+  String _formatDate(String iso) {
+    final parts = iso.split('-');
+    if (parts.length != 3) return iso;
+    final month = int.tryParse(parts[1]);
+    final day = int.tryParse(parts[2]);
+    if (month == null || day == null || month < 1 || month > 12) return iso;
+    return '$day ${_months[month]} ${parts[0]}';
+  }
+
+  TextStyle _tnum(
+    double size, {
+    Color? color,
+    FontWeight weight = FontWeight.w700,
+  }) {
+    return GoogleFonts.cairo(
+      color: color ?? textLight,
+      fontSize: size,
+      fontWeight: weight,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,386 +59,206 @@ class OfficialSourcesScreen extends StatelessWidget {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
         children: [
-          _disclaimer(),
-          const SizedBox(height: 14),
-          _indexCard(s),
+          _indexHero(s),
           const SizedBox(height: 18),
-          _sectionHeader('شبكة إيجار', 'متوسط الإيجارات لكل حي', Icons.assignment_outlined),
-          const SizedBox(height: 8),
-          ...OfficialSources.rents.map((r) => _rentCard(r)),
-          const SizedBox(height: 18),
-          _sectionHeader('منصة سكني', 'المشاريع السكنية المعتمدة', Icons.apartment_outlined),
-          const SizedBox(height: 8),
-          ...OfficialSources.projects.map((p) => _projectCard(p)),
-          const SizedBox(height: 18),
-          _sectionHeader('وزارة العدل', 'السجل العقاري — صفقات فعلية', Icons.gavel_outlined),
-          const SizedBox(height: 8),
-          ...OfficialSources.deals.map((d) => _dealCard(d)),
-          const SizedBox(height: 18),
-          _sectionHeader('منصة بلدي', 'المخططات وأنظمة البناء المعتمدة', Icons.account_balance_outlined),
-          const SizedBox(height: 8),
-          ...OfficialSources.plans.map((p) => _planCard(p)),
-          const SizedBox(height: 24),
-        ],
-      ),
-    );
-  }
-
-  Widget _disclaimer() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: primarySoft,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: primary.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.verified_outlined, color: primary, size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              OfficialSources.disclaimer,
-              style: GoogleFonts.cairo(color: textMuted, fontSize: 12, height: 1.5),
-            ),
+          _provenance(),
+          const SizedBox(height: 36),
+          _ledgerSection(
+            title: 'شبكة إيجار',
+            caption: 'متوسط الإيجار السنوي ونطاق الأسعار لكل حي',
+            children: [for (final r in OfficialSources.rents) _rentRow(r)],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _sectionHeader(String title, String subtitle, IconData icon) {
-    return Row(
-      children: [
-        Container(
-          width: 38,
-          height: 38,
-          decoration: BoxDecoration(
-            color: primarySoft,
-            borderRadius: BorderRadius.circular(11),
-          ),
-          child: Icon(icon, color: primary, size: 20),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(height: 36),
+          _ledgerSection(
+            title: 'منصة سكني',
+            caption: 'المشاريع السكنية المعتمدة ونسبة الإنجاز',
             children: [
-              Text(
-                title,
-                style: GoogleFonts.cairo(color: textLight, fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                subtitle,
-                style: GoogleFonts.cairo(color: textMuted, fontSize: 11),
-              ),
+              for (final p in OfficialSources.projects) _projectRow(p),
             ],
           ),
+          const SizedBox(height: 36),
+          _ledgerSection(
+            title: 'وزارة العدل',
+            caption: 'صفقات مسجلة في السجل العقاري',
+            children: [for (final d in OfficialSources.deals) _dealRow(d)],
+          ),
+          const SizedBox(height: 36),
+          _ledgerSection(
+            title: 'منصة بلدي',
+            caption: 'المخططات وأنظمة البناء المعتمدة',
+            children: [for (final p in OfficialSources.plans) _planRow(p)],
+          ),
+          const SizedBox(height: 28),
+        ],
+      ),
+    );
+  }
+
+  Widget _indexHero(OfficialIndex s) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: s.value),
+              duration: const Duration(milliseconds: 600),
+              curve: Curves.easeOutCubic,
+              builder: (_, value, __) => Text(
+                value.toStringAsFixed(1),
+                style: _tnum(52, color: gold, weight: FontWeight.w800),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    s.title,
+                    style: GoogleFonts.cairo(color: textLight, fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    s.period,
+                    style: GoogleFonts.cairo(color: textMuted, fontSize: 11),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            Icon(Icons.trending_up, color: primary, size: 16),
+            const SizedBox(width: 6),
+            Text(
+              '+${s.changePercent}٪ — ${s.changeNote}',
+              style: GoogleFonts.cairo(color: textLight, fontSize: 12),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Divider(color: glassBorder, height: 1),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: _heroStat(
+                label: 'متوسط سعر المتر',
+                value: '${Formatters.number(s.avgPricePerMeter)} ر.س',
+              ),
+            ),
+            Container(width: 1, height: 40, color: glassBorder),
+            Expanded(
+              child: _heroStat(
+                label: 'عدد الصفقات',
+                value: Formatters.number(s.dealsCount),
+                alignEnd: true,
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 
-  Widget _indexCard(OfficialIndex s) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1C1C1C), Color(0xFF262626)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+  Widget _heroStat({required String label, required String value, bool alignEnd = false}) {
+    return Column(
+      crossAxisAlignment: alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      children: [
+        Text(
+          value,
+          style: _tnum(18, color: textLight, weight: FontWeight.w800),
         ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: glassBorder),
-        boxShadow: softShadow,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'الهيئة العامة للعقار',
-                  style: GoogleFonts.cairo(color: textLight, fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: primarySoft,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  s.period,
-                  style: GoogleFonts.cairo(color: primary, fontSize: 10, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '${s.title} — ${s.value}',
-            style: GoogleFonts.cairo(color: gold, fontSize: 28, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Icon(Icons.trending_up, color: success, size: 18),
-              const SizedBox(width: 4),
-              Text(
-                '+${s.changePercent}٪',
-                style: GoogleFonts.cairo(color: success, fontSize: 13, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  s.changeNote,
-                  style: GoogleFonts.cairo(color: textMuted, fontSize: 11),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: _stat(
-                  'متوسط سعر المتر',
-                  '${Formatters.number(s.avgPricePerMeter)} ر.س',
-                  Icons.square_foot,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _stat(
-                  'عدد الصفقات',
-                  Formatters.number(s.dealsCount),
-                  Icons.swap_horiz_outlined,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          textAlign: alignEnd ? TextAlign.end : TextAlign.start,
+          style: GoogleFonts.cairo(color: textMuted, fontSize: 11),
+        ),
+      ],
     );
   }
 
-  Widget _stat(String label, String value, IconData icon) {
+  Widget _provenance() {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: glassFill,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: glassBorder),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: primary, size: 20),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.cairo(color: textLight, fontSize: 13, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.cairo(color: textMuted, fontSize: 10),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _rentCard(OfficialRent r) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: glassFill,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: glassBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: primary,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.location_city, color: Colors.white, size: 20),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'حي ${r.district}',
-                  style: GoogleFonts.cairo(color: textLight, fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Text(
-                '${r.contractsCount} عقد',
-                style: GoogleFonts.cairo(color: textMuted, fontSize: 11),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('متوسط الإيجار السنوي', style: GoogleFonts.cairo(color: textMuted, fontSize: 10)),
-                    const SizedBox(height: 2),
-                    Text(
-                      Formatters.compactPrice(r.avgAnnualRent),
-                      style: GoogleFonts.cairo(color: textLight, fontSize: 13, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('نطاق الأسعار', style: GoogleFonts.cairo(color: textMuted, fontSize: 10)),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${Formatters.compactPrice(r.lowRent)} – ${Formatters.compactPrice(r.highRent)}',
-                      style: GoogleFonts.cairo(color: gold, fontSize: 12, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _projectCard(OfficialProject p) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: glassFill,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: glassBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: cyan,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.apartment, color: Colors.white, size: 20),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      p.name,
-                      style: GoogleFonts.cairo(color: textLight, fontSize: 15, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      p.area,
-                      style: GoogleFonts.cairo(color: textMuted, fontSize: 11),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _kv('النوع', p.type),
-              ),
-              Expanded(
-                child: _kv('الوحدات', '${p.units} وحدة'),
-              ),
-              Expanded(
-                child: _kv('يبدأ من', Formatters.compactPrice(p.priceFrom)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: LinearProgressIndicator(
-                    value: p.completion / 100,
-                    minHeight: 6,
-                    backgroundColor: glassBorder,
-                    valueColor: const AlwaysStoppedAnimation(Color(0xFF10B981)),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                '${p.completion.toStringAsFixed(0)}٪',
-                style: GoogleFonts.cairo(color: primary, fontSize: 12, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _dealCard(OfficialDeal d) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: glassFill,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: glassBorder),
+        border: Border(
+          top: BorderSide(color: glassBorder),
+          bottom: BorderSide(color: glassBorder),
+        ),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: amber,
-              borderRadius: BorderRadius.circular(12),
+          Icon(Icons.verified_outlined, color: primary, size: 15),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              OfficialSources.disclaimer,
+              style: GoogleFonts.cairo(color: textMuted, fontSize: 11, height: 1.6),
             ),
-            child: const Icon(Icons.description_outlined, color: Colors.white, size: 20),
           ),
-          const SizedBox(width: 10),
+        ],
+      ),
+    );
+  }
+
+  Widget _ledgerSection({
+    required String title,
+    required String caption,
+    required List<Widget> children,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.cairo(color: textLight, fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          caption,
+          style: GoogleFonts.cairo(color: textMuted, fontSize: 11),
+        ),
+        const SizedBox(height: 14),
+        ...children,
+      ],
+    );
+  }
+
+  Widget _hairlineRow({required Widget child}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: glassBorder)),
+      ),
+      child: child,
+    );
+  }
+
+  Widget _rentRow(OfficialRent r) {
+    return _hairlineRow(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'صفقة — ${d.district}',
-                  style: GoogleFonts.cairo(color: textLight, fontSize: 14, fontWeight: FontWeight.bold),
+                  'حي ${r.district}',
+                  style: GoogleFonts.cairo(color: textLight, fontSize: 15, fontWeight: FontWeight.bold),
                 ),
+                const SizedBox(height: 2),
                 Text(
-                  d.date,
+                  '${r.contractsCount} عقد',
                   style: GoogleFonts.cairo(color: textMuted, fontSize: 11),
                 ),
               ],
@@ -418,11 +268,12 @@ class OfficialSourcesScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                Formatters.compactPrice(d.value),
-                style: GoogleFonts.cairo(color: gold, fontSize: 14, fontWeight: FontWeight.bold),
+                '${Formatters.number(r.avgAnnualRent)} ر.س',
+                style: _tnum(16, color: gold),
               ),
+              const SizedBox(height: 2),
               Text(
-                '${Formatters.number(d.area)} م²',
+                'سنوي · ${Formatters.compactPrice(r.lowRent)} إلى ${Formatters.compactPrice(r.highRent)}',
                 style: GoogleFonts.cairo(color: textMuted, fontSize: 11),
               ),
             ],
@@ -432,30 +283,109 @@ class OfficialSourcesScreen extends StatelessWidget {
     );
   }
 
-  Widget _planCard(OfficialPlan p) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: glassFill,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: glassBorder),
+  Widget _projectRow(OfficialProject p) {
+    return _hairlineRow(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 58,
+            child: Text(
+              '${p.completion.toStringAsFixed(0)}٪',
+              textAlign: TextAlign.end,
+              style: _tnum(22, color: primary, weight: FontWeight.w800),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  p.name,
+                  style: GoogleFonts.cairo(color: textLight, fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${p.area} · ${p.type} · ${p.units} وحدة',
+                  style: GoogleFonts.cairo(color: textMuted, fontSize: 11),
+                ),
+                const SizedBox(height: 8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: LinearProgressIndicator(
+                    value: p.completion / 100,
+                    minHeight: 4,
+                    backgroundColor: glassBorder,
+                    valueColor: AlwaysStoppedAnimation(primary),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                Formatters.compactPrice(p.priceFrom),
+                style: _tnum(14, color: gold),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '${p.developer} · يبدأ من',
+                textAlign: TextAlign.end,
+                style: GoogleFonts.cairo(color: textMuted, fontSize: 10),
+              ),
+            ],
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _dealRow(OfficialDeal d) {
+    return _hairlineRow(
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'حي ${d.district}',
+                  style: GoogleFonts.cairo(color: textLight, fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  _formatDate(d.date),
+                  style: GoogleFonts.cairo(color: textMuted, fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            '${Formatters.number(d.area)} م²',
+            style: _tnum(12, color: textMuted, weight: FontWeight.w500),
+          ),
+          const SizedBox(width: 18),
+          Text(
+            Formatters.compactPrice(d.value),
+            style: _tnum(15, color: gold),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _planRow(OfficialPlan p) {
+    final approved = p.status == 'معتمد';
+    return _hairlineRow(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: blue,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.account_balance_outlined, color: Colors.white, size: 20),
-              ),
-              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -464,6 +394,7 @@ class OfficialSourcesScreen extends StatelessWidget {
                       p.name,
                       style: GoogleFonts.cairo(color: textLight, fontSize: 15, fontWeight: FontWeight.bold),
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       'حي ${p.district}',
                       style: GoogleFonts.cairo(color: textMuted, fontSize: 11),
@@ -471,29 +402,42 @@ class OfficialSourcesScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: p.status == 'معتمد' ? primarySoft : amber.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  p.status,
-                  style: GoogleFonts.cairo(
-                    color: p.status == 'معتمد' ? primary : amber,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: approved ? primary : amber,
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 6),
+                  Text(
+                    p.status,
+                    style: GoogleFonts.cairo(
+                      color: approved ? primary : amber,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Row(
             children: [
-              Expanded(child: _kv('الارتداد', '${p.setback} م')),
-              Expanded(child: _kv('الأدوار', '${p.floors} أدوار')),
-              Expanded(child: _kv('التصاريح', '${p.permits} تصريح')),
+              Expanded(
+                child: _planStat('الارتداد', '${p.setback.toStringAsFixed(1)} م'),
+              ),
+              Expanded(
+                child: _planStat('الأدوار', '${p.floors} أدوار'),
+              ),
+              Expanded(
+                child: _planStat('التصاريح', '${p.permits} تصريح'),
+              ),
             ],
           ),
         ],
@@ -501,15 +445,18 @@ class OfficialSourcesScreen extends StatelessWidget {
     );
   }
 
-  Widget _kv(String label, String value) {
+  Widget _planStat(String label, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: GoogleFonts.cairo(color: textMuted, fontSize: 10)),
-        const SizedBox(height: 2),
         Text(
           value,
-          style: GoogleFonts.cairo(color: textLight, fontSize: 12, fontWeight: FontWeight.bold),
+          style: _tnum(14, color: textLight),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: GoogleFonts.cairo(color: textMuted, fontSize: 10),
         ),
       ],
     );
